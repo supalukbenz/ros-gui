@@ -43,14 +43,7 @@ export default new Vuex.Store({
         port: '9090',
       },
     ],
-    robotConnected: {
-      id: 2,
-      robotName: 'AVIS',
-      ip: '10.204.162.48',
-      username: 'benz',
-      password: '',
-      port: '9090',
-    },
+    robotConnected: {},
   },
   getters: {
     getRobotList: state => {
@@ -61,6 +54,9 @@ export default new Vuex.Store({
     },
     getCloseModal: state => {
       return state.closeModal;
+    },
+    getROS: state => {
+      return state.ros;
     },
   },
   mutations: {

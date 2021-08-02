@@ -1,9 +1,6 @@
 <template>
   <div class="bg-gray-200 w-72 min-h-35 text-left p-4">
-    <div>
-      <div class="font-bold text-xl">{{ robotConnected.robotName }}</div>
-      <div class="font-bold">ws://{{ robotConnected.ip }}:{{ robotConnected.port }}</div>
-    </div>
+    <div class="font-bold">Tools</div>
   </div>
 </template>
 

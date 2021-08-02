@@ -1,7 +1,7 @@
 <template>
-  <div class="m-4 flex flex-row">
+  <div class="m-10 flex flex-row">
     <SideBar></SideBar>
-    <div>connect</div>
+    <div class="m-4">connect</div>
   </div>
 </template>
 

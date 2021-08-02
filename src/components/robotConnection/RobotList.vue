@@ -2,35 +2,8 @@
   <div>
     <Loading v-show="loadingState"></Loading>
     <div class="flex justify-end">
-      <!-- <div
-        v-if="response && connectionState"
-        :class="{ fadeInOut: response && connectionState }"
-        class="py-2 px-4 bg-green-300 absolute color-green-700 font-semibold"
-        ref="resCard"
-      >
-        {{ response.data }}
-      </div> -->
-      <div
-        v-show="responseMessage !== ''"
-        :class="[
-          errorState ? 'bg-red-300' : 'bg-green-300',
-          responseMessage !== '' ? 'transformLeft' : 'fadeInOut',
-        ]"
-        id="responseCard"
-        class="
-          responseCard
-          py-3
-          w-96
-          text-left
-          rounded-tl-3xl rounded-bl-3xl
-          px-4
-          absolute
-          font-semibold
-          z-10
-        "
-        ref="resCard"
-      >
-        {{ responseMessage }}
+      <div v-show="responseMessage !== ''">
+        <StatusCard :responseMessage="responseMessage" :errorState="errorState"></StatusCard>
       </div>
     </div>
     <div class="m-10 flex justify-center">
@@ -192,6 +165,7 @@ import { connectToRobot, disconnectToRobot } from '@/api/connection';
 import ROSLIB from 'roslib';
 import RobotFormModal from '@/components/robotConnection/RobotFormModal.vue';
 import Loading from '@/components/main/Loading.vue';
+import StatusCard from '@/components/main/StatusCard.vue';
 import $ from 'jquery';
 
 export default {
@@ -205,6 +179,7 @@ export default {
   components: {
     RobotFormModal,
     Loading,
+    StatusCard,
   },
   data() {
     return {
@@ -216,7 +191,6 @@ export default {
       connectionState: false,
       responseMessage: '',
       connectionMessage: '',
-      robotSelectedInfo: {},
       errorState: false,
       robotEditSelected: null,
       editState: false,
@@ -250,6 +224,7 @@ export default {
           console.log('Error', error);
           this.disconnect();
         });
+
         this.ros.on('close', () => {
           this.connected = false;
           console.log('Connection to websocket server closed.');
@@ -257,18 +232,19 @@ export default {
       }
     },
     async disconnect() {
-      await disconnectToRobot(this.robotSelectedInfo);
-      this.setRobotConnectedEmpty();
-    },
-    setRobotConnectedEmpty() {
-      this.robotSelectedInfo = {};
+      const robotForm = {
+        username: this.robotConnected.username,
+        password: this.robotConnected.password,
+        ip: this.robotConnected.ip,
+      };
+      await disconnectToRobot(robotForm);
       this.$store.dispatch('updateRobotConnected', {});
     },
+
     async handleRobotDisconnect() {
       if (this.ros) {
         this.ros.close();
       }
-      console.log('robotSelectedInfo', this.robotSelectedInfo);
       this.responseMessage = '';
       this.disconnect();
     },
@@ -281,20 +257,23 @@ export default {
       let response = {};
       try {
         console.log(robot);
-        this.robotSelectedInfo = {
+        const robotSelectedInfo = {
           username: robot.username,
           password: robot.password,
           ip: robot.ip,
+          port: robot.port,
         };
-        response = await connectToRobot(this.robotSelectedInfo);
+        response = await connectToRobot(robotSelectedInfo);
         console.log('this.response', response);
         if (response.status === 200) {
-          // await this.sleep(20000);
           this.$store.dispatch('updateRobotConnected', robot);
           console.log('connect');
           const ws_address = `ws://${robot.ip}:${robot.port}`;
-          this.connect(ws_address);
-
+          await this.connect(ws_address);
+          this.$router.push({
+            name: 'RobotConnected',
+            params: { robotName: robot.robotName },
+          });
           this.responseMessage = 'Connected to the robot.';
         }
       } catch (err) {

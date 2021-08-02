@@ -6,7 +6,7 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: '/',
+    path: '/robot-list',
     name: 'Home',
     component: Home,
   },
@@ -29,6 +29,16 @@ const router = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.path == '/') {
+    next({
+      name: 'Home',
+    });
+  } else {
+    next();
+  }
 });
 
 export default router;
