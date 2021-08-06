@@ -88,6 +88,7 @@ export default {
   computed: {
     ...mapGetters({
       robotList: 'getRobotList',
+      closeModal: 'getCloseModal',
     }),
   },
   props: {
@@ -107,10 +108,13 @@ export default {
     handleRobotFormSubmit() {
       const currentRobotList = this.robotList;
       if (!this.editState) {
-        const sortedRobotList = currentRobotList.sort((a, b) => a.id - b.id);
-        const robotNextId = sortedRobotList[currentRobotList.length - 1].id + 1;
+        let id = 1;
+        if (currentRobotList.length > 0) {
+          const sortedRobotList = currentRobotList.sort((a, b) => a.id - b.id);
+          id = sortedRobotList[currentRobotList.length - 1].id + 1;
+        }
         const form = {
-          id: robotNextId,
+          id: id,
           robotName: this.robotName,
           ip: this.robotIP,
           username: this.username,
@@ -131,6 +135,7 @@ export default {
         });
       }
       this.$store.dispatch('updateRobotList', currentRobotList);
+      this.setEmptyRobotForm();
       this.$store.dispatch('updateCloseModal', true);
     },
     handleRemoveRobot() {
@@ -139,6 +144,13 @@ export default {
       currentRobotList.splice(index, 1);
       this.$store.dispatch('updateRobotList', currentRobotList);
       this.$store.dispatch('updateCloseModal', true);
+    },
+    setEmptyRobotForm() {
+      this.robotName = '';
+      this.robotIP = '';
+      this.username = '';
+      this.password = '';
+      this.port = '';
     },
   },
   watch: {
@@ -150,11 +162,8 @@ export default {
         this.password = this.robot.password;
         this.port = this.robot.port;
       } else {
-        this.robotName = '';
-        this.robotIP = '';
-        this.username = '';
-        this.password = '';
-        this.port = '';
+        console.log('val', val);
+        this.setEmptyRobotForm();
       }
     },
   },

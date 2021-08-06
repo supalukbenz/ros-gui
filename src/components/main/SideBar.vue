@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-200 w-72 min-h-35 text-left p-4">
+  <div class="bg-gray-200 w-48 min-h-35 text-left p-4">
     <div class="font-bold">Tools</div>
   </div>
 </template>

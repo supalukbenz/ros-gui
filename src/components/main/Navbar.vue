@@ -62,11 +62,11 @@ export default {
       };
       await disconnectToRobot(robotForm);
       this.$store.dispatch('updateRobotConnected', {});
+      this.ros.close();
+      this.$store.dispatch('updateROS', null);
       this.$router.push({
         name: 'Home',
       });
-      this.ros.close();
-      this.$store.dispatch('updateROS', null);
     },
   },
 };

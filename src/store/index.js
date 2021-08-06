@@ -3,10 +3,16 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
+// function checkTypeObject(item) {
+//   if (typeof item === 'object') {
+//     return [];
+//   }
+// }
+
 export default new Vuex.Store({
   state: {
     ws_address: '',
-    ros: null,
+    ros: JSON.parse(localStorage.getItem('ros')) || null,
     closeModal: false,
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
     robots: [
@@ -44,6 +50,9 @@ export default new Vuex.Store({
       },
     ],
     robotConnected: {},
+    topicList: { topics: [], types: [] },
+    msgList: {},
+    data: { selection: [], source: [], expanded: [] },
   },
   getters: {
     getRobotList: state => {
@@ -58,6 +67,15 @@ export default new Vuex.Store({
     getROS: state => {
       return state.ros;
     },
+    getTopicList: state => {
+      return state.topicList;
+    },
+    getMsgList: state => {
+      return state.msgList;
+    },
+    getDataTopic: state => {
+      return state.data;
+    },
   },
   mutations: {
     setWSAddress(state, payload) {
@@ -65,6 +83,7 @@ export default new Vuex.Store({
     },
     setROS(state, payload) {
       state.ros = payload;
+      localStorage.setItem('ros', JSON.stringify(payload));
     },
     setRobotList(state, payload) {
       state.robotList = payload;
@@ -75,6 +94,15 @@ export default new Vuex.Store({
     },
     setCloseModal(state, payload) {
       state.closeModal = payload;
+    },
+    setTopicList(state, payload) {
+      state.topicList = payload;
+    },
+    setMsgList(state, payload) {
+      state.msgList = payload;
+    },
+    setDataTopic(state, payload) {
+      state.data = payload;
     },
   },
   actions: {
@@ -92,6 +120,15 @@ export default new Vuex.Store({
     },
     updateCloseModal({ commit }, payload) {
       commit('setCloseModal', payload);
+    },
+    updateTopicList({ commit }, payload) {
+      commit('setTopicList', payload);
+    },
+    updateMsgList({ commit }, payload) {
+      commit('setMsgList', payload);
+    },
+    updateDataTopic({ commit }, payload) {
+      commit('setDataTopic', payload);
     },
   },
   modules: {},

@@ -9,6 +9,9 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.9.2",
+    "@syncfusion/ej2-base": "^19.2.51",
+    "@syncfusion/ej2-vue-buttons": "^19.2.47",
+    "@syncfusion/ej2-vue-navigations": "^19.2.51",
     "@vue/eslint-config-prettier": "^6.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
@@ -16,9 +19,14 @@
     "postcss": "^8.3.5",
     "prettier": "^2.3.1",
     "tailwindcss": "^2.2.4",
+    "vis-data": "^7.1.2",
+    "vis-network": "^9.0.5",
+    "vis-util": "^5.0.2",
     "vue": "^2.6.11",
+    "vue-chartjs": "^3.5.1",
     "vue-ros3djs": "^1.1.1",
     "vue-router": "^3.2.0",
+    "vue-vis-network": "^1.0.2",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
@@ -31,6 +39,9 @@
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
     "bootstrap": "^4.5.3",
+    "chart.js": "^3.5.0",
+    "chartjs-plugin-streaming": "^2.0.0",
+    "chartjs-plugin-zoom": "^1.1.1",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "eventemitter2": "^6.4.4",
@@ -42,6 +53,7 @@
     "popper.js": "^1.16.1",
     "roslib": "^1.1.0",
     "sass-loader": "^12.1.0",
+    "vis": "^4.21.0-EOL",
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.45.0",
     "webpack-cli": "^4.7.2"

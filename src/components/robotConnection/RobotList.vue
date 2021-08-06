@@ -2,8 +2,28 @@
   <div>
     <Loading v-show="loadingState"></Loading>
     <div class="flex justify-end">
-      <div v-show="responseMessage !== ''">
-        <StatusCard :responseMessage="responseMessage" :errorState="errorState"></StatusCard>
+      <!-- <StatusCard :responseMessage="responseMessage" :errorState="errorState"></StatusCard> -->
+      <div
+        v-show="responseMessage !== ''"
+        :class="[
+          errorState ? 'bg-red-300' : 'bg-green-300',
+          responseMessage !== '' ? 'transformLeft' : 'fadeInOut',
+        ]"
+        id="responseCard"
+        class="
+          responseCard
+          py-3
+          w-96
+          text-left
+          rounded-tl-3xl rounded-bl-3xl
+          px-4
+          absolute
+          font-semibold
+          z-10
+        "
+        ref="resCard"
+      >
+        {{ responseMessage }}
       </div>
     </div>
     <div class="m-10 flex justify-center">
@@ -109,6 +129,9 @@
                       >
                         <i class="fas fa-edit"></i>
                       </a>
+                      <button class="border mr-2" @click="clickedSimulation(robot)">
+                        simulate
+                      </button>
                       <button
                         v-if="robot.id !== robotConnected.id"
                         @click="handleRobotConnection(robot)"
@@ -165,7 +188,7 @@ import { connectToRobot, disconnectToRobot } from '@/api/connection';
 import ROSLIB from 'roslib';
 import RobotFormModal from '@/components/robotConnection/RobotFormModal.vue';
 import Loading from '@/components/main/Loading.vue';
-import StatusCard from '@/components/main/StatusCard.vue';
+// import StatusCard from '@/components/main/StatusCard.vue';
 import $ from 'jquery';
 
 export default {
@@ -174,12 +197,17 @@ export default {
       robotList: 'getRobotList',
       robotConnected: 'getRobotConnected',
       closeModal: 'getCloseModal',
+      msgList: 'getMsgList',
+      topicList: 'getTopicList',
     }),
   },
   components: {
     RobotFormModal,
     Loading,
-    StatusCard,
+    // StatusCard,
+  },
+  beforeCreate() {
+    this.responseMessage = '';
   },
   data() {
     return {
@@ -200,22 +228,60 @@ export default {
     sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
+    isEmptyTopicList() {
+      return this.topicList.topics.length <= 0;
+    },
+    isEmptyMsgList() {
+      return Object.keys(this.msgList).length <= 0;
+    },
     clickedEditRobot(robot) {
       this.editState = true;
       this.robotEditSelected = robot;
     },
-    connect(ws_address) {
+    async getMsgROSInfo(msgName) {
+      const msgDetails = new ROSLIB.Service({
+        ros: this.ros,
+        name: '/rosapi/message_details',
+        serviceType: 'rosapi/MessageDetails',
+      });
+      const req = new ROSLIB.ServiceRequest({
+        type: msgName,
+      });
+      msgDetails.callService(req, result => {
+        let currentMsgList = this.msgList;
+        result.typedefs.forEach(data => {
+          currentMsgList[data.type] = data;
+        });
+        const parsedObj = JSON.parse(JSON.stringify(currentMsgList));
+        this.$store.dispatch('updateMsgList', parsedObj);
+      });
+      console.log('this.$store.dispatch msgDetails', Object.keys(this.msgList).length > 0);
+      console.log('this.msg length', Object.keys(this.msgList).length);
+    },
+    setTopicList() {
+      this.ros.getTopics(topic => {
+        topic.types.forEach(async msgName => {
+          if (msgName in this.msgList === false) {
+            await this.getMsgROSInfo(msgName);
+          }
+        });
+
+        this.$store.dispatch('updateTopicList', topic);
+      });
+    },
+    async connect(ws_address) {
       if (ws_address !== '') {
-        console.log('ws_address', ws_address);
-        this.ros = new ROSLIB.Ros({
+        this.ros = await new ROSLIB.Ros({
           // url: `ws://${ws_address}:9090`,
           url: ws_address,
         });
+
         this.ros.on('connection', () => {
           this.connected = true;
+          this.errorState = false;
           this.$store.dispatch('updateWSAddress', ws_address);
           this.$store.dispatch('updateROS', this.ros);
-          console.log('connect');
+          this.setTopicList();
         });
 
         this.ros.on('error', error => {
@@ -231,14 +297,28 @@ export default {
         });
       }
     },
+    async clickedSimulation(robot) {
+      this.loadingState = true;
+      this.$store.dispatch('updateRobotConnected', robot);
+      const address = `wss://${robot.ip}`;
+      await this.connect(address);
+      console.log('this.msg length', Object.keys(this.msgList).length);
+      this.loadingState = false;
+
+      this.$router.push({
+        name: 'RobotConnected',
+        params: { robotName: robot.robotName },
+      });
+    },
     async disconnect() {
+      const robot = this.robotConnected;
+      this.$store.dispatch('updateRobotConnected', {});
       const robotForm = {
-        username: this.robotConnected.username,
-        password: this.robotConnected.password,
-        ip: this.robotConnected.ip,
+        username: robot.username,
+        password: robot.password,
+        ip: robot.ip,
       };
       await disconnectToRobot(robotForm);
-      this.$store.dispatch('updateRobotConnected', {});
     },
 
     async handleRobotDisconnect() {
@@ -270,11 +350,11 @@ export default {
           console.log('connect');
           const ws_address = `ws://${robot.ip}:${robot.port}`;
           await this.connect(ws_address);
+          this.responseMessage = 'Connected to the robot.';
           this.$router.push({
             name: 'RobotConnected',
             params: { robotName: robot.robotName },
           });
-          this.responseMessage = 'Connected to the robot.';
         }
       } catch (err) {
         this.errorState = true;
