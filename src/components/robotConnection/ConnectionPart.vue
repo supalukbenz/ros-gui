@@ -1,12 +1,12 @@
 <template>
-  <div class="m-24">
+  <div>
     <div class="flex">
-      <div class="w-1/2 mr-2">
-        <div class="flex justify-start flex-col">
-          <div class="text-left font-bold">ROSbridge websocket address</div>
-          <input v-model="ws_address" type="text" class="border p-2 w-3/4" />
+      <div class="mr-2">
+        <div class="flex justify-start flex-col text-left">
+          <div class="font-bold">ROSbridge websocket address</div>
+          <div>{{ rosbridgeURL }}</div>
         </div>
-        <div class="mt-10 flex justify-start">
+        <!-- <div class="mt-10 flex justify-start">
           <button
             @click="connect"
             v-if="!connected"
@@ -44,22 +44,15 @@
           >
             Disconnect
           </button>
-        </div>
+        </div> -->
       </div>
-      <div class="border w-1/2 bg-gray-100 p-4 text-left ml-4">
+      <!-- <div class="border w-1/2 bg-gray-100 p-4 text-left ml-4">
         <div>
           <span class="text-xl">Status: </span>
           <span v-if="connected" class="font-bold text-xl">Connected</span>
           <span v-else class="font-bold text-xl">Not connected</span>
         </div>
-        <!-- <div>
-          <span>IP: </span>
-          <span v-if="connected && ws_address !== ''" class="font-bold text-sm">{{
-            ws_address
-          }}</span>
-          <span v-else class="font-bold">-</span>
-        </div> -->
-      </div>
+      </div> -->
     </div>
     <div v-if="connected" class="m-20 h-64 grid grid-rows-3 grid-cols-3 gap-4">
       <div></div>
@@ -188,6 +181,7 @@
 
 <script>
 import ROSLIB from 'roslib';
+import { mapGetters } from 'vuex';
 // import JoystickPart from '@/components/JoystickPart.vue';
 
 export default {
@@ -196,39 +190,51 @@ export default {
   },
   data() {
     return {
-      ros: null,
       ws_address: '',
       connected: false,
       topic: null,
       message: null,
     };
   },
+  computed: {
+    ...mapGetters({
+      ros: 'getROS',
+      rosbridgeURL: 'getRosbridgeURL',
+    }),
+  },
+  async mounted() {
+    await this.updateRosConnection();
+    this.connected = true;
+  },
   methods: {
-    connect() {
-      if (this.ws_address !== '') {
-        this.ros = new ROSLIB.Ros({
-          // url: `ws://${this.ws_address}:9090`,
-          url: this.ws_address,
-        });
-        this.ros.on('connection', () => {
-          this.connected = true;
-          this.$store.dispatch('updateWSAddress', this.ws_address);
-          this.$store.dispatch('updateROS', this.ros);
-        });
+    async connect() {
+      if (this.rosbridgeURL !== '') {
+        await this.updateRosConnection();
+        //   this.ros = new ROSLIB.Ros({
+        //     // url: `ws://${this.ws_address}:9090`,
+        //     url: this.ws_address,
+        //   });
+        //   this.ros.on('connection', () => {
+        //     this.connected = true;
+        //     this.$store.dispatch('updateWSAddress', this.ws_address);
+        //     this.$store.dispatch('updateROS', this.ros);
+        //     this.handleTopic();
+        //   });
 
-        this.ros.on('error', error => {
-          console.log('Error connecting to websocket server: ', error);
-        });
-        this.ros.on('close', () => {
-          this.connected = false;
-          console.log('Connection to websocket server closed.');
-        });
+        //   this.ros.on('error', error => {
+        //     console.log('Error connecting to websocket server: ', error);
+        //   });
+        //   this.ros.on('close', () => {
+        //     this.connected = false;
+        //     console.log('Connection to websocket server closed.');
+        //   });
       }
     },
     disconnect() {
       this.ros.close();
     },
-    setTopic() {
+    async setTopic() {
+      await this.updateRosConnection();
       this.topic = new ROSLIB.Topic({
         ros: this.ros,
         name: '/cmd_vel',
@@ -276,7 +282,12 @@ export default {
       this.setTopic();
       this.topic.publish(this.message);
     },
-    handleTopic() {
+    updateRosConnection() {
+      // if (!this.ros.isConnected) {
+      this.ros.connect(this.rosbridgeURL);
+    },
+    async handleTopic() {
+      await this.updateRosConnection();
       let cmdVel = new ROSLIB.Topic({
         ros: this.ros,
         name: '/cmd_vel',

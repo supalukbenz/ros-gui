@@ -14,6 +14,7 @@ export default new Vuex.Store({
     ws_address: '',
     ros: JSON.parse(localStorage.getItem('ros')) || null,
     closeModal: false,
+    rosbridgeURL: JSON.parse(localStorage.getItem('rosbridgeURL')) || '',
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
     robots: [
       {
@@ -64,6 +65,9 @@ export default new Vuex.Store({
     getCloseModal: state => {
       return state.closeModal;
     },
+    getRosbridgeURL: state => {
+      return state.rosbridgeURL;
+    },
     getROS: state => {
       return state.ros;
     },
@@ -104,6 +108,10 @@ export default new Vuex.Store({
     setDataTopic(state, payload) {
       state.data = payload;
     },
+    setRosbridgeURL(state, payload) {
+      state.rosbridgeURL = payload;
+      localStorage.setItem('rosbridgeURL', JSON.stringify(payload));
+    },
   },
   actions: {
     updateWSAddress({ commit }, payload) {
@@ -129,6 +137,9 @@ export default new Vuex.Store({
     },
     updateDataTopic({ commit }, payload) {
       commit('setDataTopic', payload);
+    },
+    updateRosbridgeURL({ commit }, payload) {
+      commit('setRosbridgeURL', payload);
     },
   },
   modules: {},

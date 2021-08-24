@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-10">
+  <div class="my-2">
     <div class="control_wrapper w-72">
       <!-- <ejs-treeview
         class="text-left"
@@ -9,11 +9,41 @@
         :checkedNodes="checkedNodes"
         :nodeChecked="nodeChecked"
       ></ejs-treeview> -->
+      <div class="flex justify-start">
+        <button
+          type="button"
+          data-toggle="modal"
+          data-target="#topicModal"
+          class="border py-1 px-2 bg-blue-400 text-white font-bold"
+          @click="handleSetTopic()"
+        >
+          Set topic
+        </button>
+      </div>
+      <div class="modal fade" id="topicModal" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Choose Topic</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <TopicListModal v-if="addTopicState"></TopicListModal>
+              <!-- <Loading v-if="loadingState"></Loading> -->
+            </div>
+            <div class="modal-footer"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 <script>
 import Vue from 'vue';
+import TopicListModal from '@/components/graph/TopicListModal.vue';
+// import Loading from '@/components/main/Loading.vue';
 import { TreeViewPlugin } from '@syncfusion/ej2-vue-navigations';
 import { mapGetters } from 'vuex';
 
@@ -21,14 +51,18 @@ Vue.use(TreeViewPlugin);
 
 export default {
   props: {
-    msgList: Object,
-    topicList: Object,
+    // msgList: Object,
+    // topicList: Object,
+  },
+  components: {
+    TopicListModal,
+    // Loading,
   },
   computed: {
     ...mapGetters({
       robotConnected: 'getRobotConnected',
-      // msgList: 'getMsgList',
-      // topicList: 'getTopicList',
+      msgList: 'getMsgList',
+      topicList: 'getTopicList',
       data: 'getDataTopic',
     }),
   },
@@ -67,22 +101,35 @@ export default {
         text: 'name',
         hasChildren: 'hasChild',
       },
+      addTopicState: false,
       checkedNodes: ['2', '6'],
+      loadingState: false,
     };
   },
-  mounted() {
-    this.addTopic();
+  async mounted() {
+    // console.log('topicList.topics', this.topicList.topics.length);
+    // this.addTopicState = true;
+    await this.addTopic();
+    // this.loadingState = false;
+    this.addTopicState = true;
   },
   methods: {
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
     nodeChecked() {
       var treeObj = document.getElementById('treeview').ej2_instances[0];
       console.log("The checked node's id: " + treeObj.checkedNodes); // To alert the checked node's id.
     },
-    addTopic() {
-      console.log('add topic');
+    async handleSetTopic() {
+      // this.loadingState = true;
+      // await this.addTopic();
+      // await this.sleep(3000);
+      // this.loadingState = false;
+      // this.addTopicState = true;
+    },
+    async addTopic() {
       const topics = this.topicList.topics;
-      console.log('topicList', this.topicList);
-      console.log('topics', topics);
       const types = this.topicList.types;
       for (let i in topics) {
         console.log('i', i);
@@ -99,7 +146,7 @@ export default {
           // add only new topics
           console.log('newly added topic: ' + topics[i]);
           const showCheckbox = true;
-          const children = this.addExpandTopics(topics[i], types[i], topics[i], showCheckbox);
+          const children = await this.addExpandTopics(topics[i], types[i], topics[i], showCheckbox);
           console.log('children, ', children);
           if (children && children.length > 0) {
             const currentData = this.data;
@@ -116,7 +163,7 @@ export default {
         }
       }
     },
-    addExpandTopics(topic_name, topic_type, root_name, checkbox) {
+    async addExpandTopics(topic_name, topic_type, root_name, checkbox) {
       let showCheckbox = checkbox;
       const typeMsg = [
         'bool',
@@ -131,14 +178,10 @@ export default {
         'float64',
       ];
       const msg = this.msgList[String(topic_type)];
-      console.log('topic_type', topic_type);
-      console.log('this.msgList[topic_type]', msg);
-      console.log('this.msgList', this.msgList);
       if (!msg) {
         return;
       }
       let children = [];
-      console.log('msg.fieldtypes', msg.fieldtypes);
       for (let i in msg.fieldtypes) {
         let field_type = msg.fieldtypes[i];
         const field_name = topic_name + '/' + msg.fieldnames[i];
@@ -163,7 +206,12 @@ export default {
             if (msg.fieldarraylen[i] !== -1) {
               showCheckbox = false;
             }
-            const result = this.addExpandTopics(field_name, field_type, root_name, showCheckbox);
+            const result = await this.addExpandTopics(
+              field_name,
+              field_type,
+              root_name,
+              showCheckbox
+            );
             if (result.length > 0) {
               children.push({
                 value: field_name,

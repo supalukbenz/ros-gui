@@ -23,6 +23,22 @@ const routes = [
     name: 'RobotConnected',
     component: () => import(/* webpackChunkName: "robot" */ '../views/RobotConnectedHome.vue'),
   },
+  {
+    path: '/robot/:robotName/customize-button',
+    name: 'CustomizeButton',
+    component: () =>
+      import(/* webpackChunkName: "customizeButton" */ '../views/CustomizeButton.vue'),
+  },
+  {
+    path: '/robot/:robotName/graph',
+    name: 'Graph',
+    component: () => import(/* webpackChunkName: "graph" */ '../views/Graph.vue'),
+  },
+  {
+    path: '/robot/:robotName/streaming-video',
+    name: 'StreamingVideo',
+    component: () => import(/* webpackChunkName: "streamingVideo" */ '../views/StreamingVideo.vue'),
+  },
 ];
 
 const router = new VueRouter({

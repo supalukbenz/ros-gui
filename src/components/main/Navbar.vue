@@ -1,10 +1,12 @@
 <template>
-  <div class="h-20 bg-blue-custom flex items-center px-10 flex-row justify-between">
-    <div class="flex items-end">
-      <img class="w-10 h-auto" src="@/assets/images/robot-icon.png" alt="robotIcon" />
-      <div class="font-bold text-2xl text-blue">ROS</div>
-      <div class="text-2xl text-white">GUI</div>
-    </div>
+  <div class="h-20 bg-blue-custom flex items-center px-10 flex-row justify-between z-50 relative">
+    <router-link class="cursor-pointer" to="/">
+      <div class="flex items-end">
+        <img class="w-10 h-auto" src="@/assets/images/robot-icon.png" alt="robotIcon" />
+        <div class="font-bold text-2xl text-blue">ROS</div>
+        <div class="text-2xl text-white">GUI</div>
+      </div>
+    </router-link>
     <div class="flex items-end">
       <div class="mr-4 font-bold text-xl text-white hover:underline cursor-pointer">Robot List</div>
       <div v-show="objectNotEmpty(robotConnected)">

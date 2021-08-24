@@ -1,19 +1,17 @@
 <template>
   <div>
-    <CheckboxTopic
-      v-if="!isEmptyTopicList() && !isEmptyMsgList()"
-      :topicList="topicList"
-      :msgList="msgList"
-    ></CheckboxTopic>
+    <CheckboxTopic></CheckboxTopic>
   </div>
 </template>
 
 <script>
 import CheckboxTopic from '@/components/graph/CheckboxTopic.vue';
+// import TopicListModal from '@/components/graph/TopicListModal.vue';
 import { mapGetters } from 'vuex';
 export default {
   components: {
     CheckboxTopic,
+    // TopicListModal,
   },
   computed: {
     ...mapGetters({
@@ -22,14 +20,15 @@ export default {
       ros: 'getROS',
     }),
   },
-  methods: {
-    isEmptyTopicList() {
-      return this.topicList.topics.length <= 0;
-    },
-    isEmptyMsgList() {
-      console.log('Object.keys(this.msgList).length > 0', Object.keys(this.msgList).length > 0);
-      return Object.keys(this.msgList).length <= 0;
-    },
-  },
+  methods: {},
 };
 </script>
+
+<style scoped>
+@media screen and (max-width: 992px) {
+  .modal-dialog {
+    margin: 4rem;
+    max-width: 100%;
+  }
+}
+</style>

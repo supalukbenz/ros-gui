@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Loading v-show="loadingState"></Loading>
+    <Loading v-if="loadingState"></Loading>
     <div class="flex justify-end">
       <!-- <StatusCard :responseMessage="responseMessage" :errorState="errorState"></StatusCard> -->
       <div
@@ -58,7 +58,7 @@
                   >
                     Robot
                   </th>
-                  <th
+                  <!-- <th
                     scope="col"
                     class="
                       px-6
@@ -72,7 +72,7 @@
                     "
                   >
                     Status
-                  </th>
+                  </th> -->
                   <th scope="col" class="relative px-6 py-3 w-1/4">
                     <span class="sr-only">Edit</span>
                   </th>
@@ -86,7 +86,7 @@
                       <div class="text-xs text-gray-500">{{ robot.ip }}:{{ robot.port }}</div>
                     </div>
                   </td>
-                  <td class="px-6 py-4">
+                  <!-- <td class="px-6 py-4">
                     <span
                       v-if="robot.id === robotConnected.id"
                       class="
@@ -117,7 +117,7 @@
                     >
                       Unavailable
                     </span>
-                  </td>
+                  </td> -->
                   <td class="px-6 py-4 text-right text-sm font-medium">
                     <div class="flex justify-between items-center">
                       <a
@@ -129,9 +129,9 @@
                       >
                         <i class="fas fa-edit"></i>
                       </a>
-                      <button class="border mr-2" @click="clickedSimulation(robot)">
+                      <!-- <button class="border mr-2" @click="clickedSimulation(robot)">
                         simulate
-                      </button>
+                      </button> -->
                       <button
                         v-if="robot.id !== robotConnected.id"
                         @click="handleRobotConnection(robot)"
@@ -200,6 +200,9 @@ export default {
       msgList: 'getMsgList',
       topicList: 'getTopicList',
     }),
+    setROSInfo() {
+      return this.msg && this.topics && this.connectionState;
+    },
   },
   components: {
     RobotFormModal,
@@ -216,6 +219,8 @@ export default {
       loadingState: false,
       message: null,
       status: null,
+      topics: null,
+      msg: null,
       connectionState: false,
       responseMessage: '',
       connectionMessage: '',
@@ -254,9 +259,8 @@ export default {
         });
         const parsedObj = JSON.parse(JSON.stringify(currentMsgList));
         this.$store.dispatch('updateMsgList', parsedObj);
+        this.msg = parsedObj;
       });
-      console.log('this.$store.dispatch msgDetails', Object.keys(this.msgList).length > 0);
-      console.log('this.msg length', Object.keys(this.msgList).length);
     },
     setTopicList() {
       this.ros.getTopics(topic => {
@@ -265,8 +269,8 @@ export default {
             await this.getMsgROSInfo(msgName);
           }
         });
-
         this.$store.dispatch('updateTopicList', topic);
+        this.topics = topic;
       });
     },
     async connect(ws_address) {
@@ -282,7 +286,11 @@ export default {
           this.$store.dispatch('updateWSAddress', ws_address);
           this.$store.dispatch('updateROS', this.ros);
           this.setTopicList();
+          // setTimeout(() => {
+          //   this.setTopicList();
+          // }, 5000);
         });
+        console.log('ros robotlist, ', this.ros);
 
         this.ros.on('error', error => {
           // this.responseMessage = 'Error connecting to websocket server';
@@ -299,16 +307,20 @@ export default {
     },
     async clickedSimulation(robot) {
       this.loadingState = true;
+      console.log('this.loadingState', this.loadingState);
+      this.connectionState = true;
       this.$store.dispatch('updateRobotConnected', robot);
       const address = `wss://${robot.ip}`;
+      this.$store.dispatch('updateRosbridgeURL', address);
       await this.connect(address);
-      console.log('this.msg length', Object.keys(this.msgList).length);
+      this.sleep(2000);
       this.loadingState = false;
-
-      this.$router.push({
-        name: 'RobotConnected',
-        params: { robotName: robot.robotName },
-      });
+      // if (this.msg && this.topics) {
+      //   this.$router.push({
+      //     name: 'RobotConnected',
+      //     params: { robotName: robot.robotName },
+      //   });
+      // }
     },
     async disconnect() {
       const robot = this.robotConnected;
@@ -334,6 +346,7 @@ export default {
     },
     async handleRobotConnection(robot) {
       this.loadingState = true;
+      this.connectionState = true;
       let response = {};
       try {
         console.log(robot);
@@ -349,10 +362,11 @@ export default {
           this.$store.dispatch('updateRobotConnected', robot);
           console.log('connect');
           const ws_address = `ws://${robot.ip}:${robot.port}`;
+          this.$store.dispatch('updateRosbridgeURL', ws_address);
           await this.connect(ws_address);
           this.responseMessage = 'Connected to the robot.';
           this.$router.push({
-            name: 'RobotConnected',
+            name: 'Graph',
             params: { robotName: robot.robotName },
           });
         }
@@ -367,13 +381,21 @@ export default {
       }
       this.loadingState = false;
       this.handleConnectionMessage();
-      this.connectionState = false;
     },
   },
   watch: {
     closeModal(val) {
       if (val) {
         $('#modal').modal('hide');
+      }
+    },
+    setROSInfo(val) {
+      if (val) {
+        // console.log('info');
+        this.$router.push({
+          name: 'Graph',
+          params: { robotName: this.robotConnected.robotName },
+        });
       }
     },
   },

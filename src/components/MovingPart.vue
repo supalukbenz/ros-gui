@@ -1,6 +1,46 @@
 <template>
-  <div class="h-64 grid grid-rows-3 grid-cols-3 gap-4">
-    <div>
+  <div class="m-20 h-64 grid grid-rows-3 grid-cols-3 gap-4">
+    <div></div>
+    <div class="flex justify-center items-center">
+      <button
+        class="
+          border-2
+          py-2
+          w-28
+          bg-gray-500
+          border-gray-500
+          hover:bg-white
+          text-white
+          hover:text-gray-500
+          font-bold
+        "
+        type="button"
+        @click="forward()"
+      >
+        Forward
+      </button>
+    </div>
+    <div></div>
+    <div class="flex justify-center items-center">
+      <button
+        class="
+          border-2
+          py-2
+          w-28
+          bg-gray-500
+          border-gray-500
+          hover:bg-white
+          text-white
+          hover:text-gray-500
+          font-bold
+        "
+        type="button"
+        @click="turnLeft()"
+      >
+        Left
+      </button>
+    </div>
+    <div class="flex justify-center items-center">
       <button
         class="
           border-2
@@ -14,12 +54,49 @@
           font-bold
         "
         type="button"
+        @click="stop()"
       >
-        Disconnect
+        Stop
       </button>
     </div>
-    <div>1</div>
-    <div>1</div>
-    <div>1</div>
+    <div class="flex justify-center items-center">
+      <button
+        class="
+          border-2
+          py-2
+          w-28
+          bg-gray-500
+          border-gray-500
+          hover:bg-white
+          text-white
+          hover:text-gray-500
+          font-bold
+        "
+        type="button"
+        @click="turnRight()"
+      >
+        Right
+      </button>
+    </div>
+    <div></div>
+    <div class="flex justify-center items-center">
+      <button
+        class="
+          border-2
+          py-2
+          w-28
+          bg-gray-500
+          border-gray-500
+          hover:bg-white
+          text-white
+          hover:text-gray-500
+          font-bold
+        "
+        type="button"
+        @click="backward()"
+      >
+        Backward
+      </button>
+    </div>
   </div>
 </template>
