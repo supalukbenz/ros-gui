@@ -9,9 +9,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.9.2",
-    "@syncfusion/ej2-base": "^19.2.51",
-    "@syncfusion/ej2-vue-buttons": "^19.2.47",
-    "@syncfusion/ej2-vue-navigations": "^19.2.51",
+    "@riophae/vue-treeselect": "^0.4.0",
     "@vue/eslint-config-prettier": "^6.0.0",
     "apexcharts": "^3.27.3",
     "axios": "^0.21.1",

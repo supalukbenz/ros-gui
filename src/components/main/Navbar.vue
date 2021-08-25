@@ -66,6 +66,8 @@ export default {
       this.$store.dispatch('updateRobotConnected', {});
       this.ros.close();
       this.$store.dispatch('updateROS', null);
+      this.$store.dispatch('updateMsgList', {});
+      this.$store.dispatch('updateTopicList', { topics: [], types: [] });
       this.$router.push({
         name: 'Home',
       });

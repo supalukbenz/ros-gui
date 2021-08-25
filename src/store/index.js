@@ -16,44 +16,11 @@ export default new Vuex.Store({
     closeModal: false,
     rosbridgeURL: JSON.parse(localStorage.getItem('rosbridgeURL')) || '',
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
-    robots: [
-      {
-        id: 1,
-        robotName: 'turtlebot',
-        ip: '10.204.226.149',
-        username: 'pi',
-        password: 'turtlebot',
-        port: '9090',
-      },
-      {
-        id: 2,
-        robotName: 'AVIS',
-        ip: '10.204.162.48',
-        username: 'benz',
-        password: '',
-        port: '9090',
-      },
-      {
-        id: 3,
-        robotName: 'AVIS2',
-        ip: '10.204.162.48',
-        username: 'benz',
-        password: '',
-        port: '9090',
-      },
-      {
-        id: 4,
-        robotName: 'AVIS3',
-        ip: '10.204.162.48',
-        username: 'benz',
-        password: '',
-        port: '9090',
-      },
-    ],
-    robotConnected: {},
-    topicList: { topics: [], types: [] },
-    msgList: {},
+    robotConnected: JSON.parse(localStorage.getItem('robotConnected')) || [],
+    topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
+    msgList: JSON.parse(localStorage.getItem('msgList')) || {},
     data: { selection: [], source: [], expanded: [] },
+    selectedTopic: [],
   },
   getters: {
     getRobotList: state => {
@@ -61,6 +28,12 @@ export default new Vuex.Store({
     },
     getRobotConnected: state => {
       return state.robotConnected;
+    },
+    getSortedTopicData: state => {
+      const sortedList = state.data.source.sort((a, b) =>
+        a.label > b.label ? 1 : b.label > a.label ? -1 : 0
+      );
+      return sortedList;
     },
     getCloseModal: state => {
       return state.closeModal;
@@ -80,6 +53,9 @@ export default new Vuex.Store({
     getDataTopic: state => {
       return state.data;
     },
+    getSelectedTopic: state => {
+      return state.selectedTopic;
+    },
   },
   mutations: {
     setWSAddress(state, payload) {
@@ -95,18 +71,24 @@ export default new Vuex.Store({
     },
     setRobotConnected(state, payload) {
       state.robotConnected = payload;
+      localStorage.setItem('robotConnected', JSON.stringify(payload));
     },
     setCloseModal(state, payload) {
       state.closeModal = payload;
     },
     setTopicList(state, payload) {
       state.topicList = payload;
+      localStorage.setItem('topicList', JSON.stringify(payload));
     },
     setMsgList(state, payload) {
       state.msgList = payload;
+      localStorage.setItem('msgList', JSON.stringify(payload));
     },
     setDataTopic(state, payload) {
       state.data = payload;
+    },
+    setSelectedTopic(state, payload) {
+      state.selectedTopic = payload;
     },
     setRosbridgeURL(state, payload) {
       state.rosbridgeURL = payload;
@@ -140,6 +122,9 @@ export default new Vuex.Store({
     },
     updateRosbridgeURL({ commit }, payload) {
       commit('setRosbridgeURL', payload);
+    },
+    updateSelectedTopic({ commit }, payload) {
+      commit('setSelectedTopic', payload);
     },
   },
   modules: {},

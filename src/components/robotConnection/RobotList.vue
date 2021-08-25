@@ -129,9 +129,9 @@
                       >
                         <i class="fas fa-edit"></i>
                       </a>
-                      <!-- <button class="border mr-2" @click="clickedSimulation(robot)">
+                      <button class="border mr-2" @click="clickedSimulation(robot)">
                         simulate
-                      </button> -->
+                      </button>
                       <button
                         v-if="robot.id !== robotConnected.id"
                         @click="handleRobotConnection(robot)"
@@ -211,6 +211,7 @@ export default {
   },
   beforeCreate() {
     this.responseMessage = '';
+    this.editState = false;
   },
   data() {
     return {
@@ -240,6 +241,7 @@ export default {
       return Object.keys(this.msgList).length <= 0;
     },
     clickedEditRobot(robot) {
+      console.log('robot');
       this.editState = true;
       this.robotEditSelected = robot;
     },
@@ -306,15 +308,16 @@ export default {
       }
     },
     async clickedSimulation(robot) {
+      console.log('clickedSimulation');
       this.loadingState = true;
       console.log('this.loadingState', this.loadingState);
       this.connectionState = true;
       this.$store.dispatch('updateRobotConnected', robot);
-      const address = `wss://${robot.ip}`;
+      const address = `ws://${robot.ip}:${robot.port}`;
       this.$store.dispatch('updateRosbridgeURL', address);
       await this.connect(address);
       this.sleep(2000);
-      this.loadingState = false;
+      // this.loadingState = false;
       // if (this.msg && this.topics) {
       //   this.$router.push({
       //     name: 'RobotConnected',
@@ -325,6 +328,9 @@ export default {
     async disconnect() {
       const robot = this.robotConnected;
       this.$store.dispatch('updateRobotConnected', {});
+      this.$store.dispatch('updateROS', null);
+      this.$store.dispatch('updateMsgList', {});
+      this.$store.dispatch('updateTopicList', { topics: [], types: [] });
       const robotForm = {
         username: robot.username,
         password: robot.password,

@@ -35,6 +35,18 @@ export default {
             showLine: true,
             data: [],
           },
+          {
+            label: 'Dataset 2',
+
+            fill: false,
+            lineTension: 0.4,
+            backgroundColor: '#ffc107',
+            borderColor: '#ffc107',
+            borderJoinStyle: 'miter',
+            pointRadius: 0,
+            showLine: true,
+            data: [],
+          },
         ],
       },
 
@@ -166,10 +178,10 @@ export default {
               type: 'realtime',
               realtime: {
                 onRefresh: () => {
-                  this.data.datasets[0].data.push({
-                    x: Date.now(),
-                    y: Math.random() * 100,
-                  });
+                  // this.data.datasets[0].data.push({
+                  //   x: Date.now(),
+                  //   y: Math.random() * 100,
+                  // });
                 },
                 delay: 2000,
               },
