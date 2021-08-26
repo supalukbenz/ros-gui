@@ -313,7 +313,7 @@ export default {
       console.log('this.loadingState', this.loadingState);
       this.connectionState = true;
       this.$store.dispatch('updateRobotConnected', robot);
-      const address = `ws://${robot.ip}:${robot.port}`;
+      const address = `wss://${robot.ip}`;
       this.$store.dispatch('updateRosbridgeURL', address);
       await this.connect(address);
       this.sleep(2000);
