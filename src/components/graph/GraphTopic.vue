@@ -23,12 +23,3 @@ export default {
   methods: {},
 };
 </script>
-
-<style scoped>
-@media screen and (max-width: 992px) {
-  .modal-dialog {
-    margin: 4rem;
-    max-width: 100%;
-  }
-}
-</style>

@@ -328,6 +328,7 @@ export default {
     async disconnect() {
       const robot = this.robotConnected;
       this.$store.dispatch('updateRobotConnected', {});
+      this.$store.dispatch('updateRosbridgeURL', '');
       this.$store.dispatch('updateROS', null);
       this.$store.dispatch('updateMsgList', {});
       this.$store.dispatch('updateTopicList', { topics: [], types: [] });
@@ -393,6 +394,7 @@ export default {
     closeModal(val) {
       if (val) {
         $('#modal').modal('hide');
+        this.$store.dispatch('updateCloseModal', false);
       }
     },
     setROSInfo(val) {

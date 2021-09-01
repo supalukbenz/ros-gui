@@ -14,11 +14,14 @@ export default new Vuex.Store({
     ws_address: '',
     ros: JSON.parse(localStorage.getItem('ros')) || null,
     closeModal: false,
+    closeAddButtonModal: false,
+    closeEditButtonModal: false,
     rosbridgeURL: JSON.parse(localStorage.getItem('rosbridgeURL')) || '',
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
     robotConnected: JSON.parse(localStorage.getItem('robotConnected')) || [],
     topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
     msgList: JSON.parse(localStorage.getItem('msgList')) || {},
+    buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
     data: { selection: [], source: [], expanded: [] },
     selectedTopic: [],
   },
@@ -38,6 +41,12 @@ export default new Vuex.Store({
     getCloseModal: state => {
       return state.closeModal;
     },
+    getCloseAddButtonModal: state => {
+      return state.closeAddButtonModal;
+    },
+    getCloseEditButtonModal: state => {
+      return state.closeEditButtonModal;
+    },
     getRosbridgeURL: state => {
       return state.rosbridgeURL;
     },
@@ -55,6 +64,9 @@ export default new Vuex.Store({
     },
     getSelectedTopic: state => {
       return state.selectedTopic;
+    },
+    getButtonList: state => {
+      return state.buttonList;
     },
   },
   mutations: {
@@ -76,6 +88,12 @@ export default new Vuex.Store({
     setCloseModal(state, payload) {
       state.closeModal = payload;
     },
+    setCloseAddButtonModal(state, payload) {
+      state.closeAddButtonModal = payload;
+    },
+    setCloseEditButtonModal(state, payload) {
+      state.closeEditButtonModal = payload;
+    },
     setTopicList(state, payload) {
       state.topicList = payload;
       localStorage.setItem('topicList', JSON.stringify(payload));
@@ -83,6 +101,10 @@ export default new Vuex.Store({
     setMsgList(state, payload) {
       state.msgList = payload;
       localStorage.setItem('msgList', JSON.stringify(payload));
+    },
+    setButtonList(state, payload) {
+      state.buttonList = payload;
+      localStorage.setItem('buttonList', JSON.stringify(payload));
     },
     setDataTopic(state, payload) {
       state.data = payload;
@@ -111,6 +133,12 @@ export default new Vuex.Store({
     updateCloseModal({ commit }, payload) {
       commit('setCloseModal', payload);
     },
+    updateCloseAddButtonModal({ commit }, payload) {
+      commit('setCloseAddButtonModal', payload);
+    },
+    updateCloseEditButtonModal({ commit }, payload) {
+      commit('setCloseEditButtonModal', payload);
+    },
     updateTopicList({ commit }, payload) {
       commit('setTopicList', payload);
     },
@@ -125,6 +153,9 @@ export default new Vuex.Store({
     },
     updateSelectedTopic({ commit }, payload) {
       commit('setSelectedTopic', payload);
+    },
+    updateButtonList({ commit }, payload) {
+      commit('setButtonList', payload);
     },
   },
   modules: {},
