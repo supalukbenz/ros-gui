@@ -12,11 +12,13 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
 import VueApexCharts from 'vue-apexcharts';
+import VueDraggableResizable from 'vue-draggable-resizable';
 
 Vue.config.productionTip = false;
 Vue.use(VueApexCharts);
 
 Vue.component('apexchart', VueApexCharts);
+Vue.component('vue-draggable-resizable', VueDraggableResizable);
 
 // Vue.use(LoadScript);
 axios.defaults.baseURL = 'http://localhost:5000/';

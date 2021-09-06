@@ -219,12 +219,12 @@ export default {
   },
   methods: {
     handleButtonFormSubmit() {
-      const currentButtonList = this.buttonList;
+      let currentButtonList = this.buttonList;
       if (!this.editState) {
         let id = 1;
         if (currentButtonList.length > 0) {
-          const sortedButton = currentButtonList.sort((a, b) => a.id - b.id);
-          id = sortedButton[currentButtonList.length - 1].id + 1;
+          const sortedButton = currentButtonList.sort((a, b) => a.buttonId - b.buttonId);
+          id = sortedButton[currentButtonList.length - 1].buttonId + 1;
         }
         if (
           this.nodeType !== '' &&

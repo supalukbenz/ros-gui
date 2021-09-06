@@ -22,6 +22,7 @@ export default new Vuex.Store({
     topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
     msgList: JSON.parse(localStorage.getItem('msgList')) || {},
     buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
+    selectedButtonList: JSON.parse(localStorage.getItem('selectedButtonList')) || [],
     data: { selection: [], source: [], expanded: [] },
     selectedTopic: [],
   },
@@ -68,6 +69,9 @@ export default new Vuex.Store({
     getButtonList: state => {
       return state.buttonList;
     },
+    getSelectedButtonList: state => {
+      return state.selectedButtonList;
+    },
   },
   mutations: {
     setWSAddress(state, payload) {
@@ -105,6 +109,10 @@ export default new Vuex.Store({
     setButtonList(state, payload) {
       state.buttonList = payload;
       localStorage.setItem('buttonList', JSON.stringify(payload));
+    },
+    setSelectedButtonList(state, payload) {
+      state.selectedButtonList = payload;
+      localStorage.setItem('selectedButtonList', JSON.stringify(payload));
     },
     setDataTopic(state, payload) {
       state.data = payload;
@@ -156,6 +164,9 @@ export default new Vuex.Store({
     },
     updateButtonList({ commit }, payload) {
       commit('setButtonList', payload);
+    },
+    updateSelectedButtonList({ commit }, payload) {
+      commit('setSelectedButtonList', payload);
     },
   },
   modules: {},

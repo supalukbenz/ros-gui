@@ -24,12 +24,14 @@
         button-item
         border-tran
         overflow-hidden
+        rounded-sm
       "
       :id="buttonId"
       :style="{
         background: buttonInfo.bg,
         color: buttonInfo.color,
       }"
+      @click="addSelectedButton()"
       @contextmenu.prevent="handlerRightClick"
     >
       {{ buttonInfo.buttonName }}
@@ -110,6 +112,7 @@ export default {
     ...mapGetters({
       buttonList: 'getButtonList',
       closeEditButtonModal: 'getCloseEditButtonModal',
+      selectedButtonList: 'getSelectedButtonList',
     }),
     modalId() {
       return `modal${this.index}`;
@@ -136,6 +139,25 @@ export default {
     });
   },
   methods: {
+    addSelectedButton() {
+      const currentSelectedButton = this.selectedButtonList;
+      console.log('currentSelectedButton', currentSelectedButton);
+      let selectedId = 1;
+      if (currentSelectedButton.length > 0) {
+        const sortedButton = currentSelectedButton.sort((a, b) => a.selectedId - b.selectedId);
+        selectedId = sortedButton[currentSelectedButton.length - 1].selectedId + 1;
+        console.log('selectedId', selectedId);
+      }
+      let currentButton = this.buttonInfo;
+      currentButton.selectedId = selectedId;
+      currentButton.buttonPosition = {
+        xPos: 0,
+        yPos: 0,
+      };
+      currentSelectedButton.push(currentButton);
+      console.log(currentButton);
+      this.$store.dispatch('updateSelectedButtonList', currentSelectedButton);
+    },
     handlerRightClick() {
       // this.editState = true;
       // console.log('this', this.modalId);

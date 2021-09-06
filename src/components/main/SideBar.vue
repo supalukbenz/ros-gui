@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-200 w-64 text-left py-4 px-3 z-0 h-full">
+  <div class="bg-gray-200 w-56 text-left py-4 px-3 z-0 h-full">
     <div>
       <div class="font-semibold text-2xl">Robot Tools</div>
       <hr />
