@@ -42,6 +42,7 @@
             }"
             :parent="true"
             :resizable="false"
+            :draggable="moveState"
             class="flex flex-row rounded font-bold relative cursor-pointer"
           >
             <!-- {{ selectedButton.buttonName }} -->
@@ -76,7 +77,8 @@
           type="button"
           class="border-green shadow rounded-full w-10 h-10"
         >
-          <i class="fas fa-arrows-alt"></i>
+          <span v-show="!moveState"><i class="fas fa-arrows-alt"></i></span>
+          <span v-show="moveState"><i class="fas fa-save"></i></span>
         </button>
       </div>
     </div>
@@ -136,26 +138,7 @@ export default {
   data() {
     return {
       showVideo: false,
-      addDragState: false,
-      buttonPosition: {
-        xPos: 0,
-        yPos: 0,
-      },
       moveState: false,
-      // buttonList: [
-      //   {
-      //     nodeType: 'topic',
-      //     nodeAction: 'publisher',
-      //     msgType: 'int8',
-      //     topicName: '/topic',
-      //     buttonName: 'button1',
-      //     width: '120',
-      //     height: '48',
-      //     bg: '#60A5FA',
-      //     color: '#2C3E50',
-      //     listState: true,
-      //   },
-      // ],
     };
   },
   methods: {
@@ -174,9 +157,7 @@ export default {
     },
     onResize() {},
     clickedSelectedButton(button) {
-      if (this.moveState) {
-        console.log(button.buttonName);
-      }
+      console.log(button.buttonName);
     },
     handleShowVideo() {
       this.showVideo = !this.showVideo;
@@ -202,7 +183,6 @@ export default {
     },
     selectedButtonList: {
       handler() {
-        this.addDragState = false;
         this.moveState = true;
       },
       deep: true,
