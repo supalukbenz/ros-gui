@@ -1,6 +1,5 @@
 <template>
-  <div class="flex flex-row h-full">
-    <SideBar></SideBar>
+  <div class="h-full">
     <div class="m-10">
       <div class="flex justify-start mb-2">
         <button
@@ -42,13 +41,10 @@
 </template>
 
 <script>
-import SideBar from '@/components/main/SideBar.vue';
 import { mapGetters } from 'vuex';
 
 export default {
-  components: {
-    SideBar,
-  },
+  components: {},
   data() {
     return {
       srcVideo: '',

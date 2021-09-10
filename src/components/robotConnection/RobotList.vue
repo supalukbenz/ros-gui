@@ -195,23 +195,26 @@ export default {
   computed: {
     ...mapGetters({
       robotList: 'getRobotList',
+      rosState: 'getROS',
+      rosbridgeURL: 'getRosbridgeURL',
       robotConnected: 'getRobotConnected',
       closeModal: 'getCloseModal',
       msgList: 'getMsgList',
       topicList: 'getTopicList',
     }),
-    setROSInfo() {
-      return this.msg && this.topics && this.connectionState;
-    },
   },
   components: {
     RobotFormModal,
     Loading,
     // StatusCard,
   },
-  beforeCreate() {
+  created() {
     this.responseMessage = '';
     this.editState = false;
+    if (this.rosState) {
+      const currentRobot = this.robotConnected;
+      this.connect(currentRobot, this.rosbridgeURL);
+    }
   },
   data() {
     return {
@@ -275,7 +278,7 @@ export default {
         this.topics = topic;
       });
     },
-    async connect(ws_address) {
+    async connect(robot, ws_address) {
       if (ws_address !== '') {
         this.ros = await new ROSLIB.Ros({
           // url: `ws://${ws_address}:9090`,
@@ -287,10 +290,7 @@ export default {
           this.errorState = false;
           this.$store.dispatch('updateWSAddress', ws_address);
           this.$store.dispatch('updateROS', this.ros);
-          this.setTopicList();
-          // setTimeout(() => {
-          //   this.setTopicList();
-          // }, 5000);
+          // this.setTopicList();
         });
         console.log('ros robotlist, ', this.ros);
 
@@ -298,12 +298,12 @@ export default {
           // this.responseMessage = 'Error connecting to websocket server';
           this.errorState = true;
           console.log('Error', error);
-          this.disconnect();
+          this.disconnect(robot);
         });
 
         this.ros.on('close', () => {
           this.connected = false;
-          console.log('Connection to websocket server closed.');
+          this.disconnect(robot);
         });
       }
     },
@@ -313,25 +313,27 @@ export default {
       console.log('this.loadingState', this.loadingState);
       this.connectionState = true;
       this.$store.dispatch('updateRobotConnected', robot);
-      const address = `wss://${robot.ip}`;
+      const address = `ws://${robot.ip}:${robot.port}`;
       this.$store.dispatch('updateRosbridgeURL', address);
-      await this.connect(address);
+      // await this.connect(address);
       this.sleep(2000);
       // this.loadingState = false;
       // if (this.msg && this.topics) {
-      //   this.$router.push({
-      //     name: 'RobotConnected',
-      //     params: { robotName: robot.robotName },
-      //   });
+      this.$router.push({
+        name: 'Graph',
+        params: { robotName: robot.robotName },
+      });
       // }
     },
-    async disconnect() {
-      const robot = this.robotConnected;
+    resetROSInfo() {
       this.$store.dispatch('updateRobotConnected', {});
       this.$store.dispatch('updateRosbridgeURL', '');
       this.$store.dispatch('updateROS', null);
       this.$store.dispatch('updateMsgList', {});
       this.$store.dispatch('updateTopicList', { topics: [], types: [] });
+    },
+    async disconnect(robot) {
+      this.resetROSInfo();
       const robotForm = {
         username: robot.username,
         password: robot.password,
@@ -370,7 +372,7 @@ export default {
           console.log('connect');
           const ws_address = `ws://${robot.ip}:${robot.port}`;
           this.$store.dispatch('updateRosbridgeURL', ws_address);
-          await this.connect(ws_address);
+          // await this.connect(ws_address);
           this.responseMessage = 'Connected to the robot.';
           this.$router.push({
             name: 'Graph',
@@ -395,15 +397,6 @@ export default {
       if (val) {
         $('#modal').modal('hide');
         this.$store.dispatch('updateCloseModal', false);
-      }
-    },
-    setROSInfo(val) {
-      if (val) {
-        // console.log('info');
-        this.$router.push({
-          name: 'Graph',
-          params: { robotName: this.robotConnected.robotName },
-        });
       }
     },
   },

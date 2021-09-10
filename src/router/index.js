@@ -27,17 +27,18 @@ const routes = [
     path: '/robot/:robotName/customize-button',
     name: 'CustomizeButton',
     component: () =>
-      import(/* webpackChunkName: "customizeButton" */ '../views/CustomizeButton.vue'),
+      import(/* webpackChunkName: "customizeButton" */ '../views/RobotConnectedHome.vue'),
   },
   {
     path: '/robot/:robotName/graph',
     name: 'Graph',
-    component: () => import(/* webpackChunkName: "graph" */ '../views/Graph.vue'),
+    component: () => import(/* webpackChunkName: "graph" */ '../views/RobotConnectedHome.vue'),
   },
   {
     path: '/robot/:robotName/streaming-video',
     name: 'StreamingVideo',
-    component: () => import(/* webpackChunkName: "streamingVideo" */ '../views/StreamingVideo.vue'),
+    component: () =>
+      import(/* webpackChunkName: "streamingVideo" */ '../views/RobotConnectedHome.vue'),
   },
 ];
 

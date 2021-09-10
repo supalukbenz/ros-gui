@@ -74,9 +74,9 @@ export default {
     };
   },
   async mounted() {
-    if (!this.ros.isConnected) {
-      await this.ros.connect(this.rosbridgeURL);
-    }
+    // if (!this.ros.isConnected) {
+    //   await this.ros.connect(this.rosbridgeURL);
+    // }
     // await this.setTopicList();
     // this.addTopic();
   },

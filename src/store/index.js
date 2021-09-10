@@ -18,9 +18,12 @@ export default new Vuex.Store({
     closeEditButtonModal: false,
     rosbridgeURL: JSON.parse(localStorage.getItem('rosbridgeURL')) || '',
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
-    robotConnected: JSON.parse(localStorage.getItem('robotConnected')) || [],
+    robotConnected: JSON.parse(localStorage.getItem('robotConnected')) || {},
     topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
     msgList: JSON.parse(localStorage.getItem('msgList')) || {},
+    topicMsg: JSON.parse(localStorage.getItem('topicMsg')) || [],
+    nodeList: JSON.parse(localStorage.getItem('nodeList')) || [],
+    paramList: JSON.parse(localStorage.getItem('paramList')) || [],
     buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
     selectedButtonList: JSON.parse(localStorage.getItem('selectedButtonList')) || [],
     data: { selection: [], source: [], expanded: [] },
@@ -57,8 +60,17 @@ export default new Vuex.Store({
     getTopicList: state => {
       return state.topicList;
     },
+    getTopicMsg: state => {
+      return state.topicMsg;
+    },
     getMsgList: state => {
       return state.msgList;
+    },
+    getNodeList: state => {
+      return state.nodeList;
+    },
+    getParamList: state => {
+      return state.paramList;
     },
     getDataTopic: state => {
       return state.data;
@@ -102,9 +114,21 @@ export default new Vuex.Store({
       state.topicList = payload;
       localStorage.setItem('topicList', JSON.stringify(payload));
     },
+    setTopicMsg(state, payload) {
+      state.topicMsg = payload;
+      localStorage.setItem('topicMsg', JSON.stringify(payload));
+    },
     setMsgList(state, payload) {
       state.msgList = payload;
       localStorage.setItem('msgList', JSON.stringify(payload));
+    },
+    setNodeList(state, payload) {
+      state.nodeList = payload;
+      localStorage.setItem('nodeList', JSON.stringify(payload));
+    },
+    setParamList(state, payload) {
+      state.paramList = payload;
+      localStorage.setItem('paramList', JSON.stringify(payload));
     },
     setButtonList(state, payload) {
       state.buttonList = payload;
@@ -150,8 +174,17 @@ export default new Vuex.Store({
     updateTopicList({ commit }, payload) {
       commit('setTopicList', payload);
     },
+    updateTopicMsg({ commit }, payload) {
+      commit('setTopicMsg', payload);
+    },
     updateMsgList({ commit }, payload) {
       commit('setMsgList', payload);
+    },
+    updateNodeList({ commit }, payload) {
+      commit('setNodeList', payload);
+    },
+    updateParamList({ commit }, payload) {
+      commit('setParamList', payload);
     },
     updateDataTopic({ commit }, payload) {
       commit('setDataTopic', payload);

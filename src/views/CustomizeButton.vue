@@ -1,7 +1,7 @@
 <template>
-  <div class="flex flex-row h-full w-full">
-    <SideBar></SideBar>
-    <div class="my-3 ml-3 mr-3 flex flex-row w-full">
+  <div class="h-full w-full my-3 ml-3 mr-3">
+    <!-- <SideBar></SideBar> -->
+    <div class="flex flex-row w-full h-full">
       <div class="h-full">
         <div class="border w-52 h-min-20 rounded-sm overflow-y-scroll">
           <div
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div
-        class="ml-3 shadow w-full h-full bg-board"
+        class="ml-3 shadow w-full h-custom bg-board"
         :class="[moveState ? 'bg-container' : '']"
         id="grid-container"
       >
@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import SideBar from '@/components/main/SideBar.vue';
+// import SideBar from '@/components/main/SideBar.vue';
 import AddButtonModal from '@/components/buttonTool/AddButtonModal.vue';
 import ButtonItem from '@/components/buttonTool/ButtonItem.vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
@@ -114,7 +114,7 @@ import $ from 'jquery';
 
 export default {
   components: {
-    SideBar,
+    // SideBar,
     // ConnectionPart,
     // VideoFrame,
     AddButtonModal,
@@ -126,12 +126,34 @@ export default {
       closeAddButtonModal: 'getCloseAddButtonModal',
       buttonList: 'getButtonList',
       selectedButtonList: 'getSelectedButtonList',
+      topicMsg: 'getTopicMsg',
+      paramList: 'getParamList',
+      nodeList: 'getNodeList',
     }),
-    setROSInfo() {
-      return this.msg && this.topics && this.connectionState;
-    },
     dragButtonId(id) {
       return `drag${id}`;
+    },
+    nodeInfo() {
+      const filtedNodes = this.nodeList.filter(n => this.filterROSTopic(n));
+      const filteredParams = this.paramList.filter(p => this.filterROSTopic(p));
+
+      filtedNodes.map(n => {
+        n.services = n.services.filter(s => this.filterROSTopic(s));
+        n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
+        n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
+        return n;
+      });
+
+      const nodes = filtedNodes.map(n => {
+        n.topics = n.publishing
+          .concat(n.subscribing)
+          .map(name => this.topicMsg.find(m => m.name === name));
+        n.params = filteredParams.filter(param => param.node === n.name);
+
+        return n;
+      });
+
+      return nodes;
     },
   },
   mounted() {},
@@ -172,6 +194,20 @@ export default {
       const currentSelectedBtnList = this.selectedButtonList;
       currentSelectedBtnList.splice(index, 1);
       this.$store.dispatch('updateSelectedButtonList', currentSelectedBtnList);
+    },
+    filterROSTopic(topic) {
+      if (topic.name) {
+        topic = topic.name;
+      }
+      const excludeList = [
+        '/rosapi',
+        '/rosout',
+        '/rosbridge_websocket',
+        '/rosversion',
+        '/run_id',
+        '/rosdistro',
+      ];
+      return !excludeList.includes(topic);
     },
   },
   watch: {
@@ -217,6 +253,10 @@ export default {
 
 .z-20 {
   z-index: 20;
+}
+
+.h-custom {
+  height: 720px;
 }
 
 .bg-button-move {

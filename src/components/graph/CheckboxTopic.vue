@@ -73,10 +73,6 @@ export default {
     sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
-    nodeChecked() {
-      var treeObj = document.getElementById('treeview').ej2_instances[0];
-      console.log("The checked node's id: " + treeObj.checkedNodes); // To alert the checked node's id.
-    },
     async handleSetTopic() {
       // this.loadingState = true;
       await this.addTopic();
@@ -88,7 +84,6 @@ export default {
       const topics = this.topicList.topics;
       const types = this.topicList.types;
       for (let i in topics) {
-        console.log('i', i);
         let topicExist = false;
         for (let j in this.data.source) {
           if (this.data.source[j].label === topics[i]) {
@@ -96,14 +91,11 @@ export default {
           }
         }
         if (topicExist) {
-          console.log('topicExist', topicExist);
           continue;
         } else {
           // add only new topics
-          console.log('newly added topic: ' + topics[i]);
           const showCheckbox = true;
           const children = await this.addExpandTopics(topics[i], types[i], topics[i], showCheckbox);
-          console.log('children, ', children);
           if (children && children.length > 0) {
             const currentData = this.data;
             currentData.source.push({

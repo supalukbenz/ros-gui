@@ -12,10 +12,12 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
 import VueApexCharts from 'vue-apexcharts';
+import VueRx from 'vue-rx';
 import VueDraggableResizable from 'vue-draggable-resizable';
 
 Vue.config.productionTip = false;
 Vue.use(VueApexCharts);
+Vue.use(VueRx);
 
 Vue.component('apexchart', VueApexCharts);
 Vue.component('vue-draggable-resizable', VueDraggableResizable);

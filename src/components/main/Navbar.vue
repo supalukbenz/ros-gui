@@ -62,12 +62,17 @@ export default {
         password: this.robotConnected.password,
         ip: this.robotConnected.ip,
       };
-      await disconnectToRobot(robotForm);
       this.$store.dispatch('updateRobotConnected', {});
-      this.ros.close();
+      this.$store.dispatch('updateRosbridgeURL', '');
       this.$store.dispatch('updateROS', null);
       this.$store.dispatch('updateMsgList', {});
       this.$store.dispatch('updateTopicList', { topics: [], types: [] });
+      try {
+        this.ros.close();
+        await disconnectToRobot(robotForm);
+      } catch (e) {
+        console.log(e);
+      }
       this.$router.push({
         name: 'Home',
       });

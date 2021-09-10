@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-200 w-56 text-left py-4 px-3 z-0 h-full">
+  <div class="bg-gray-200 text-left py-4 px-3 z-0 h-full">
     <div>
       <div class="font-semibold text-2xl">Robot Tools</div>
       <hr />
@@ -41,23 +41,25 @@ export default {
     ...mapGetters({
       robotConnected: 'getRobotConnected',
     }),
+    pageName() {
+      return this.$route.name;
+    },
+    robotName() {
+      return this.$route.params.robotName;
+    },
   },
   data() {
-    return {
-      pageName: '',
-      robotName: '',
-    };
+    return {};
   },
-  mounted() {
-    this.pageName = this.$route.name;
-    this.robotName = this.$route.params.robotName;
-  },
+  mounted() {},
   methods: {
     changePage(page) {
-      this.$router.push({
-        name: page,
-        params: { robotName: this.robotName },
-      });
+      this.$router
+        .push({
+          name: page,
+          params: { robotName: this.robotName },
+        })
+        .catch(() => {});
     },
   },
 };

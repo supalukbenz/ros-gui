@@ -40,13 +40,13 @@ export default {
     };
   },
   async mounted() {
-    if (!this.rosbridge.isConnected) {
-      await this.rosbridge.connect(this.rosbridgeURL);
-      this.ros = await new ROSLIB.Ros({
-        // url: `ws://${ws_address}:9090`,
-        url: this.rosbridgeURL,
-      });
-    }
+    // if (!this.rosbridge.isConnected) {
+    //   await this.rosbridge.connect(this.rosbridgeURL);
+    //   this.ros = await new ROSLIB.Ros({
+    //     // url: `ws://${ws_address}:9090`,
+    //     url: this.rosbridgeURL,
+    //   });
+    // }
   },
   methods: {
     isNumeric(val) {
@@ -65,7 +65,38 @@ export default {
         }
       }
     },
+    removeLineFromChart(line_name) {
+      var datasets = this.data.datasets;
+      for (var i = 0; i < datasets.length; i++) {
+        if (datasets[i]['label'] === line_name) {
+          datasets.splice(i, 1);
+          break;
+        }
+      }
+      var labels = this.data.labels;
+      for (i in labels) {
+        if (labels[i] === line_name) {
+          labels.splice(i, 1);
+        }
+      }
+
+      //remove from lines in topic
+      for (var topic_name in this.topics) {
+        for (i = 0; i < this.topics[topic_name].lines.length; i++) {
+          if (this.topics[topic_name].lines[i] === line_name) {
+            this.topics[topic_name].lines.splice(i, 1);
+            break;
+          }
+        }
+      }
+    },
     async updateLineChart(data) {
+      const labels = Array.from(this.data.labels);
+      for (var i in labels) {
+        if (!data.selection.includes(labels[i])) {
+          this.removeLineFromChart(labels[i]);
+        }
+      }
       for (let i in data.selection) {
         const node = this.getNode(data.selection[i], data.source);
         const rootNode = this.getNode(node.root, data.source);
@@ -112,7 +143,9 @@ export default {
           });
         }
       }
-      this.renderGraph = true;
+      if (data.selection.length > 0) {
+        this.renderGraph = true;
+      }
     },
     async reconnectROS() {
       this.ros = await new ROSLIB.Ros({
