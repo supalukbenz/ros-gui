@@ -126,34 +126,9 @@ export default {
       closeAddButtonModal: 'getCloseAddButtonModal',
       buttonList: 'getButtonList',
       selectedButtonList: 'getSelectedButtonList',
-      topicMsg: 'getTopicMsg',
-      paramList: 'getParamList',
-      nodeList: 'getNodeList',
     }),
     dragButtonId(id) {
       return `drag${id}`;
-    },
-    nodeInfo() {
-      const filtedNodes = this.nodeList.filter(n => this.filterROSTopic(n));
-      const filteredParams = this.paramList.filter(p => this.filterROSTopic(p));
-
-      filtedNodes.map(n => {
-        n.services = n.services.filter(s => this.filterROSTopic(s));
-        n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
-        n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
-        return n;
-      });
-
-      const nodes = filtedNodes.map(n => {
-        n.topics = n.publishing
-          .concat(n.subscribing)
-          .map(name => this.topicMsg.find(m => m.name === name));
-        n.params = filteredParams.filter(param => param.node === n.name);
-
-        return n;
-      });
-
-      return nodes;
     },
   },
   mounted() {},
@@ -161,6 +136,7 @@ export default {
     return {
       showVideo: false,
       moveState: false,
+      nodeInfo1: [],
     };
   },
   methods: {
@@ -223,6 +199,21 @@ export default {
       },
       deep: true,
     },
+    // loadData: {
+    //   handler() {
+    //     console.log('wow');
+    //   },
+    //   deep: true,
+    // },
+    // nodeInfo: {
+    //   handler(val) {
+    //     if (val) {
+    //       // check if userid is available
+    //       this.setNodeInfo(val);
+    //     }
+    //   },
+    //   // immediate: true, // make this watch function is called when component created
+    // },
   },
 };
 </script>

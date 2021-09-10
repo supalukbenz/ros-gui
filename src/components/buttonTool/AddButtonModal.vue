@@ -62,6 +62,28 @@
             </div>
           </div>
           <div class="w-full flex flex-col items-start mt-2 relative">
+            <div class="font-bold">Topic</div>
+            <input
+              type="text"
+              class="border rounded w-full px-2 py-1"
+              data-toggle="dropdown"
+              :id="dropdownId"
+              aria-haspopup="true"
+              aria-expanded="false"
+              placeholder="/topic"
+              v-model="msg"
+            />
+            <div class="dropdown-menu" :aria-labelledby="dropdownId">
+              <div class="w-72 max-h-15 overflow-y-scroll flex flex-col items-start break-all">
+                <div v-for="(option, index) in msgTypeList" :key="index" class="w-full h-full">
+                  <div class="cursor-pointer hover:bg-gray-100 pl-2 pb-1">
+                    {{ option }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="w-full flex flex-col items-start mt-2 relative">
             <div class="font-bold">Types</div>
             <input
               type="text"
@@ -73,12 +95,6 @@
               placeholder="msgs type"
               v-model="msg"
             />
-            <!-- <div
-              type="text"
-              class="border rounded w-72 px-2 py-1 overflow-y-scroll h-24 mt-14 absolute bg-white"
-            >
-              <div v-for="(option, index) in options" :key="index">{{ option }}</div>
-            </div> -->
             <div class="dropdown-menu" :aria-labelledby="dropdownId">
               <div class="w-72 max-h-15 overflow-y-scroll flex flex-col items-start break-all">
                 <div v-for="(option, index) in msgTypeList" :key="index" class="w-full h-full">
@@ -92,10 +108,10 @@
               </div>
             </div>
           </div>
-          <div class="w-full flex flex-col items-start mt-2">
+          <!-- <div class="w-full flex flex-col items-start mt-2">
             <div class="font-bold">Topic name</div>
             <input v-model="topicName" type="text" class="border rounded w-full px-2 py-1" />
-          </div>
+          </div> -->
           <div class="w-full flex flex-col items-start mt-3">
             <div class="font-bold">Button name</div>
             <input v-model="buttonName" type="text" class="border rounded w-full px-2 py-1" />
@@ -165,12 +181,62 @@ export default {
   computed: {
     ...mapGetters({
       buttonList: 'getButtonList',
+      topicMsg: 'getTopicMsg',
+      paramList: 'getParamList',
+      nodeList: 'getNodeList',
     }),
     msgTypeList() {
       return this.filteredMsg.length > 0 ? this.filteredMsg : this.options;
     },
     dropdownId() {
       return `dropdown${this.index}`;
+    },
+    nodeInfo() {
+      const filtedNodes = this.nodeList.filter(n => this.filterROSTopic(n));
+      const filteredParams = this.paramList.filter(p => this.filterROSTopic(p));
+
+      filtedNodes.map(n => {
+        n.services = n.services.filter(s => this.filterROSTopic(s));
+        n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
+        n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
+        return n;
+      });
+
+      const nodes = filtedNodes.map(n => {
+        n.topics = n.publishing
+          .concat(n.subscribing)
+          .map(name => this.topicMsg.find(m => m.name === name));
+        n.params = filteredParams.filter(param => param.node === n.name);
+
+        return n;
+      });
+      let nodeFormTemp = {
+        publishing: [],
+        subscribing: [],
+        topics: [],
+        param: [],
+      };
+      nodes.forEach(n => {
+        n.publishing.forEach(pub => {
+          if (!nodeFormTemp.publishing.find(temp => temp === pub)) {
+            nodeFormTemp.publishing.push(pub);
+          }
+        });
+        n.subscribing.forEach(sub => {
+          if (!nodeFormTemp.subscribing.find(temp => temp === sub)) {
+            nodeFormTemp.subscribing.push(sub);
+          }
+        });
+        n.topics.forEach(topic => {
+          if (
+            !nodeFormTemp.topics.find(temp => temp.name === topic.name && temp.type === topic.type)
+          ) {
+            nodeFormTemp.topics.push(topic);
+          }
+          // nodeFormTemp.topics.push(topic);
+        });
+      });
+      return nodeFormTemp;
     },
   },
   props: {
@@ -218,6 +284,20 @@ export default {
     this.setEditInfo(this.editState);
   },
   methods: {
+    filterROSTopic(topic) {
+      if (topic.name) {
+        topic = topic.name;
+      }
+      const excludeList = [
+        '/rosapi',
+        '/rosout',
+        '/rosbridge_websocket',
+        '/rosversion',
+        '/run_id',
+        '/rosdistro',
+      ];
+      return !excludeList.includes(topic);
+    },
     handleButtonFormSubmit() {
       let currentButtonList = this.buttonList;
       if (!this.editState) {

@@ -19,11 +19,17 @@ export default new Vuex.Store({
     rosbridgeURL: JSON.parse(localStorage.getItem('rosbridgeURL')) || '',
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
     robotConnected: JSON.parse(localStorage.getItem('robotConnected')) || {},
-    topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
-    msgList: JSON.parse(localStorage.getItem('msgList')) || {},
-    topicMsg: JSON.parse(localStorage.getItem('topicMsg')) || [],
-    nodeList: JSON.parse(localStorage.getItem('nodeList')) || [],
-    paramList: JSON.parse(localStorage.getItem('paramList')) || [],
+    // topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
+    // msgList: JSON.parse(localStorage.getItem('msgList')) || {},
+    // topicMsg: JSON.parse(localStorage.getItem('topicMsg')) || [],
+    // nodeList: JSON.parse(localStorage.getItem('nodeList')) || [],
+    // paramList: JSON.parse(localStorage.getItem('paramList')) || [],
+    topicList: { topics: [], types: [] },
+    msgList: {},
+    topicMsg: [],
+    nodeList: [],
+    paramList: [],
+    nodeForm: [],
     buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
     selectedButtonList: JSON.parse(localStorage.getItem('selectedButtonList')) || [],
     data: { selection: [], source: [], expanded: [] },
@@ -69,6 +75,9 @@ export default new Vuex.Store({
     getNodeList: state => {
       return state.nodeList;
     },
+    getNodeForm: state => {
+      return state.nodeForm;
+    },
     getParamList: state => {
       return state.paramList;
     },
@@ -112,19 +121,22 @@ export default new Vuex.Store({
     },
     setTopicList(state, payload) {
       state.topicList = payload;
-      localStorage.setItem('topicList', JSON.stringify(payload));
+      // localStorage.setItem('topicList', JSON.stringify(payload));
     },
     setTopicMsg(state, payload) {
       state.topicMsg = payload;
-      localStorage.setItem('topicMsg', JSON.stringify(payload));
+      // localStorage.setItem('topicMsg', JSON.stringify(payload));
     },
     setMsgList(state, payload) {
       state.msgList = payload;
-      localStorage.setItem('msgList', JSON.stringify(payload));
+      // localStorage.setItem('msgList', JSON.stringify(payload));
     },
     setNodeList(state, payload) {
       state.nodeList = payload;
-      localStorage.setItem('nodeList', JSON.stringify(payload));
+      // localStorage.setItem('nodeList', JSON.stringify(payload));
+    },
+    setNodeForm(state, payload) {
+      state.nodeForm = payload;
     },
     setParamList(state, payload) {
       state.paramList = payload;
@@ -182,6 +194,9 @@ export default new Vuex.Store({
     },
     updateNodeList({ commit }, payload) {
       commit('setNodeList', payload);
+    },
+    updateNodeForm({ commit }, payload) {
+      commit('setNodeForm', payload);
     },
     updateParamList({ commit }, payload) {
       commit('setParamList', payload);

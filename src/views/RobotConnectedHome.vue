@@ -3,10 +3,12 @@
     <Loading v-if="!isConnected"></Loading>
     <div class="flex flex-row h-full w-full">
       <SideBar class="w-56"></SideBar>
-      <div class="flex-auto mr-5 mb-10">
+      <div v-if="isConnected" class="flex-auto mr-5 mb-10">
         <Graph v-show="routeName === 'Graph'"></Graph>
         <StreamingVideo v-show="routeName === 'StreamingVideo'"></StreamingVideo>
-        <CustomizeButton v-show="routeName === 'CustomizeButton'"></CustomizeButton>
+        <CustomizeButton
+          v-show="routeName === 'CustomizeButton' && loadDataState"
+        ></CustomizeButton>
       </div>
     </div>
   </div>
@@ -47,6 +49,7 @@ export default {
       // paramList: [],
       serviceList: [],
       // topicMsg: [],
+      loadDataState: false,
     };
   },
   computed: {
@@ -73,6 +76,7 @@ export default {
   },
   methods: {
     async rosConnection() {
+      this.loadDataState = false;
       if (this.isConnected) {
         return;
       }
@@ -277,10 +281,12 @@ export default {
         });
       });
     },
-    loadData() {
-      this.setTopicList();
-      this.setParams();
-      this.setNodeList();
+    async loadData() {
+      // this.setTopicList();
+      // this.setParams();
+      // this.setNodeList();
+      await Promise.all([this.setTopicList(), this.setNodeList(), this.setParams()]);
+      this.loadDataState = true;
     },
     async setNodeData() {
       const [topics, nodes, params] = await Promise.all([
