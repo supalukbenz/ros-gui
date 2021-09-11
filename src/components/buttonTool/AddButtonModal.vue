@@ -67,17 +67,24 @@
               type="text"
               class="border rounded w-full px-2 py-1"
               data-toggle="dropdown"
-              :id="dropdownId"
+              :id="dropdownTopicId"
               aria-haspopup="true"
               aria-expanded="false"
               placeholder="/topic"
-              v-model="msg"
+              v-model="topicName"
             />
-            <div class="dropdown-menu" :aria-labelledby="dropdownId">
-              <div class="w-72 max-h-15 overflow-y-scroll flex flex-col items-start break-all">
-                <div v-for="(option, index) in msgTypeList" :key="index" class="w-full h-full">
+            <div class="dropdown-menu" :aria-labelledby="dropdownTopicId">
+              <div
+                v-if="nodeTopicList.topics.length > 0"
+                class="w-72 max-h-15 overflow-y-scroll flex flex-col items-start break-all"
+              >
+                <div
+                  v-for="(topic, index) in nodeTopicList.topics"
+                  :key="index"
+                  class="w-full h-full"
+                >
                   <div class="cursor-pointer hover:bg-gray-100 pl-2 pb-1">
-                    {{ option }}
+                    {{ topic.name }}
                   </div>
                 </div>
               </div>
@@ -184,59 +191,20 @@ export default {
       topicMsg: 'getTopicMsg',
       paramList: 'getParamList',
       nodeList: 'getNodeList',
+      // nodeForm: 'getNodeForm',
     }),
     msgTypeList() {
       return this.filteredMsg.length > 0 ? this.filteredMsg : this.options;
     },
+    nodeTopicList() {
+      const nodeInfo = this.setNodeInfo();
+      return this.filteredNodeTopic.length > 0 ? this.filteredNodeTopic : nodeInfo;
+    },
     dropdownId() {
       return `dropdown${this.index}`;
     },
-    nodeInfo() {
-      const filtedNodes = this.nodeList.filter(n => this.filterROSTopic(n));
-      const filteredParams = this.paramList.filter(p => this.filterROSTopic(p));
-
-      filtedNodes.map(n => {
-        n.services = n.services.filter(s => this.filterROSTopic(s));
-        n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
-        n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
-        return n;
-      });
-
-      const nodes = filtedNodes.map(n => {
-        n.topics = n.publishing
-          .concat(n.subscribing)
-          .map(name => this.topicMsg.find(m => m.name === name));
-        n.params = filteredParams.filter(param => param.node === n.name);
-
-        return n;
-      });
-      let nodeFormTemp = {
-        publishing: [],
-        subscribing: [],
-        topics: [],
-        param: [],
-      };
-      nodes.forEach(n => {
-        n.publishing.forEach(pub => {
-          if (!nodeFormTemp.publishing.find(temp => temp === pub)) {
-            nodeFormTemp.publishing.push(pub);
-          }
-        });
-        n.subscribing.forEach(sub => {
-          if (!nodeFormTemp.subscribing.find(temp => temp === sub)) {
-            nodeFormTemp.subscribing.push(sub);
-          }
-        });
-        n.topics.forEach(topic => {
-          if (
-            !nodeFormTemp.topics.find(temp => temp.name === topic.name && temp.type === topic.type)
-          ) {
-            nodeFormTemp.topics.push(topic);
-          }
-          // nodeFormTemp.topics.push(topic);
-        });
-      });
-      return nodeFormTemp;
+    dropdownTopicId() {
+      return `dropdown-topic${this.index}`;
     },
   },
   props: {
@@ -250,7 +218,7 @@ export default {
       sameName: false,
       nodeType: '',
       nodeAction: '',
-      topicName: '/',
+      topicName: '',
       buttonName: '',
       widthButton: 120,
       bgButton: '#60A5FA',
@@ -275,13 +243,19 @@ export default {
       ],
       msg: null,
       filteredMsg: [],
+      filteredNodeTopic: [],
+      // nodeInfo: {},
     };
+  },
+  created() {
+    // this.nodeInfo = this.setNodeInfo();
   },
   mounted() {
     window.addEventListener('resize', () => {
       this.windowWidth = window.innerWidth;
     });
     this.setEditInfo(this.editState);
+    this.nodeInfo = this.setNodeInfo();
   },
   methods: {
     filterROSTopic(topic) {
@@ -356,7 +330,7 @@ export default {
       this.value = null;
       this.nodeType = '';
       this.nodeAction = '';
-      this.topicName = '/';
+      this.topicName = '';
       this.buttonName = '';
       this.widthButton = 120;
       this.bgButton = '#60A5FA';
@@ -385,6 +359,53 @@ export default {
         this.setEmptyButtonForm();
       }
     },
+    setNodeInfo() {
+      const filtedNodes = this.nodeList.filter(n => this.filterROSTopic(n));
+      const filteredParams = this.paramList.filter(p => this.filterROSTopic(p));
+
+      filtedNodes.map(n => {
+        n.services = n.services.filter(s => this.filterROSTopic(s));
+        n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
+        n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
+        return n;
+      });
+
+      const nodes = filtedNodes.map(n => {
+        n.topics = n.publishing
+          .concat(n.subscribing)
+          .map(name => this.topicMsg.find(m => m.name === name));
+        n.params = filteredParams.filter(param => param.node === n.name);
+
+        return n;
+      });
+      let nodeFormTemp = {
+        publishing: [],
+        subscribing: [],
+        topics: [],
+        param: [],
+      };
+      nodes.forEach(n => {
+        n.publishing.forEach(pub => {
+          if (!nodeFormTemp.publishing.find(temp => temp === pub)) {
+            nodeFormTemp.publishing.push(pub);
+          }
+        });
+        n.subscribing.forEach(sub => {
+          if (!nodeFormTemp.subscribing.find(temp => temp === sub)) {
+            nodeFormTemp.subscribing.push(sub);
+          }
+        });
+        n.topics.forEach(topic => {
+          if (
+            !nodeFormTemp.topics.find(temp => temp.name === topic.name && temp.type === topic.type)
+          ) {
+            nodeFormTemp.topics.push(topic);
+          }
+          // nodeFormTemp.topics.push(topic);
+        });
+      });
+      return nodeFormTemp;
+    },
   },
   watch: {
     msg(val) {
@@ -394,6 +415,16 @@ export default {
         this.filteredMsg = this.options;
       }
     },
+    // topicName(val) {
+    //   if (val !== '' && this.nodeInfo.topics.length > 0) {
+    //     this.filteredNodeTopic = this.nodeInfo.topics.filter(n => {
+    //       console.log('n', n.name);
+    //       return n.name.includes(val);
+    //     });
+    //   } else {
+    //     this.filteredNodeTopic = this.nodeInfo;
+    //   }
+    // },
     editState(val) {
       this.setEditInfo(val);
     },

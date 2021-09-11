@@ -286,6 +286,7 @@ export default {
         });
 
         this.ros.on('connection', () => {
+          console.log('connect');
           this.connected = true;
           this.errorState = false;
           this.$store.dispatch('updateWSAddress', ws_address);
