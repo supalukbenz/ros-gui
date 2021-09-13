@@ -1,10 +1,10 @@
 <template>
-  <div class="card">
+  <div class="card p-2">
     <div class="flex items-center">
-      <h5 class="card-title">
-        {{ topic.name }}
+      <div>
+        <strong class="mr-1">{{ topic.name }}</strong>
         <small class="text-muted">({{ topic.type }})</small>
-      </h5>
+      </div>
     </div>
     <div v-if="topic.info">
       <form class="flex">
@@ -23,5 +23,6 @@ export default {
   props: {
     topic: Object,
   },
+  methods: {},
 };
 </script>

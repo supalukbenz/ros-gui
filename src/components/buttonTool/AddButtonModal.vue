@@ -4,8 +4,8 @@
       :class="[windowWidth < 992 ? 'flex-col' : 'flex-row']"
       class="flex py-2 px-4 justify-center"
     >
-      <div class="flex justify-center flex-col mr-4">
-        <div>
+      <div class="flex justify-start items-start flex-col mr-4 pt-2 min-w-20">
+        <div class="w-full h-full">
           <div class="grid grid-rows-2 grid-cols-2">
             <div class="text-left">
               <div class="form-check form-check-inline">
@@ -88,7 +88,7 @@
               </div>
             </div>
           </div>
-          <div class="w-full flex flex-col items-start mt-2 relative">
+          <div class="w-full flex flex-col items-start mt-2 relative mb-2">
             <div class="font-bold">Types</div>
             <input
               type="text"
@@ -118,25 +118,21 @@
             <div class="font-bold">Topic name</div>
             <input v-model="topicName" type="text" class="border rounded w-full px-2 py-1" />
           </div> -->
-          <div class="w-full flex flex-col items-start mt-3">
-            <div class="font-bold">Button name</div>
-            <input v-model="buttonName" type="text" class="border rounded w-full px-2 py-1" />
-            <div class="flex flex-row items-center">
-              <input v-model="sameName" type="checkbox" @change="handleSameName()" />
-              <span class="ml-1 text-sm">use the same name as topic</span>
-            </div>
-          </div>
           <a @click="setCurrentTopic()" class="text-sm font-bold cursor-pointer underline"
-            >Set variable</a
+            >Set variables</a
           >
-          <VariableNodeForm v-if="showVariable" :topic="topicSelected"></VariableNodeForm>
+          <VariableNodeForm
+            v-if="showVariable"
+            @variable="setVariable"
+            :topic="topicSelected"
+          ></VariableNodeForm>
         </div>
       </div>
       <div
         :class="[windowWidth < 992 ? 'mt-4' : 'w-72']"
-        class="flex flex-col justify-between items-start bg-gray-100 pt-4 px-4 pb-1"
+        class="flex flex-col justify-between items-start pt-2 pl-4 pb-1"
       >
-        <div class="flex justify-center items-center w-full h-full">
+        <div class="flex justify-center items-center w-full h-full bg-gray-100 min-h-10">
           <button
             type="button"
             class="font-bold rounded p-1 overflow-hidden"
@@ -151,6 +147,14 @@
           </button>
         </div>
         <div>
+          <div class="flex flex-col items-start mt-3 mr-4">
+            <div class="font-bold">Button name</div>
+            <input v-model="buttonName" type="text" class="border rounded px-2 py-1 w-full" />
+            <div class="flex flex-row items-center">
+              <input v-model="sameName" type="checkbox" @change="handleSameName()" />
+              <span class="ml-1 text-sm">use the same name as topic</span>
+            </div>
+          </div>
           <div class="w-72 flex flex-row items-start mt-2">
             <div class="mr-1">
               <div class="font-bold text-left">Width</div>
@@ -202,6 +206,7 @@ export default {
       topicMsg: 'getTopicMsg',
       paramList: 'getParamList',
       nodeList: 'getNodeList',
+      robotConnected: 'getRobotConnected',
       // nodeForm: 'getNodeForm',
     }),
     msgTypeList() {
@@ -215,75 +220,17 @@ export default {
             return t.type;
           }
         });
+        msg = msg.filter(Boolean);
+        console.log('msg', msg);
+        return msg;
+      } else {
+        return [];
       }
-      msg = msg.filter(Boolean);
-      console.log('msg', msg);
-      return msg;
-    },
-    nodeTopicList() {
-      let nodeFormTemp = {
-        publishing: [],
-        subscribing: [],
-        topics: [],
-        param: [],
-      };
-      if (this.nodeList.length > 0 && this.paramList.length > 0 && this.topicMsg.length > 0) {
-        const filtedNodes = this.nodeList.filter(n => this.filterROSTopic(n?.name));
-        const filteredParams = this.paramList.filter(p => this.filterROSTopic(p?.name));
-
-        filtedNodes.map(n => {
-          n.services = n.services.filter(s => this.filterROSTopic(s));
-          n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
-          n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
-          return n;
-        });
-
-        const nodes = filtedNodes.map(n => {
-          n.topics = n.publishing.concat(n.subscribing).map(name => {
-            if (this.topicMsg.length > 0) {
-              return this.topicMsg.find(m => m?.name === name);
-            }
-          });
-          n.params = filteredParams.filter(param => param.node === n?.name);
-
-          return n;
-        });
-        nodes.forEach(n => {
-          n.publishing.forEach(pub => {
-            if (!nodeFormTemp.publishing.find(temp => temp === pub)) {
-              nodeFormTemp.publishing.push(pub);
-            }
-          });
-          n.subscribing.forEach(sub => {
-            if (!nodeFormTemp.subscribing.find(temp => temp === sub)) {
-              nodeFormTemp.subscribing.push(sub);
-            }
-          });
-          n.topics.forEach(topic => {
-            if (
-              !nodeFormTemp.topics.find(temp => {
-                if (temp) {
-                  return temp?.name === topic?.name && temp.type === topic.type;
-                }
-              })
-            ) {
-              nodeFormTemp.topics.push(topic);
-            }
-            // nodeFormTemp.topics.push(topic);
-          });
-        });
-        // nodeFormTemp.topics = await nodeFormTemp.topics.filter(
-        //   (elem, index, self) =>
-        //     self.findIndex(t => {
-        //       return t.name === elem.name && t.type === elem.type;
-        //     }) === index
-        // );
-        // nodeInfo = nodeFormTemp;
-      }
-      return nodeFormTemp;
     },
     filterNode() {
-      return this.filteredNodeTopic.topics.length > 0 ? this.filteredNodeTopic : this.nodeTopicList;
+      return this.filteredNodeTopic.topics.length > 0
+        ? this.filteredNodeTopic
+        : this.nodeTopicList();
     },
     dropdownId() {
       return `dropdown${this.index}`;
@@ -328,6 +275,7 @@ export default {
       ],
       msg: '',
       filteredMsg: [],
+      variables: [],
       filteredNodeTopic: { topics: [] },
       topicSelected: {},
       showVariable: false,
@@ -345,6 +293,69 @@ export default {
     this.nodeInfo = this.setNodeInfo();
   },
   methods: {
+    setVariable(form) {
+      console.log('add button', form.name, form.value);
+    },
+    nodeTopicList() {
+      let nodeFormTemp = {
+        publishing: [],
+        subscribing: [],
+        topics: [],
+        param: [],
+      };
+      if (this.nodeList.length > 0 && this.paramList.length > 0 && this.topicMsg.length > 0) {
+        const filtedNodes = this.nodeList.filter(n => this.filterROSTopic(n?.name));
+        const filteredParams = this.paramList.filter(p => this.filterROSTopic(p?.name));
+
+        filtedNodes.map(n => {
+          n.services = n.services.filter(s => this.filterROSTopic(s));
+          n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
+          n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
+          return n;
+        });
+
+        const nodes = filtedNodes.map(n => {
+          n.topics = n.publishing.concat(n.subscribing).map(name => {
+            return this.topicMsg.find(m => m?.name === name);
+          });
+          n.params = filteredParams.filter(param => param.node === n?.name);
+
+          return n;
+        });
+        nodes.forEach(n => {
+          n.publishing.forEach(pub => {
+            if (!nodeFormTemp.publishing.find(temp => temp === pub)) {
+              nodeFormTemp.publishing.push(pub);
+            }
+          });
+          n.subscribing.forEach(sub => {
+            if (!nodeFormTemp.subscribing.find(temp => temp === sub)) {
+              nodeFormTemp.subscribing.push(sub);
+            }
+          });
+          n.topics.forEach(topic => {
+            if (
+              !nodeFormTemp.topics.find(temp => {
+                if (temp) {
+                  return temp?.name === topic?.name && temp.type === topic.type;
+                }
+              })
+            ) {
+              nodeFormTemp.topics.push(topic);
+            }
+            // nodeFormTemp.topics.push(topic);
+          });
+        });
+        // nodeFormTemp.topics = await nodeFormTemp.topics.filter(
+        //   (elem, index, self) =>
+        //     self.findIndex(t => {
+        //       return t.name === elem.name && t.type === elem.type;
+        //     }) === index
+        // );
+        // nodeInfo = nodeFormTemp;
+      }
+      return nodeFormTemp;
+    },
     filterROSTopic(topic) {
       // console.log('topic.name', topic.name);
       // console.log('topic', topic);
@@ -377,6 +388,7 @@ export default {
     handleButtonFormSubmit() {
       let currentButtonList = this.buttonList;
       if (!this.editState) {
+        const robotId = this.robotConnected.id;
         let id = 1;
         if (currentButtonList.length > 0) {
           const sortedButton = currentButtonList.sort((a, b) => a.buttonId - b.buttonId);
@@ -393,15 +405,21 @@ export default {
           }
           const btnForm = {
             buttonId: id,
-            nodeType: this.nodeType,
-            nodeAction: this.nodeAction,
-            msgType: this.msg,
-            topicName: this.topicName,
+            robotId: robotId,
+            buttonAction: {
+              nodeType: this.nodeType,
+              nodeAction: this.nodeAction,
+              msgType: this.msg,
+              topicName: this.topicName,
+              variables: [],
+            },
+            buttonStyle: {
+              width: this.widthButton,
+              height: this.heightButton,
+              bg: this.bgButton,
+              color: this.textColorButton,
+            },
             buttonName: this.buttonName,
-            width: this.widthButton,
-            height: this.heightButton,
-            bg: this.bgButton,
-            color: this.textColorButton,
             listState: true,
           };
           currentButtonList.push(btnForm);
@@ -411,15 +429,15 @@ export default {
       } else {
         currentButtonList.map(b => {
           if (b.buttonId === this.buttonInfo.buttonId) {
-            b.nodeType = this.nodeType;
-            b.nodeAction = this.nodeAction;
-            b.msgType = this.msg;
-            b.topicName = this.topicName;
+            b.buttonAction.nodeType = this.nodeType;
+            b.buttonAction.nodeAction = this.nodeAction;
+            b.buttonAction.msgType = this.msg;
+            b.buttonAction.topicName = this.topicName;
             b.buttonName = this.buttonName;
-            b.width = this.widthButton;
-            b.height = this.heightButton;
-            b.bg = this.bgButton;
-            b.color = this.textColorButton;
+            b.buttonStyle.width = this.widthButton;
+            b.buttonStyle.height = this.heightButton;
+            b.buttonStyle.bg = this.bgButton;
+            b.buttonStyle.color = this.textColorButton;
           }
           return b;
         });
@@ -434,6 +452,7 @@ export default {
       this.nodeAction = '';
       this.topicName = '';
       this.buttonName = '';
+      this.msg = '';
       this.widthButton = 120;
       this.bgButton = '#60A5FA';
       this.textColorButton = '#2C3E50';
@@ -451,15 +470,15 @@ export default {
     },
     setEditInfo(state) {
       if (state) {
-        this.nodeType = this.buttonInfo.nodeType;
-        this.nodeAction = this.buttonInfo.nodeAction;
-        this.msg = this.buttonInfo.msgType;
-        this.topicName = this.buttonInfo.topicName;
+        this.nodeType = this.buttonInfo.buttonAction.nodeType;
+        this.nodeAction = this.buttonInfo.buttonAction.nodeAction;
+        this.msg = this.buttonInfo.buttonAction.msgType;
+        this.topicName = this.buttonInfo.buttonAction.topicName;
         this.buttonName = this.buttonInfo.buttonName;
-        this.widthButton = this.buttonInfo.width;
-        this.heightButton = this.buttonInfo.height;
-        this.bgButton = this.buttonInfo.bg;
-        this.textColorButton = this.buttonInfo.color;
+        this.widthButton = this.buttonInfo.buttonStyle.width;
+        this.heightButton = this.buttonInfo.buttonStyle.height;
+        this.bgButton = this.buttonInfo.buttonStyle.bg;
+        this.textColorButton = this.buttonInfo.buttonStyle.color;
       } else {
         this.setEmptyButtonForm();
       }
@@ -468,6 +487,7 @@ export default {
   },
   watch: {
     msg(val) {
+      this.showVariable = false;
       if (val !== '') {
         this.filteredMsg = this.filteredMsgByTopic.filter(op => op.includes(val));
       } else {
@@ -475,6 +495,7 @@ export default {
       }
     },
     topicName(val) {
+      this.showVariable = false;
       if (val !== '') {
         // this.filteredNodeTopic = this.nodeTopicList.topics.filter(n => {
         //   if (n) {
@@ -482,14 +503,14 @@ export default {
         //     return n.name.includes(val);
         //   }
         // });
-        this.filteredNodeTopic.topics = this.nodeTopicList.topics.filter(n => {
+        this.filteredNodeTopic.topics = this.nodeTopicList().topics.filter(n => {
           if (n) {
             return n.name.includes(val);
           }
         });
       } else {
-        this.filteredNodeTopic.topics = this.nodeTopicList.topics;
-        this.filteredMsgByTopic = [];
+        this.msg = '';
+        this.filteredNodeTopic.topics = this.nodeTopicList().topics;
       }
     },
     editState(val) {
@@ -502,5 +523,13 @@ export default {
 <style scoped>
 .max-h-15 {
   max-height: 15rem;
+}
+
+.min-h-10 {
+  min-height: 10rem;
+}
+
+.min-w-20 {
+  min-width: 15rem;
 }
 </style>

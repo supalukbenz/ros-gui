@@ -148,7 +148,7 @@ export default {
             e.members = allInfo.find(i => e.type === i.type).members;
           }
           if (e.members) {
-            this.findMembers(e);
+            this.findMembers(allInfo, e);
           }
         }
       }

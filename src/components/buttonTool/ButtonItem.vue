@@ -28,8 +28,8 @@
       "
       :id="buttonId"
       :style="{
-        background: buttonInfo.bg,
-        color: buttonInfo.color,
+        background: buttonInfo.buttonStyle.bg,
+        color: buttonInfo.buttonStyle.color,
       }"
       @click="addSelectedButton()"
       @contextmenu.prevent="handlerRightClick"
@@ -72,7 +72,7 @@
               <span class="font-bold text-red-500">{{ buttonInfo.buttonName }}</span>
             </div>
           </div>
-          <div class="modal-footer">
+          <div v-if="removeState" class="modal-footer">
             <button type="button" @click="clickedRemoveButton()" class="btn btn-danger">
               Remove
             </button>

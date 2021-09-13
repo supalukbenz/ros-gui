@@ -35,10 +35,10 @@
             :x="selectedButton.buttonPosition.xPos"
             :y="selectedButton.buttonPosition.yPos"
             :style="{
-              background: selectedButton.bg,
-              color: selectedButton.color,
-              width: selectedButton.width + 'px',
-              height: selectedButton.height + 'px',
+              background: selectedButton.buttonStyle.bg,
+              color: selectedButton.buttonStyle.color,
+              width: selectedButton.buttonStyle.width + 'px',
+              height: selectedButton.buttonStyle.height + 'px',
             }"
             :parent="true"
             :resizable="false"
@@ -49,8 +49,8 @@
             <button
               :class="[moveState ? 'cursor-move-btn' : 'cursor-pointer']"
               :style="{
-                width: selectedButton.width + 'px',
-                height: selectedButton.height + 'px',
+                width: selectedButton.buttonStyle.width + 'px',
+                height: selectedButton.buttonStyle.height + 'px',
               }"
               type="button"
               class="rounded font-bold"
