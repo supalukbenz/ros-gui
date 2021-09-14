@@ -8,7 +8,7 @@
     </div>
     <div v-if="topic.info">
       <form class="flex">
-        <TypeNodeForm :info="topic.info"></TypeNodeForm>
+        <TypeNodeForm :info="topic.info" :editedVariable="editedVariable"></TypeNodeForm>
       </form>
     </div>
   </div>
@@ -22,6 +22,7 @@ export default {
   },
   props: {
     topic: Object,
+    editedVariable: Object,
   },
   methods: {},
 };

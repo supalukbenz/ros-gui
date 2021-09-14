@@ -8,6 +8,7 @@
           :info="m"
           :parentList="parent"
           :parentName="m.name"
+          :editedVariable="editedVariable"
           :dataObj="setVariableFormObf(m.name)"
         ></type-childe-form>
       </div>
@@ -26,7 +27,6 @@
               :name="m.name"
               :type="getInputType(m.type)"
               :placeholder="m.type"
-              v-model="variables[m.name]"
               @change="setVariable(m.name, $event)"
             />
           </div>
@@ -38,6 +38,9 @@
 
 <script>
 import TypeNodeForm from '@/components/buttonTool/TypeNodeForm.vue';
+import { mapGetters } from 'vuex';
+// import _ from 'lodash';
+
 export default {
   name: 'type-childe-form',
   components: {
@@ -46,7 +49,9 @@ export default {
   data() {
     return {
       variables: {},
+      currentValue: null,
       parent: [],
+      currentVariable: {},
     };
   },
   props: {
@@ -54,10 +59,9 @@ export default {
     parentList: Array,
     parentName: String,
     dataObj: Object,
+    editedVariable: Object,
   },
   async created() {
-    console.log('created parent', this.parentName);
-    console.log('dataObj', this.dataObj);
     if (this.parentList !== undefined) {
       if (this.parentList.length > 0) {
         this.parent = await this.parentList;
@@ -68,7 +72,11 @@ export default {
       this.variables = this.dataObj;
     }
   },
-  computed: {},
+  computed: {
+    ...mapGetters({
+      variableList: 'getVariableList',
+    }),
+  },
   methods: {
     setVariableFormObf(name) {
       if (this.variables[name] === undefined) {
@@ -76,58 +84,38 @@ export default {
       }
       return this.variables[name];
     },
+    setKeyVariable(acc, cur) {
+      this.variables[cur] = acc;
+    },
     setVariable(name, event) {
-      console.log('name', name);
       const value = event.target.value;
       this.parent.push(name);
-      console.log(value);
-      console.log('this.parent', this.parent);
-      console.log('this.parentList', this.parentList);
-      let dataForm = {};
-      // const mapData = this.parent.map(key => {
-      //   dataForm[key] =
-      // })
-      // this.parent.forEach((n, index) => {
-      //   if (dataForm[n] === undefined) {
-      //     dataForm[n] = {};
-      //   }
-      //   if (index === this.parent.length - 1) {
-      //     dataForm[n] = value;
-      //   } else {
-      //     dataForm = dataForm[n];
-      //   }
-      // });
+      let currentVariableList = this.variableList;
+      const variable = this.parent.reduceRight(
+        (acc, cur) => ({
+          [cur]: acc,
+        }),
+        value
+      );
 
-      for (let i = this.parent.length - 1; i >= 0; i--) {
-        if (i === this.parent.length - 1) {
-          dataForm[this.parent[i]] = value;
-        } else {
-          dataForm[this.parent[i]] = dataForm;
-        }
-        console.log(this.parent[i]);
-      }
-
-      console.log('dataForm', dataForm);
-      // if (value === '') {
-      //   if (this.parentName === undefined) {
-      //     delete this.variables[name];
-      //   } else {
-      //     delete this.variables[this.parentName][name];
-      //   }
-      // } else {
-      //   if (this.parentName === undefined) {
-      //     this.variables[name] = value;
-      //   } else {
-      //     this.variables[this.parentName].name = value;
-      //   }
-      // }
-      // console.log(this.variables);
+      currentVariableList.push(variable);
+      this.parent.pop();
+      this.$store.dispatch('updateVariableList', currentVariableList);
     },
-    updateVariable(name, event) {
-      console.log(name, event.target.value);
-      console.log(this.variables);
-      console.log('updateVariable');
-      console.log('this.parent', this.parent);
+    updateVariable(name) {
+      if (this.editedVariable !== undefined) {
+        let tempParent = this.parent;
+        tempParent.push(name);
+        console.log('tempParent', tempParent);
+        // let value = _.get(this.editedVariable, tempParent);
+        let value = 1;
+        tempParent.pop();
+        console.log('value', value);
+        if (value) {
+          return value;
+        }
+      }
+      return null;
     },
     getInputType(type) {
       const numbers = [

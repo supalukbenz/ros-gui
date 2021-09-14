@@ -118,6 +118,21 @@
             <div class="font-bold">Topic name</div>
             <input v-model="topicName" type="text" class="border rounded w-full px-2 py-1" />
           </div> -->
+          <div class="border rounded md-1 px-2">
+            <div class="font-bold">Variables</div>
+            <div v-if="editState && editedVariable">
+              <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left">
+                <div class="" v-if="typeof editedVariable[key] === 'object'">
+                  <span class="text-muted">{{ key }}/ </span>
+                  <TreeVariable :depth="10" :keyObj="editedVariable[key]"></TreeVariable>
+                </div>
+                <div v-else>
+                  <span class="font-bold">{{ key }}: </span>{{ editedVariable[key] }}
+                </div>
+              </div>
+            </div>
+            <div class="text-sm" v-else>No variable.</div>
+          </div>
           <a @click="setCurrentTopic()" class="text-sm font-bold cursor-pointer underline"
             >Set variables</a
           >
@@ -125,6 +140,7 @@
             v-if="showVariable"
             @variable="setVariable"
             :topic="topicSelected"
+            :editedVariable="editedVariable"
           ></VariableNodeForm>
         </div>
       </div>
@@ -194,11 +210,14 @@
 
 <script>
 import VariableNodeForm from '@/components/buttonTool/VariableNodeForm.vue';
+import TreeVariable from '@/components/buttonTool/TreeVariable.vue';
 import { mapGetters } from 'vuex';
+import _ from 'lodash';
 
 export default {
   components: {
     VariableNodeForm,
+    TreeVariable,
   },
   computed: {
     ...mapGetters({
@@ -207,11 +226,15 @@ export default {
       paramList: 'getParamList',
       nodeList: 'getNodeList',
       robotConnected: 'getRobotConnected',
+      variableList: 'getVariableList',
       // nodeForm: 'getNodeForm',
     }),
     msgTypeList() {
       return this.filteredMsg.length > 0 ? this.filteredMsg : this.filteredMsgByTopic;
     },
+    // keyVariableObject() {
+    //   return Object.keys(this.editedVariable);
+    // },
     filteredMsgByTopic() {
       let msg = [];
       if (this.topicName !== '') {
@@ -255,30 +278,15 @@ export default {
       widthButton: 120,
       bgButton: '#60A5FA',
       textColorButton: '#2C3E50',
+      editedVariable: null,
       heightButton: 48,
-      options: [
-        'bool',
-        'byte',
-        'char',
-        'float32',
-        'float64',
-        'int8',
-        'uint8',
-        'int16',
-        'uint16',
-        'int32',
-        'uint32',
-        'int64',
-        'uint64',
-        'string',
-        'wstring',
-      ],
       msg: '',
       filteredMsg: [],
       variables: [],
       filteredNodeTopic: { topics: [] },
       topicSelected: {},
       showVariable: false,
+      keyVariableObject: [],
       // nodeInfo: {},
     };
   },
@@ -387,6 +395,15 @@ export default {
     },
     handleButtonFormSubmit() {
       let currentButtonList = this.buttonList;
+      let variables = {};
+      if (this.variableList.length > 0) {
+        let mapVariable = this.variableList[0];
+        this.variableList.forEach(v => {
+          mapVariable = _.merge(mapVariable, v);
+        });
+        variables = mapVariable;
+      }
+      console.log('variables add button', variables);
       if (!this.editState) {
         const robotId = this.robotConnected.id;
         let id = 1;
@@ -411,7 +428,7 @@ export default {
               nodeAction: this.nodeAction,
               msgType: this.msg,
               topicName: this.topicName,
-              variables: [],
+              variables: variables,
             },
             buttonStyle: {
               width: this.widthButton,
@@ -433,6 +450,7 @@ export default {
             b.buttonAction.nodeAction = this.nodeAction;
             b.buttonAction.msgType = this.msg;
             b.buttonAction.topicName = this.topicName;
+            b.buttonAction.variables = this.variables;
             b.buttonName = this.buttonName;
             b.buttonStyle.width = this.widthButton;
             b.buttonStyle.height = this.heightButton;
@@ -444,6 +462,7 @@ export default {
         this.$store.dispatch('updateCloseEditButtonModal', true);
       }
       this.$store.dispatch('updateButtonList', currentButtonList);
+      this.$store.dispatch('updateVariableList', []);
     },
     setEmptyButtonForm() {
       this.sameName = false;
@@ -458,6 +477,7 @@ export default {
       this.textColorButton = '#2C3E50';
       this.heightButton = 48;
       this.filteredMsg = [];
+      this.$store.dispatch('updateVariableList', []);
     },
     handleSameName() {
       this.buttonName = this.topicName;
@@ -474,11 +494,14 @@ export default {
         this.nodeAction = this.buttonInfo.buttonAction.nodeAction;
         this.msg = this.buttonInfo.buttonAction.msgType;
         this.topicName = this.buttonInfo.buttonAction.topicName;
+        this.editedVariable = this.buttonInfo.buttonAction.variables;
         this.buttonName = this.buttonInfo.buttonName;
         this.widthButton = this.buttonInfo.buttonStyle.width;
         this.heightButton = this.buttonInfo.buttonStyle.height;
         this.bgButton = this.buttonInfo.buttonStyle.bg;
         this.textColorButton = this.buttonInfo.buttonStyle.color;
+        this.keyVariableObject = Object.keys(this.buttonInfo.buttonAction.variables);
+        console.log('this.editedVariable', this.editedVariable['header']);
       } else {
         this.setEmptyButtonForm();
       }
@@ -488,6 +511,7 @@ export default {
   watch: {
     msg(val) {
       this.showVariable = false;
+      this.$store.dispatch('updateVariableList', []);
       if (val !== '') {
         this.filteredMsg = this.filteredMsgByTopic.filter(op => op.includes(val));
       } else {
@@ -496,6 +520,7 @@ export default {
     },
     topicName(val) {
       this.showVariable = false;
+      this.$store.dispatch('updateVariableList', []);
       if (val !== '') {
         // this.filteredNodeTopic = this.nodeTopicList.topics.filter(n => {
         //   if (n) {

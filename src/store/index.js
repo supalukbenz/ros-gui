@@ -30,6 +30,7 @@ export default new Vuex.Store({
     nodeList: [],
     paramList: [],
     nodeForm: [],
+    variableList: [],
     buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
     selectedButtonList: JSON.parse(localStorage.getItem('selectedButtonList')) || [],
     data: { selection: [], source: [], expanded: [] },
@@ -77,6 +78,9 @@ export default new Vuex.Store({
     },
     getNodeForm: state => {
       return state.nodeForm;
+    },
+    getVariableList: state => {
+      return state.variableList;
     },
     getParamList: state => {
       return state.paramList;
@@ -160,6 +164,9 @@ export default new Vuex.Store({
       state.rosbridgeURL = payload;
       localStorage.setItem('rosbridgeURL', JSON.stringify(payload));
     },
+    setVariableList(state, payload) {
+      state.variableList = payload;
+    },
   },
   actions: {
     updateWSAddress({ commit }, payload) {
@@ -215,6 +222,9 @@ export default new Vuex.Store({
     },
     updateSelectedButtonList({ commit }, payload) {
       commit('setSelectedButtonList', payload);
+    },
+    updateVariableList({ commit }, payload) {
+      commit('setVariableList', payload);
     },
   },
   modules: {},
