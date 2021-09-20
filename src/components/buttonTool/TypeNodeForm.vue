@@ -19,7 +19,7 @@
         </div>
         <div>
           <div v-if="getInputType(m.type) === 'bool'">
-            <input :name="m.name" type="checkbox" />
+            <input :name="m.name" type="checkbox" @change="setVariable(m.name, m.type, $event)" />
           </div>
           <div v-else>
             <input

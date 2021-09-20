@@ -134,7 +134,7 @@
             <div class="text-sm" v-else>No variable.</div>
           </div>
           <a @click="setCurrentTopic()" class="text-sm font-bold cursor-pointer underline">{{
-            editState ? 'Set new varialble' : 'Set variables'
+            editState ? 'Set new variable' : 'Set variables'
           }}</a>
           <VariableNodeForm
             v-if="showVariable"
@@ -397,12 +397,14 @@ export default {
     handleButtonFormSubmit() {
       let currentButtonList = this.buttonList;
       let variables = {};
+      console.log('variableList', this.variableList);
       if (this.variableList.length > 0) {
         let mapVariable = this.variableList[0];
         this.variableList.forEach(v => {
           mapVariable = _.merge(mapVariable, v);
         });
         variables = mapVariable;
+        console.log('mapVariable', mapVariable);
       }
       console.log('variables add button', variables);
       if (!this.editState) {
@@ -447,16 +449,19 @@ export default {
       } else {
         currentButtonList.map(b => {
           if (b.buttonId === this.buttonInfo.buttonId) {
+            console.log('if b.buttonId === this.buttonInfo.buttonId');
             b.buttonAction.nodeType = this.nodeType;
             b.buttonAction.nodeAction = this.nodeAction;
             b.buttonAction.msgType = this.msg;
             b.buttonAction.topicName = this.topicName;
-            b.buttonAction.variables = variables;
             b.buttonName = this.buttonName;
             b.buttonStyle.width = this.widthButton;
             b.buttonStyle.height = this.heightButton;
             b.buttonStyle.bg = this.bgButton;
             b.buttonStyle.color = this.textColorButton;
+            if (this.variableList.length > 0) {
+              b.buttonAction.variables = variables;
+            }
           }
           return b;
         });
@@ -467,12 +472,14 @@ export default {
             b.buttonAction.nodeAction = this.nodeAction;
             b.buttonAction.msgType = this.msg;
             b.buttonAction.topicName = this.topicName;
-            b.buttonAction.variables = variables;
             b.buttonName = this.buttonName;
             b.buttonStyle.width = this.widthButton;
             b.buttonStyle.height = this.heightButton;
             b.buttonStyle.bg = this.bgButton;
             b.buttonStyle.color = this.textColorButton;
+            if (this.variableList.length > 0) {
+              b.buttonAction.variables = variables;
+            }
           }
           return b;
         });
@@ -558,6 +565,7 @@ export default {
     },
     editState(val) {
       this.setEditInfo(val);
+      this.showVariable = false;
     },
   },
 };

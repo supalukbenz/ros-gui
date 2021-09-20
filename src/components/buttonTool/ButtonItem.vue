@@ -59,32 +59,35 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body">
-            <div v-if="editState">
+          <div v-if="editState" class="modal-body">
+            <div>
               <AddButtonModal
                 :index="index"
                 :buttonInfo="buttonInfo"
                 :editState="editState"
               ></AddButtonModal>
             </div>
-            <div v-if="removeState" class="text-xl">
+          </div>
+          <div v-if="removeState" class="modal-body">
+            <div class="text-xl mb-4">
               Are you sure to remove
               <span class="font-bold text-red-500">{{ buttonInfo.buttonName }}</span>
             </div>
+            <div class="flex justify-end">
+              <button type="button" @click="clickedRemoveButton()" class="btn btn-danger mr-3">
+                Remove
+              </button>
+              <button
+                type="button"
+                @click="removeState = false"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+            </div>
           </div>
-          <div v-if="removeState" class="modal-footer">
-            <button type="button" @click="clickedRemoveButton()" class="btn btn-danger">
-              Remove
-            </button>
-            <button
-              type="button"
-              @click="removeState = false"
-              class="btn btn-secondary"
-              data-dismiss="modal"
-            >
-              Close
-            </button>
-          </div>
+          <div class="modal-footer"></div>
         </div>
       </div>
     </div>
@@ -107,6 +110,10 @@ export default {
       editState: false,
       removeState: false,
     };
+  },
+  created() {
+    this.editState = false;
+    this.removeState = false;
   },
   computed: {
     ...mapGetters({
@@ -167,6 +174,7 @@ export default {
       this.editState = true;
       this.removeState = false;
       $(`#${this.modalId}`).modal('show');
+      this.$store.dispatch('updateCloseEditButtonModal', false);
     },
     handleRemoveButton() {
       this.removeState = true;
@@ -174,11 +182,19 @@ export default {
       $(`#${this.modalId}`).modal('show');
     },
     clickedRemoveButton() {
-      const currentButtonList = this.buttonList;
-      console.log('this.buttonInfo.buttonId', this.buttonInfo.buttonId);
-      const index = currentButtonList.findIndex(r => r.buttonId === this.buttonInfo.buttonId);
-      currentButtonList.splice(index, 1);
+      let currentButtonList = this.buttonList;
+      let currentSelectedList = this.selectedButtonList;
+      const indexButtonList = currentButtonList.findIndex(
+        r => r.buttonId === this.buttonInfo.buttonId
+      );
+      currentButtonList.splice(indexButtonList, 1);
+
+      const indexSelectedList = currentSelectedList.findIndex(
+        r => r.buttonId === this.buttonInfo.buttonId
+      );
+      currentSelectedList.splice(indexSelectedList, 1);
       this.$store.dispatch('updateButtonList', currentButtonList);
+      this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
       $(`#${this.modalId}`).modal('hide');
       this.removeState = false;
     },
@@ -205,9 +221,10 @@ export default {
   watch: {
     closeEditButtonModal(val) {
       if (val) {
+        console.log('close modal');
         $(`#${this.modalId}`).modal('hide');
         this.editState = false;
-        this.$store.dispatch('updateCloseEditButtonModal', false);
+        // this.$store.dispatch('updateCloseEditButtonModal', false);
       }
     },
   },
