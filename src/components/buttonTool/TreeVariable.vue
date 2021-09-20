@@ -2,11 +2,11 @@
   <div>
     <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left flex flex-col">
       <div class="" v-if="typeof keyObj[key] === 'object'">
-        <div :style="{ marginLeft: depth + 'px' }" class="text-muted">{{ key }}/</div>
+        <div :style="{ marginLeft: depth + 'px' }" class="text-muted text-sm">{{ key }}/</div>
         <tree-variable :keyObj="keyObj[key]" :depth="depth + 10"></tree-variable>
       </div>
       <div :style="{ marginLeft: depth + 'px' }" v-else>
-        <span class="font-bold text-left">{{ key }}: </span>{{ keyObj[key] }}
+        <span class="font-bold text-left text-sm">{{ key }}: </span>{{ keyObj[key] }}
       </div>
     </div>
   </div>

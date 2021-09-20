@@ -27,7 +27,7 @@
               :name="m.name"
               :type="getInputType(m.type)"
               :placeholder="m.type"
-              @change="setVariable(m.name, $event)"
+              @change="setVariable(m.name, m.type, $event)"
             />
           </div>
         </div>
@@ -87,10 +87,15 @@ export default {
     setKeyVariable(acc, cur) {
       this.variables[cur] = acc;
     },
-    setVariable(name, event) {
-      const value = event.target.value;
+    setVariable(name, type, event) {
+      let value = event.target.value;
       this.parent.push(name);
       let currentVariableList = this.variableList;
+      console.log('type', type);
+      if (this.getInputType(type) === 'number') {
+        value = Number(value);
+      }
+      console.log('value', value);
       const variable = this.parent.reduceRight(
         (acc, cur) => ({
           [cur]: acc,

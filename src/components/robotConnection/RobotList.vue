@@ -214,6 +214,9 @@ export default {
     if (this.rosState) {
       const currentRobot = this.robotConnected;
       this.connect(currentRobot, this.rosbridgeURL);
+      if (!this.ros || !this.ros.isConnected) {
+        this.resetROSInfo();
+      }
     }
   },
   data() {

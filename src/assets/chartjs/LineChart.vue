@@ -1,13 +1,15 @@
 <script>
-import { Line } from 'vue-chartjs';
+import { Line, mixins } from 'vue-chartjs';
+const { reactiveProp } = mixins;
 // import ROSLIB from 'roslib';
 import 'chartjs-plugin-streaming';
 import 'chartjs-plugin-zoom';
 
 export default {
   extends: Line,
+  mixins: [reactiveProp],
   props: {
-    data: Object,
+    chartData: Object,
   },
   data() {
     return {
@@ -85,7 +87,7 @@ export default {
   },
   async mounted() {
     // await this.updateSelectedLines();
-    this.renderChart(this.data, this.options);
+    this.renderChart(this.chartData, this.options);
   },
   methods: {},
 };

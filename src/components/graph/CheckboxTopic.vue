@@ -174,8 +174,6 @@ export default {
                 root: root_name,
               });
             }
-          } else {
-            console.log('not in the msgList', field_type);
           }
         }
       }

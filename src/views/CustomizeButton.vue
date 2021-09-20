@@ -17,7 +17,11 @@
               +
             </button>
           </div>
-          <div v-for="(buttonInfo, index) in buttonList" :key="index" class="px-1 pt-1 w-full">
+          <div
+            v-for="(buttonInfo, index) in filterButtonList"
+            :key="index"
+            class="px-1 pt-1 w-full"
+          >
             <ButtonItem :buttonInfo="buttonInfo" :index="index + 1"></ButtonItem>
           </div>
         </div>
@@ -30,7 +34,7 @@
         <div class="w-full h-full" :class="[moveState ? 'canvas' : '']">
           <vue-draggable-resizable
             @dragstop="(x, y) => onDragstop(x, y, selectedButton)"
-            v-for="(selectedButton, index) in selectedButtonList"
+            v-for="(selectedButton, index) in filterSelectedButtonList"
             :key="index"
             :x="selectedButton.buttonPosition.xPos"
             :y="selectedButton.buttonPosition.yPos"
@@ -45,28 +49,11 @@
             :draggable="moveState"
             class="flex flex-row rounded font-bold relative cursor-pointer"
           >
-            <!-- {{ selectedButton.buttonName }} -->
-            <button
-              :class="[moveState ? 'cursor-move-btn' : 'cursor-pointer']"
-              :style="{
-                width: selectedButton.buttonStyle.width + 'px',
-                height: selectedButton.buttonStyle.height + 'px',
-              }"
-              type="button"
-              class="rounded font-bold"
-              @click="clickedSelectedButton(selectedButton)"
-            >
-              {{ selectedButton.buttonName }}
-            </button>
-            <div class="flex justify-end remove-h">
-              <div
-                v-show="moveState"
-                @click="removeSelectedButton(index)"
-                class="cursor-pointer text-xs w-2 -mr-2 -mt-2 text-gray-600 hover:text-gray-700"
-              >
-                <i class="fas fa-times-circle"></i>
-              </div>
-            </div>
+            <DraggableButtonItem
+              :moveState="moveState"
+              :selectedButton="selectedButton"
+              :index="index"
+            ></DraggableButtonItem>
           </vue-draggable-resizable>
         </div>
       </div>
@@ -106,9 +93,7 @@
 import AddButtonModal from '@/components/buttonTool/AddButtonModal.vue';
 import ButtonItem from '@/components/buttonTool/ButtonItem.vue';
 import VueDraggableResizable from 'vue-draggable-resizable';
-
-// import ConnectionPart from '@/components/robotConnection/ConnectionPart.vue';
-// import VideoFrame from '@/components/streaming/VideoFrame.vue';
+import DraggableButtonItem from '@/components/buttonTool/DraggableButtonItem.vue';
 import { mapGetters } from 'vuex';
 import $ from 'jquery';
 
@@ -120,13 +105,23 @@ export default {
     AddButtonModal,
     ButtonItem,
     VueDraggableResizable,
+    DraggableButtonItem,
   },
   computed: {
     ...mapGetters({
       closeAddButtonModal: 'getCloseAddButtonModal',
       buttonList: 'getButtonList',
+      ros: 'getROS',
+      rosbridgeURL: 'getRosbridgeURL',
+      robotConnected: 'getRobotConnected',
       selectedButtonList: 'getSelectedButtonList',
     }),
+    filterSelectedButtonList() {
+      return this.selectedButtonList.filter(b => b.robotId === this.robotConnected.id);
+    },
+    filterButtonList() {
+      return this.buttonList.filter(b => b.robotId === this.robotConnected.id);
+    },
     dragButtonId(id) {
       return `drag${id}`;
     },
@@ -137,6 +132,9 @@ export default {
       showVideo: false,
       moveState: false,
       nodeInfo1: [],
+      rosTopic: null,
+      subscribeInput: null,
+      clikedButtonIdList: [],
     };
   },
   methods: {
@@ -154,9 +152,6 @@ export default {
       this.$store.dispatch('updateSelectedButtonList', currentSelectedBtnList);
     },
     onResize() {},
-    clickedSelectedButton(button) {
-      console.log(button.buttonName);
-    },
     handleShowVideo() {
       this.showVideo = !this.showVideo;
     },

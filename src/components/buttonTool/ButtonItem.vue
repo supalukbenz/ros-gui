@@ -175,7 +175,8 @@ export default {
     },
     clickedRemoveButton() {
       const currentButtonList = this.buttonList;
-      const index = currentButtonList.findIndex(r => r.id === this.buttonInfo.buttonId);
+      console.log('this.buttonInfo.buttonId', this.buttonInfo.buttonId);
+      const index = currentButtonList.findIndex(r => r.buttonId === this.buttonInfo.buttonId);
       currentButtonList.splice(index, 1);
       this.$store.dispatch('updateButtonList', currentButtonList);
       $(`#${this.modalId}`).modal('hide');

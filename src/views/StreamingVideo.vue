@@ -63,7 +63,7 @@ export default {
   },
   mounted() {
     if (this.objectNotEmpty(this.robotConnected)) {
-      this.srcVideo = `http://${this.robotConnected.ip}:${this.portVideo}`;
+      // this.srcVideo = `http://${this.robotConnected.ip}:${this.portVideo}`;
     }
   },
   methods: {

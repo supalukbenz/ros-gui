@@ -3,7 +3,7 @@
     <div>
       <!-- <apexchart width="500" type="bar" :options="chartOptions" :series="series"></apexchart> -->
     </div>
-    <line-chart v-if="renderGraph" :data="data"></line-chart>
+    <line-chart v-if="renderGraph" :chartData="data"></line-chart>
   </div>
 </template>
 

@@ -118,24 +118,24 @@
             <div class="font-bold">Topic name</div>
             <input v-model="topicName" type="text" class="border rounded w-full px-2 py-1" />
           </div> -->
-          <div class="border rounded md-1 px-2">
-            <div class="font-bold">Variables</div>
+          <div class="border rounded md-1 py-1 px-2">
+            <div class="font-bold text-sm">Variables</div>
             <div v-if="editState && editedVariable">
               <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left">
                 <div class="" v-if="typeof editedVariable[key] === 'object'">
-                  <span class="text-muted">{{ key }}/ </span>
+                  <span class="text-muted text-sm">{{ key }}/ </span>
                   <TreeVariable :depth="10" :keyObj="editedVariable[key]"></TreeVariable>
                 </div>
                 <div v-else>
-                  <span class="font-bold">{{ key }}: </span>{{ editedVariable[key] }}
+                  <span class="font-bold text-sm">{{ key }}: </span>{{ editedVariable[key] }}
                 </div>
               </div>
             </div>
             <div class="text-sm" v-else>No variable.</div>
           </div>
-          <a @click="setCurrentTopic()" class="text-sm font-bold cursor-pointer underline"
-            >Set variables</a
-          >
+          <a @click="setCurrentTopic()" class="text-sm font-bold cursor-pointer underline">{{
+            editState ? 'Set new varialble' : 'Set variables'
+          }}</a>
           <VariableNodeForm
             v-if="showVariable"
             @variable="setVariable"
@@ -227,6 +227,7 @@ export default {
       nodeList: 'getNodeList',
       robotConnected: 'getRobotConnected',
       variableList: 'getVariableList',
+      selectedButtonList: 'getSelectedButtonList',
       // nodeForm: 'getNodeForm',
     }),
     msgTypeList() {
@@ -450,7 +451,23 @@ export default {
             b.buttonAction.nodeAction = this.nodeAction;
             b.buttonAction.msgType = this.msg;
             b.buttonAction.topicName = this.topicName;
-            b.buttonAction.variables = this.variables;
+            b.buttonAction.variables = variables;
+            b.buttonName = this.buttonName;
+            b.buttonStyle.width = this.widthButton;
+            b.buttonStyle.height = this.heightButton;
+            b.buttonStyle.bg = this.bgButton;
+            b.buttonStyle.color = this.textColorButton;
+          }
+          return b;
+        });
+        let currentSelectedList = this.selectedButtonList;
+        currentSelectedList.map(b => {
+          if (b.buttonId === this.buttonInfo.buttonId) {
+            b.buttonAction.nodeType = this.nodeType;
+            b.buttonAction.nodeAction = this.nodeAction;
+            b.buttonAction.msgType = this.msg;
+            b.buttonAction.topicName = this.topicName;
+            b.buttonAction.variables = variables;
             b.buttonName = this.buttonName;
             b.buttonStyle.width = this.widthButton;
             b.buttonStyle.height = this.heightButton;
@@ -460,6 +477,7 @@ export default {
           return b;
         });
         this.$store.dispatch('updateCloseEditButtonModal', true);
+        this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
       }
       this.$store.dispatch('updateButtonList', currentButtonList);
       this.$store.dispatch('updateVariableList', []);

@@ -1,14 +1,32 @@
 <template>
   <div class="h-full">
     <Loading v-if="!isConnected"></Loading>
+    <div class="modal" role="dialog" id="errorConnectionModal">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Connection Error</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="font-bold text-left text-red-500">Cannot connect to ROS bridge server</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="redirectToRobotList()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="flex flex-row h-full w-full">
       <SideBar class="w-56"></SideBar>
       <div v-if="isConnected" class="flex-auto mr-5 mb-10">
         <Graph v-show="routeName === 'Graph'"></Graph>
         <StreamingVideo v-show="routeName === 'StreamingVideo'"></StreamingVideo>
-        <CustomizeButton
-          v-show="routeName === 'CustomizeButton' && loadDataState"
-        ></CustomizeButton>
+        <CustomizeButton v-show="routeName === 'CustomizeButton'"></CustomizeButton>
       </div>
     </div>
   </div>
@@ -22,6 +40,7 @@ import CustomizeButton from '@/views/CustomizeButton.vue';
 import Loading from '@/components/main/Loading.vue';
 import ROSLIB from 'roslib';
 import { mapGetters } from 'vuex';
+// import $ from 'jquery';
 // import ConnectionPartVue from '../components/robotConnection/ConnectionPart.vue';
 // import { Observable } from 'rxjs';
 // import { forkJoin } from 'rxjs';
@@ -50,6 +69,8 @@ export default {
       serviceList: [],
       // topicMsg: [],
       loadDataState: false,
+      errorCount: 0,
+      alertError: false,
     };
   },
   computed: {
@@ -68,22 +89,36 @@ export default {
     },
   },
   created() {
-    // setInterval(() => console.log('wow'), 1000);
+    this.alertError = false;
     this.rosConnection();
     // setInterval(() => {
     //   this.rosConnection();
+    // if (this.ros === null || !this.ros.isConnected) {
+    //   this.errorCount = this.errorCount + 1;
+    //   console.log('count');
+    // }
+    // if (this.errorCount === 30) {
+    //   this.alertError = true;
+    //   this.isConnected = true;
+    //   setInterval(() => {
+    //     $('#errorConnectionModal').modal('show');
+    //   }, 5000);
+    //   $('#errorConnectionModal').modal('hide');
+    //   this.$router.push({
+    //     name: 'Home',
+    //   });
+    // }
     // }, 1000);
   },
   methods: {
     async rosConnection() {
-      this.loadDataState = false;
       if (this.isConnected) {
         return;
       }
 
       if (this.ros) {
         this.ros.close(); // Close old connection
-        this.ros = false;
+        this.ros = null;
         return;
       }
 
@@ -91,17 +126,24 @@ export default {
 
       this.ros.on('connection', async () => {
         await this.loadData();
-        // await this.setNodeData();
+        console.log('connect');
         this.isConnected = true;
         this.$store.dispatch('updateROS', this.ros);
       });
 
       this.ros.on('error', () => {
+        console.log('error');
         this.isConnected = false;
       });
 
       this.ros.on('close', () => {
+        console.log('close');
         this.isConnected = false;
+      });
+    },
+    redirectToRobotList() {
+      this.$router.push({
+        name: 'Home',
       });
     },
     async setTopicList() {
@@ -285,8 +327,10 @@ export default {
       // this.setTopicList();
       // this.setParams();
       // this.setNodeList();
+      console.log('load data');
       await Promise.all([this.setTopicList(), this.setNodeList(), this.setParams()]);
       this.loadDataState = true;
+      console.log('load data');
     },
     async setNodeData() {
       const [topics, nodes, params] = await Promise.all([
@@ -327,5 +371,8 @@ export default {
 <style scoped>
 .flex-content {
   flex: 1 0 auto;
+}
+.p-absolute {
+  position: absolute !important;
 }
 </style>
