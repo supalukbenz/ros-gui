@@ -8,7 +8,10 @@
           v-model="robotName"
           class="form-control outline-none"
           placeholder="Name"
-          :class="{ 'border-green': robot ? robot.robotName !== robotName : '' }"
+          :class="{
+            'border-green': robot && editState ? robot.robotName !== robotName : '',
+            'border-red': clickedState && robotName.trim() === '',
+          }"
         />
       </div>
       <div class="form-row">
@@ -19,7 +22,10 @@
             v-model="robotIP"
             class="form-control"
             placeholder="10.0.0.1"
-            :class="{ 'border-green': robot ? robot.ip !== robotIP : '' }"
+            :class="{
+              'border-green': robot && editState ? robot.ip !== robotIP : '',
+              'border-red': clickedState && robotIP.trim() === '',
+            }"
           />
         </div>
         <div class="form-group col-md-4">
@@ -31,8 +37,44 @@
               type="number"
               class="form-control"
               placeholder="9090"
-              :class="{ 'border-green': robot ? robot.port !== port : '' }"
+              :class="{
+                'border-green': robot && editState ? robot.port !== port : '',
+                'border-red': clickedState && port.trim() === '',
+              }"
             />
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="text-left font-semibold">Command</div>
+        <div class="mb-1">
+          <div v-if="commandList.length > 0">
+            <div v-for="(c, index) in commandList" :key="index" class="text-left">
+              <div>
+                $ {{ c
+                }}<span
+                  @click="removeCommand(index)"
+                  class="ml-5 text-red-500 text-sm cursor-pointer"
+                  ><i class="fas fa-minus-circle"></i
+                ></span>
+              </div>
+            </div>
+          </div>
+          <div v-else class="text-left text-gray-400">[ No command. ]</div>
+        </div>
+        <div class="flex flex-row items-center">
+          <input
+            type="text"
+            v-model="command"
+            class="form-control outline-none"
+            placeholder="roslaunch <package_name> <launch_file>"
+          />
+          <div
+            class="text-green-500 hover:text-green-700 cursor-pointer w-10 text-xl"
+            title="add command"
+            @click="addCommand()"
+          >
+            <i class="fas fa-plus-circle"></i>
           </div>
         </div>
       </div>
@@ -45,7 +87,10 @@
             type="email"
             v-model="username"
             class="form-control"
-            :class="{ 'border-green': robot ? robot.username !== username : '' }"
+            :class="{
+              'border-green': robot && editState ? robot.username !== username : '',
+              'border-red': clickedState && username.trim() === '',
+            }"
           />
         </div>
         <div class="form-group col-md-6">
@@ -55,7 +100,7 @@
             v-model="password"
             class="form-control"
             placeholder="***"
-            :class="{ 'border-green': robot ? robot.password !== password : '' }"
+            :class="{ 'border-green': robot && editState ? robot.password !== password : '' }"
           />
         </div>
       </div>
@@ -73,7 +118,7 @@
       <button
         type="button"
         @click="handleRobotFormSubmit()"
-        class="bg-green-500 text-white w-36 py-2 rounded-lg font-bold"
+        class="bg-blue-custom text-white w-36 py-2 rounded-lg font-bold"
       >
         Submit
       </button>
@@ -102,41 +147,62 @@ export default {
       username: '',
       password: '',
       port: '',
+      command: '',
+      commandList: [],
+      clickedState: false,
     };
+  },
+  mounted() {
+    this.clickedState = false;
+    this.setEditInfo(this.editState);
   },
   methods: {
     handleRobotFormSubmit() {
       const currentRobotList = this.robotList;
-      if (!this.editState) {
-        let id = 1;
-        if (currentRobotList.length > 0) {
-          const sortedRobotList = currentRobotList.sort((a, b) => a.id - b.id);
-          id = sortedRobotList[currentRobotList.length - 1].id + 1;
-        }
-        const form = {
-          id: id,
-          robotName: this.robotName,
-          ip: this.robotIP,
-          username: this.username,
-          password: this.password,
-          port: this.port,
-        };
-        currentRobotList.push(form);
-      } else {
-        currentRobotList.map(r => {
-          if (r.id === this.robot.id) {
-            r.robotName = this.robotName;
-            r.ip = this.robotIP;
-            r.username = this.username;
-            r.password = this.password;
-            r.port = this.port;
+      if (!this.checkInputEmpty()) {
+        if (!this.editState) {
+          let id = 1;
+          if (currentRobotList.length > 0) {
+            const sortedRobotList = currentRobotList.sort((a, b) => a.id - b.id);
+            id = sortedRobotList[currentRobotList.length - 1].id + 1;
           }
-          return r;
-        });
+          const form = {
+            id: id,
+            robotName: this.robotName,
+            ip: this.robotIP,
+            username: this.username,
+            password: this.password,
+            port: this.port,
+            commands: this.commandList,
+          };
+          currentRobotList.push(form);
+        } else {
+          currentRobotList.map(r => {
+            if (r.id === this.robot.id) {
+              r.robotName = this.robotName;
+              r.ip = this.robotIP;
+              r.username = this.username;
+              r.password = this.password;
+              r.port = this.port;
+              r.commands = this.commandList;
+            }
+            return r;
+          });
+        }
+        this.$store.dispatch('updateRobotList', currentRobotList);
+        // this.setEmptyRobotForm();
+        this.$store.dispatch('updateCloseModal', true);
+      } else {
+        this.clickedState = true;
       }
-      this.$store.dispatch('updateRobotList', currentRobotList);
-      this.setEmptyRobotForm();
-      this.$store.dispatch('updateCloseModal', true);
+    },
+    checkInputEmpty() {
+      return (
+        this.robotName.trim() === '' &&
+        this.robotIP.trim() === '' &&
+        this.username.trim() === '' &&
+        this.port.trim() === ''
+      );
     },
     handleRemoveRobot() {
       const currentRobotList = this.robotList;
@@ -152,18 +218,35 @@ export default {
       this.password = '';
       this.port = '';
     },
-  },
-  watch: {
-    editState(val) {
-      if (val) {
+    addCommand() {
+      if (this.command.trim() !== '') {
+        this.commandList.push(this.command);
+        this.command = '';
+      }
+    },
+    removeCommand(index) {
+      this.commandList.splice(index, 1);
+    },
+    setEditInfo(state) {
+      if (state) {
         this.robotName = this.robot.robotName;
         this.robotIP = this.robot.ip;
         this.username = this.robot.username;
         this.password = this.robot.password;
         this.port = this.robot.port;
+        this.commandList = this.robot.commands;
       } else {
-        console.log('val', val);
         this.setEmptyRobotForm();
+      }
+    },
+  },
+  watch: {
+    editState(val) {
+      this.setEditInfo(val);
+    },
+    robot(val) {
+      if (val) {
+        this.setEditInfo(true);
       }
     },
   },
@@ -178,5 +261,18 @@ export default {
 .border-green {
   --tw-border-opacity: 1;
   border-color: rgba(16, 185, 129, var(--tw-border-opacity)) !important;
+}
+
+.bg-blue-custom {
+  background: #485a73;
+}
+
+.bg-blue-custom:hover {
+  background: #3c4b5f;
+}
+
+.border-red {
+  --tw-border-opacity: 1;
+  border-color: rgba(248, 113, 113, var(--tw-border-opacity)) !important;
 }
 </style>

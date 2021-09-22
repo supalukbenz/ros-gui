@@ -11,9 +11,17 @@ async function connectToRobot(form) {
 }
 
 async function disconnectToRobot(form) {
-  console.log('form', form);
   const response = await axios.post('disconnect', form);
-  console.log('response', response);
+  const resInfo = {
+    status: response.status,
+    data: response.data,
+  };
+  console.log('disconnect');
+  return resInfo;
+}
+
+async function runCommand(form) {
+  const response = await axios.post('command', form);
   const resInfo = {
     status: response.status,
     data: response.data,
@@ -21,4 +29,4 @@ async function disconnectToRobot(form) {
   return resInfo;
 }
 
-export { connectToRobot, disconnectToRobot };
+export { connectToRobot, disconnectToRobot, runCommand };

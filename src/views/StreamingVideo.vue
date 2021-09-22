@@ -1,57 +1,49 @@
 <template>
-  <div class="h-full">
-    <div class="m-10">
-      <div class="flex justify-start mb-2">
-        <button
-          class="btn btn-secondary flex flex-row"
-          type="button"
-          data-toggle="dropdown"
-          id="dropdownCam"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <div class="font-bold">{{ camActive }}</div>
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownCam">
-          <div class="flex flex-col items-start pl-2 break-all">
-            <a class="dropdown-item" href="#">...</a>
-          </div>
-        </div>
-      </div>
-      <div class="font-bold flex flex-col justify-start mb-4">
-        <!-- {{ robotConnected.ip }} -->
-        <div class="flex flex-row">
-          <span class="mr-2">IP address:</span>
-          <span>10.204.226.190</span>
-        </div>
-        <div class="flex flex-row">
-          <span class="mr-2">Stream port:</span>
-          <input type="text" class="border-b border-black w-20 pl-1" v-model="portVideo" />
-        </div>
-      </div>
-      <iframe v-if="srcVideo !== ''" width="640" height="480" :src="srcVideo"> </iframe>
-      <div
-        class="video border bg-gray-100 text-gray-300 flex justify-center text-5xl items-center"
-        v-else
+  <div class="h-full m-10">
+    <div class="flex justify-start mb-2">
+      <button
+        class="btn btn-secondary flex flex-row"
+        type="button"
+        data-toggle="dropdown"
+        id="dropdownCam"
+        aria-haspopup="true"
+        aria-expanded="false"
       >
-        <i class="fas fa-video-slash"></i>
+        <div class="font-bold">
+          {{ camActive }} <span class="ml-3"><i class="fas fa-caret-down"></i></span>
+        </div>
+      </button>
+      <div class="dropdown-menu" aria-labelledby="dropdownCam">
+        <div class="flex flex-col items-start pr-2 break-all w-full">
+          <a
+            class="dropdown-item cursor-pointer"
+            @click="setCamActive('Raspberry Pi Camera: Stream Port')"
+            >Raspberry Pi Camera: Stream Port</a
+          >
+          <a class="dropdown-item cursor-pointer" @click="setCamActive('Webserver Video')"
+            >Webserver Video</a
+          >
+        </div>
       </div>
     </div>
+    <StreamByPort v-show="camActive === 'Raspberry Pi Camera: Stream Port'"></StreamByPort>
+    <WebserverVideo v-show="camActive === 'Webserver Video'"></WebserverVideo>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
+import StreamByPort from '@/components/streaming/StreamByPort.vue';
+import WebserverVideo from '@/components/streaming/WebserverVideo.vue';
 
 export default {
-  components: {},
+  components: {
+    StreamByPort,
+    WebserverVideo,
+  },
   data() {
     return {
-      srcVideo: '',
-      portVideo: 8081,
-      width: 640,
-      height: 480,
-      camActive: 'Raspberry Pi Camera',
+      camActive: 'Raspberry Pi Camera: Stream Port',
     };
   },
   computed: {
@@ -62,21 +54,14 @@ export default {
     }),
   },
   mounted() {
-    if (this.objectNotEmpty(this.robotConnected)) {
-      // this.srcVideo = `http://${this.robotConnected.ip}:${this.portVideo}`;
-    }
+    // if (this.objectNotEmpty(this.robotConnected)) {
+    //   // this.srcVideo = `http://${this.robotConnected.ip}:${this.portVideo}`;
+    // }
   },
   methods: {
-    objectNotEmpty(obj) {
-      return Object.keys(obj).length !== 0;
+    setCamActive(source) {
+      this.camActive = source;
     },
   },
 };
 </script>
-
-<style scoped>
-.video {
-  width: 640px;
-  height: 480px;
-}
-</style>

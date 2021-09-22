@@ -125,6 +125,9 @@ export default {
     dragButtonId(id) {
       return `drag${id}`;
     },
+    lengthSelectedButtonList() {
+      return this.selectedButtonList.length;
+    },
   },
   mounted() {},
   data() {
@@ -188,11 +191,8 @@ export default {
         this.$store.dispatch('updateCloseAddButtonModal', false);
       }
     },
-    selectedButtonList: {
-      handler() {
-        this.moveState = true;
-      },
-      deep: true,
+    lengthSelectedButtonList() {
+      this.moveState = true;
     },
     // loadData: {
     //   handler() {

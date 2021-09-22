@@ -67,7 +67,6 @@ export default {
     // this.addTopicState = true;
     await this.addTopic();
     // this.loadingState = false;
-    this.addTopicState = true;
   },
   methods: {
     sleep(ms) {
@@ -111,6 +110,7 @@ export default {
           }
         }
       }
+      this.addTopicState = true;
     },
     async addExpandTopics(topic_name, topic_type, root_name, checkbox) {
       let showCheckbox = checkbox;

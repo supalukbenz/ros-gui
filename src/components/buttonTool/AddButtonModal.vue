@@ -124,10 +124,13 @@
               <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left">
                 <div class="" v-if="typeof editedVariable[key] === 'object'">
                   <span class="text-muted text-sm">{{ key }}/ </span>
-                  <TreeVariable :depth="10" :keyObj="editedVariable[key]"></TreeVariable>
+                  <TreeVariable
+                    :depth="10"
+                    :keyObj="handleArray(editedVariable[key])"
+                  ></TreeVariable>
                 </div>
                 <div v-else>
-                  <span class="font-bold text-sm">{{ key }}: </span>{{ editedVariable[key] }}
+                  <span class="font-bold text-sm">{{ key }}: {{ editedVariable[key] }}</span>
                 </div>
               </div>
             </div>
@@ -245,7 +248,6 @@ export default {
           }
         });
         msg = msg.filter(Boolean);
-        console.log('msg', msg);
         return msg;
       } else {
         return [];
@@ -302,6 +304,13 @@ export default {
     this.nodeInfo = this.setNodeInfo();
   },
   methods: {
+    handleArray(obj) {
+      let tempObj = obj;
+      if (Array.isArray(obj)) {
+        tempObj = { ...tempObj };
+      }
+      return tempObj;
+    },
     setVariable(form) {
       console.log('add button', form.name, form.value);
     },

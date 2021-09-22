@@ -6,7 +6,7 @@
         <tree-variable :keyObj="keyObj[key]" :depth="depth + 10"></tree-variable>
       </div>
       <div :style="{ marginLeft: depth + 'px' }" v-else>
-        <span class="font-bold text-left text-sm">{{ key }}: </span>{{ keyObj[key] }}
+        <span class="font-bold text-left text-sm">{{ key }}: {{ keyObj[key] }}</span>
       </div>
     </div>
   </div>

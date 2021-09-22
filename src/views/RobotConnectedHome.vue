@@ -40,7 +40,7 @@ import CustomizeButton from '@/views/CustomizeButton.vue';
 import Loading from '@/components/main/Loading.vue';
 import ROSLIB from 'roslib';
 import { mapGetters } from 'vuex';
-// import $ from 'jquery';
+import $ from 'jquery';
 // import ConnectionPartVue from '../components/robotConnection/ConnectionPart.vue';
 // import { Observable } from 'rxjs';
 // import { forkJoin } from 'rxjs';
@@ -91,24 +91,24 @@ export default {
   created() {
     this.alertError = false;
     this.rosConnection();
-    // setInterval(() => {
-    //   this.rosConnection();
-    // if (this.ros === null || !this.ros.isConnected) {
-    //   this.errorCount = this.errorCount + 1;
-    //   console.log('count');
-    // }
-    // if (this.errorCount === 30) {
-    //   this.alertError = true;
-    //   this.isConnected = true;
-    //   setInterval(() => {
-    //     $('#errorConnectionModal').modal('show');
-    //   }, 5000);
-    //   $('#errorConnectionModal').modal('hide');
-    //   this.$router.push({
-    //     name: 'Home',
-    //   });
-    // }
-    // }, 1000);
+    const interval = setInterval(() => {
+      this.rosConnection();
+      if (this.ros === null || !this.ros.isConnected) {
+        this.errorCount = this.errorCount + 1;
+      }
+      if (this.errorCount === 30) {
+        this.alertError = true;
+        this.isConnected = true;
+        setInterval(() => {
+          $('#errorConnectionModal').modal('show');
+        }, 5000);
+        $('#errorConnectionModal').modal('hide');
+        clearInterval(interval);
+        this.$router.push({
+          name: 'Home',
+        });
+      }
+    }, 1000);
   },
   methods: {
     async rosConnection() {

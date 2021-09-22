@@ -34,7 +34,7 @@
               class="cursor-pointer"
               data-toggle="modal"
               data-target="#modal"
-              @click="editState = false"
+              @click="addRobotButton()"
             >
               + Add robot
             </div>
@@ -129,9 +129,9 @@
                       >
                         <i class="fas fa-edit"></i>
                       </a>
-                      <button class="border mr-2" @click="clickedSimulation(robot)">
+                      <!-- <button class="border mr-2" @click="clickedSimulation(robot)">
                         simulate
-                      </button>
+                      </button> -->
                       <button
                         v-if="robot.id !== robotConnected.id"
                         @click="handleRobotConnection(robot)"
@@ -157,7 +157,7 @@
     </div>
 
     <div class="modal fade" id="modal" role="dialog">
-      <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLongTitle">
@@ -168,12 +168,8 @@
             </button>
           </div>
           <div class="modal-body">
-            <RobotFormModal
-              v-if="editState"
-              :editState="editState"
-              :robot="robotEditSelected"
-            ></RobotFormModal>
-            <RobotFormModal v-else :editState="editState"></RobotFormModal>
+            <RobotFormModal :editState="editState" :robot="robotEditSelected"></RobotFormModal>
+            <!-- <RobotFormModal v-else :editState="editState"></RobotFormModal> -->
           </div>
           <div class="modal-footer"></div>
         </div>
@@ -184,7 +180,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { connectToRobot, disconnectToRobot } from '@/api/connection';
+import { connectToRobot, disconnectToRobot, runCommand } from '@/api/connection';
 import ROSLIB from 'roslib';
 import RobotFormModal from '@/components/robotConnection/RobotFormModal.vue';
 import Loading from '@/components/main/Loading.vue';
@@ -214,7 +210,7 @@ export default {
     if (this.rosState) {
       const currentRobot = this.robotConnected;
       this.connect(currentRobot, this.rosbridgeURL);
-      if (!this.ros || !this.ros.isConnected) {
+      if (!this.ros) {
         this.resetROSInfo();
       }
     }
@@ -240,14 +236,11 @@ export default {
     sleep(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
-    isEmptyTopicList() {
-      return this.topicList.topics.length <= 0;
-    },
-    isEmptyMsgList() {
-      return Object.keys(this.msgList).length <= 0;
+    addRobotButton() {
+      this.editState = false;
+      this.robotEditSelected = null;
     },
     clickedEditRobot(robot) {
-      console.log('robot');
       this.editState = true;
       this.robotEditSelected = robot;
     },
@@ -362,18 +355,34 @@ export default {
       this.connectionState = true;
       let response = {};
       try {
-        console.log(robot);
-        const robotSelectedInfo = {
+        let robotSelectedInfo = {
           username: robot.username,
           password: robot.password,
           ip: robot.ip,
           port: robot.port,
         };
+
         response = await connectToRobot(robotSelectedInfo);
         console.log('this.response', response);
+        let responseCommandList = [];
         if (response.status === 200) {
+          if (robot.commands.length > 0) {
+            for (const command of robot.commands) {
+              robotSelectedInfo.command = command;
+              const res = await runCommand(robotSelectedInfo);
+              responseCommandList.push(res);
+              console.log('res', res);
+            }
+            // await Promise.all(
+            //   robot.commands.map(async command => {
+            //     robotSelectedInfo.command = command;
+            //     const res = await runCommand(robotSelectedInfo);
+            //     responseCommandList.push(res);
+            //     console.log('res', res);
+            //   })
+            // );
+          }
           this.$store.dispatch('updateRobotConnected', robot);
-          console.log('connect');
           const ws_address = `ws://${robot.ip}:${robot.port}`;
           this.$store.dispatch('updateRosbridgeURL', ws_address);
           // await this.connect(ws_address);

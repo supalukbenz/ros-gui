@@ -1,32 +1,40 @@
 <template>
   <div class="flex flex-row">
-    <button
-      :id="buttonId"
-      :class="[
-        moveState ? 'cursor-move-btn' : 'cursor-pointer',
-        clickedState(selectedButton.selectedId) ? 'shadow' : '',
-      ]"
-      :style="{
-        width: selectedButton.buttonStyle.width + 'px',
-        height: selectedButton.buttonStyle.height + 'px',
-      }"
-      type="button"
-      class="rounded font-bold tooltip-box"
-      @click="clickedSelectedButton(selectedButton)"
-    >
-      {{ selectedButton.buttonName }}
-      <div class="tooltip-text py-1 px-2">
+    <div class="tooltip-box">
+      <button
+        :id="buttonId"
+        :class="[
+          moveState ? 'cursor-move-btn' : 'cursor-pointer',
+          clickedState(selectedButton.selectedId) ? 'border-cliked-button' : '',
+        ]"
+        :style="{
+          width: selectedButton.buttonStyle.width + 'px',
+          height: selectedButton.buttonStyle.height + 'px',
+        }"
+        type="button"
+        class="rounded"
+        @click="clickedSelectedButton(selectedButton)"
+      >
+        <span class="font-bold">{{ selectedButton.buttonName }}</span>
+      </button>
+      <div v-if="!moveState" class="tooltip-text py-1 px-2 text-xs">
+        <div>
+          {{ selectedButton.buttonAction.nodeAction }}/{{ selectedButton.buttonAction.nodeType }}
+        </div>
+        <div>({{ selectedButton.buttonAction.topicName }})</div>
+      </div>
+      <div v-if="!moveState" class="tooltip-variable py-1 px-2 text-xs">
         <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left">
           <div class="" v-if="typeof editedVariable[key] === 'object'">
             <span class="text-muted text-sm">{{ key }}/ </span>
-            <TreeVariable :depth="10" :keyObj="editedVariable[key]"></TreeVariable>
+            <TreeVariable :depth="10" :keyObj="handleArray(editedVariable[key])"></TreeVariable>
           </div>
           <div v-else>
             <span class="font-bold text-sm">{{ key }}: </span>{{ editedVariable[key] }}
           </div>
         </div>
       </div>
-    </button>
+    </div>
     <div class="flex justify-end remove-h">
       <div
         v-show="moveState"
@@ -51,11 +59,11 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-end remove-h">
+    <div class="flex justify-end remove-h tooltip-stop">
       <div
         v-show="!moveState && clickedState(selectedButton.selectedId)"
         @click="removeClickedButtonId(selectedButton)"
-        class="cursor-pointer text-sm w-3 -mr-3 -mt-2 text-red-600 hover:text-red-700"
+        class="cursor-pointer text-sm text-xl -mr-3 -mt-2 text-red-600 hover:text-red-700"
       >
         <i class="fas fa-stop-circle"></i>
       </div>
@@ -78,6 +86,7 @@ export default {
       rosbridgeURL: 'getRosbridgeURL',
       robotConnected: 'getRobotConnected',
       selectedButtonList: 'getSelectedButtonList',
+      buttonList: 'getButtonList',
     }),
     tooltipId() {
       return `dropdown${this.index}`;
@@ -105,6 +114,13 @@ export default {
     index: Number,
   },
   methods: {
+    handleArray(obj) {
+      let tempObj = obj;
+      if (Array.isArray(obj)) {
+        tempObj = { ...tempObj };
+      }
+      return tempObj;
+    },
     clickedState(selectedId) {
       return this.clikedButtonIdList.includes(selectedId);
     },
@@ -119,9 +135,20 @@ export default {
           messageType: button.buttonAction.msgType,
         });
         if (button.buttonAction.nodeType === 'subscriber') {
+          let currentButtonList = this.buttonList;
+          let currentSelectedList = this.selectedButtonList;
+          const indexButtonList = currentButtonList.findIndex(r => r.buttonId === button.buttonId);
+
+          const indexSelectedList = currentSelectedList.findIndex(
+            r => r.buttonId === button.buttonId
+          );
           this.rosTopic.subscribe(message => {
             console.log('message subscribe', message);
             this.subscribeInput = message;
+            currentButtonList[indexButtonList].buttonAction.variables = message;
+            currentSelectedList[indexSelectedList].buttonAction.variables = message;
+            this.$store.dispatch('updateButtonList', currentButtonList);
+            this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
           });
         } else {
           const message = new ROSLIB.Message(button.buttonAction.variables);
@@ -133,6 +160,7 @@ export default {
     removeClickedButtonId(button) {
       if (button.buttonAction.nodeType === 'subscriber') {
         this.rosTopic.unsubscribe();
+        console.log('unsubscribe');
       } else {
         const message = new ROSLIB.Message({});
         console.log('delete message', message);
@@ -153,25 +181,44 @@ export default {
 </script>
 
 <style scoped>
-.tooltip-box {
+.tooltip-box,
+.tooltip-stop {
   position: relative;
   display: inline-block;
 }
 
-.tooltip-box .tooltip-text {
+.tooltip-text,
+.tooltip-variable {
   visibility: hidden;
-  max-width: 120px;
-  background-color: #555;
-  color: #fff;
+  /* max-width: 250px; */
+  max-width: none;
+  white-space: nowrap;
+  color: #212529;
   text-align: center;
+  cursor: default !important;
+  /* margin-left: -20px; */
   border-radius: 6px;
   position: absolute;
   z-index: 1;
-  bottom: 125%;
-  left: 50%;
-  margin-left: -60px;
   opacity: 0;
   transition: opacity 0.3s;
+}
+
+.tooltip-text {
+  bottom: 125%;
+  background-color: #ffffff;
+  border: 1px solid #555;
+}
+
+.tooltip-variable {
+  top: 90%;
+  background: rgba(249, 249, 249, 0.19);
+  border: 1px solid rgb(207, 207, 207);
+}
+
+.border-cliked-button {
+  border: 3px solid #303030;
+  border-radius: 0.25rem !important;
 }
 
 .tooltip-box .tooltip-text::after {
@@ -186,6 +233,16 @@ export default {
 }
 
 .tooltip-box:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-box:hover .tooltip-variable {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-stop:hover .tooltip-variable {
   visibility: visible;
   opacity: 1;
 }

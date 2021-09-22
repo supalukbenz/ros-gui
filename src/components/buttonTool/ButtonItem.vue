@@ -147,8 +147,7 @@ export default {
   },
   methods: {
     addSelectedButton() {
-      const currentSelectedButton = this.selectedButtonList;
-      console.log('currentSelectedButton', currentSelectedButton);
+      let currentSelectedButton = this.selectedButtonList;
       let selectedId = 1;
       if (currentSelectedButton.length > 0) {
         const sortedButton = currentSelectedButton.sort((a, b) => a.selectedId - b.selectedId);
