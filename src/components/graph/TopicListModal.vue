@@ -73,13 +73,7 @@ export default {
       value: null,
     };
   },
-  async mounted() {
-    // if (!this.ros.isConnected) {
-    //   await this.ros.connect(this.rosbridgeURL);
-    // }
-    // await this.setTopicList();
-    // this.addTopic();
-  },
+  async mounted() {},
   methods: {
     expandCheckbox() {},
     clickedCheckboxTopic(node) {

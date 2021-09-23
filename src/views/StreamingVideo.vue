@@ -1,6 +1,6 @@
 <template>
   <div class="h-full m-10">
-    <div class="flex justify-start mb-2">
+    <div class="flex justify-end mb-2">
       <button
         class="btn btn-secondary flex flex-row"
         type="button"
@@ -43,7 +43,7 @@ export default {
   },
   data() {
     return {
-      camActive: 'Raspberry Pi Camera: Stream Port',
+      camActive: 'Webserver Video',
     };
   },
   computed: {
