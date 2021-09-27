@@ -375,11 +375,6 @@ export default {
       return nodeFormTemp;
     },
     filterROSTopic(topic) {
-      // console.log('topic.name', topic.name);
-      // console.log('topic', topic);
-      // if (topic.name) {
-      //   topic = topic.name;
-      // }
       const excludeList = [
         '/rosapi',
         '/rosout',

@@ -23,7 +23,13 @@
               </button>
             </div>
             <div class="modal-body">
-              <TopicListModal v-if="addTopicState"></TopicListModal>
+              <TopicListModal v-if="addTopicState && data.source.length > 0"></TopicListModal>
+              <div
+                v-else
+                class="spinner-border text-blue-300"
+                style="width: 2rem; height: 2rem"
+                role="status"
+              ></div>
               <!-- <Loading v-if="loadingState"></Loading> -->
             </div>
             <div class="modal-footer"></div>
@@ -64,8 +70,8 @@ export default {
   },
   async mounted() {
     // console.log('topicList.topics', this.topicList.topics.length);
-    // this.addTopicState = true;
     await this.addTopic();
+    this.addTopicState = true;
     // this.loadingState = false;
   },
   methods: {
@@ -110,7 +116,7 @@ export default {
           }
         }
       }
-      this.addTopicState = true;
+      // this.addTopicState = true;
     },
     async addExpandTopics(topic_name, topic_type, root_name, checkbox) {
       let showCheckbox = checkbox;

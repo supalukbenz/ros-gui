@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full">
+  <div class="h-screen">
     <Loading v-if="!isConnected"></Loading>
     <div class="modal" role="dialog" id="errorConnectionModal">
       <div class="modal-dialog modal-dialog-centered">
@@ -21,19 +21,29 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-row h-full w-full">
-      <SideBar class="w-56"></SideBar>
-      <div v-if="isConnected" class="flex-auto mr-5 mb-10">
-        <Graph v-show="routeName === 'Graph'"></Graph>
-        <StreamingVideo v-show="routeName === 'StreamingVideo'"></StreamingVideo>
-        <CustomizeButton v-show="routeName === 'CustomizeButton'"></CustomizeButton>
-      </div>
+    <!-- <div class="flex flex-row w-full"> -->
+    <SideBar class="float-left h-100"></SideBar>
+    <div v-if="isConnected" class="flex flex-auto flex-col justify-between">
+      <!-- <div class="mr-5 mb-10"> -->
+      <Graph v-show="routeName === 'Graph'"></Graph>
+      <StreamingVideo v-show="routeName === 'StreamingVideo'"></StreamingVideo>
+      <CustomizeButton v-show="routeName === 'CustomizeButton'"></CustomizeButton>
+      <!-- </div> -->
     </div>
+    <!-- <div class="mr-5 mb-10">
+      <Graph v-show="routeName === 'Graph'"></Graph>
+      <StreamingVideo v-show="routeName === 'StreamingVideo'"></StreamingVideo>
+      <CustomizeButton v-show="routeName === 'CustomizeButton'"></CustomizeButton>
+      <LogMessage></LogMessage>
+    </div> -->
+    <!-- </div> -->
+    <LogMessage></LogMessage>
   </div>
 </template>
 
 <script>
 import SideBar from '@/components/main/SideBar.vue';
+import LogMessage from '@/components/main/LogMessage.vue';
 import Graph from '@/views/Graph.vue';
 import StreamingVideo from '@/views/StreamingVideo.vue';
 import CustomizeButton from '@/views/CustomizeButton.vue';
@@ -41,13 +51,6 @@ import Loading from '@/components/main/Loading.vue';
 import ROSLIB from 'roslib';
 import { mapGetters } from 'vuex';
 import $ from 'jquery';
-// import ConnectionPartVue from '../components/robotConnection/ConnectionPart.vue';
-// import { Observable } from 'rxjs';
-// import { forkJoin } from 'rxjs';
-// import { map, filter } from 'rxjs/operators';
-// import 'rxjs/add/operator/map';
-// import 'rxjs/add/operator/mergeMap';
-// import { forkJoin } from 'rxjs/observable/forkJoin';
 
 export default {
   components: {
@@ -56,6 +59,7 @@ export default {
     Graph,
     StreamingVideo,
     Loading,
+    LogMessage,
   },
   data() {
     return {
@@ -83,6 +87,7 @@ export default {
       topicMsg: 'getTopicMsg',
       paramList: 'getParamList',
       nodeList: 'getNodeList',
+      logMsg: 'getLogMessage',
     }),
     routeName() {
       return this.$route.name;
@@ -109,6 +114,10 @@ export default {
         });
       }
     }, 1000);
+    if (this.isConnected) {
+      this.loadData();
+      this.setLogMessage();
+    }
   },
   methods: {
     async rosConnection() {
@@ -126,6 +135,7 @@ export default {
 
       this.ros.on('connection', async () => {
         await this.loadData();
+        await this.setLogMessage();
         console.log('connect');
         this.isConnected = true;
         this.$store.dispatch('updateROS', this.ros);
@@ -324,45 +334,41 @@ export default {
       });
     },
     async loadData() {
-      // this.setTopicList();
-      // this.setParams();
-      // this.setNodeList();
-      console.log('load data');
       await Promise.all([this.setTopicList(), this.setNodeList(), this.setParams()]);
       this.loadDataState = true;
-      console.log('load data');
     },
-    async setNodeData() {
-      const [topics, nodes, params] = await Promise.all([
-        this.setTopicList(),
-        this.setNodeList(),
-        this.setParams(),
-      ]);
-      console.log(topics);
-      console.log(nodes);
-      console.log(params);
-      console.log('node', Array.from(nodes));
-      // const filteredNode = this.nodeList.filter(s => this.filterROSTopic(s));
-      // const filteredParam = this.paramList.filter(p => this.filterROSTopic(p));
+    filterROSTopic(topic) {
+      const excludeList = ['/rosapi', '/rosout', '/rosversion', '/run_id', '/rosdistro'];
+      return !excludeList.includes(topic);
+    },
+    addZeroToTime(i) {
+      return i < 10 ? `0${i}` : `${i}`;
+    },
+    setLogMessage() {
+      const logTopic = new ROSLIB.Topic({
+        ros: this.ros,
+        name: '/rosout',
+        messageType: 'rosgraph_msgs/Log',
+      });
 
-      // filteredNode.map(n => {
-      //   n.services = n.services.filter(s => this.filterROSTopic(s));
-      //   n.publishing = n.publishing.filter(p => this.filterROSTopic(p));
-      //   n.subscribing = n.subscribing.filter(s => this.filterROSTopic(s));
-      //   return n;
-      // });
+      logTopic.subscribe(message => {
+        console.log('message', message);
+        let currentLogMsg = this.logMsg;
+        if (!this.filterROSTopic(message.name)) {
+          return;
+        }
 
-      // console.log('filteredNode', filteredNode);
-      // console.log('filteredParam', filteredParam);
-      // const nodes = filteredNode.map(n => {
-      //   n.topics = n.publishing
-      //     .concat(n.subscribing)
-      //     .map(name => this.topicMsg.find(e => e.topicName === name));
-      //   n.params = filteredParam.filter(param => param.node === n.name);
-      //   return n;
-      // });
+        const nameArray = message.name.split('/');
+        const date = new Date(message.header.stamp.secs * 1e3 + message.header.stamp.nsecs * 1e-6);
 
-      // console.log('nodes', nodes);
+        message.name = nameArray.length > 1 ? nameArray[1] : message.name;
+        message.dateString = `${this.addZeroToTime(date.getHours())}:${this.addZeroToTime(
+          date.getMinutes()
+        )}:${this.addZeroToTime(date.getSeconds())}.${this.addZeroToTime(date.getMilliseconds())}`;
+        console.log(message.dateString);
+        currentLogMsg.push(message);
+        this.$store.dispatch('updateLogMessage', currentLogMsg);
+      });
     },
   },
 };

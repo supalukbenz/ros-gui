@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full my-3 ml-3 mr-3">
+  <div class="h-full w-auto my-3 ml-3 mr-3">
     <!-- <SideBar></SideBar> -->
     <div class="flex flex-row w-full h-full">
       <div class="h-full">

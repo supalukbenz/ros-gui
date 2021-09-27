@@ -9,6 +9,12 @@
         v-model="value"
         :value-consists-of="'ALL'"
       />
+      <!-- <div
+        v-if="options.length <= 0 && data.length > 0"
+        class="spinner-border text-blue-300"
+        style="width: 2rem; height: 2rem"
+        role="status"
+      ></div> -->
     </div>
     <!-- <div v-if="data.source.length > 0">
       <ul class="list-group text-left">
@@ -55,10 +61,7 @@ export default {
   computed: {
     ...mapGetters({
       ros: 'getROS',
-      msgList: 'getMsgList',
-      topicList: 'getTopicList',
       data: 'getDataTopic',
-      sortedDataTopic: 'getSortedTopicData',
       options: 'getSortedTopicData',
       rosbridgeURL: 'getRosbridgeURL',
     }),
@@ -76,12 +79,11 @@ export default {
   async mounted() {},
   methods: {
     expandCheckbox() {},
-    clickedCheckboxTopic(node) {
-      const children = node.children.forEach(c => {
-        return c.value;
-      });
-      console.log(children);
-    },
+    // clickedCheckboxTopic(node) {
+    //   const children = node.children.forEach(c => {
+    //     return c.value;
+    //   });
+    // },
   },
   watch: {
     value: {

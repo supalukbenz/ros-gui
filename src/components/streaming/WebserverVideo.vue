@@ -10,13 +10,28 @@
       </div> -->
       <div class="w-min-dropdown">
         <treeselect
+          v-if="topicImg.length > 0"
           :multiple="true"
           :options="topicImg"
           :always-open="false"
-          placeholder="Select topic"
+          placeholder="/topic_name"
           v-model="value"
           :value-consists-of="'ALL'"
         />
+        <div
+          v-if="topicImg.length <= 0 && topicMsg.length > 0"
+          class="spinner-border text-blue-300"
+          style="width: 2rem; height: 2rem"
+          role="status"
+        ></div>
+
+        <!-- <div v-else>
+          <input
+            type="text"
+            class="border w-full px-2 py-1 rounded outline-none"
+            placeholder="/topic_name"
+          />
+        </div> -->
       </div>
     </div>
     <hr />
@@ -27,7 +42,10 @@
         class="flex justify-center flex-col w-full"
       >
         <div class="font-bold">{{ source }}</div>
-        <p align="center"><iframe width="640" height="480" :src="srcVideo(source)"> </iframe></p>
+        <p align="center">
+          <iframe v-if="source !== ''" width="640" height="480" :src="srcVideo(source)"> </iframe>
+        </p>
+        <div id="mjpeg"></div>
       </div>
     </div>
     <div v-else class="flex justify-center">
@@ -53,14 +71,21 @@
 <script>
 import { mapGetters } from 'vuex';
 import Treeselect from '@riophae/vue-treeselect';
+// var EventEmitter2 = require('eventemitter2');
+// import Vue from 'vue';
+// import LoadScript from 'vue-plugin-load-script';
 
 export default {
   components: {
     Treeselect,
   },
+  mounted() {
+    // Vue.use(LoadScript);
+  },
   computed: {
     ...mapGetters({
       rosbridgeURL: 'getRosbridgeURL',
+      robotConnected: 'getRobotConnected',
       topicMsg: 'getTopicMsg',
     }),
     topicImg() {
@@ -71,6 +96,7 @@ export default {
         return topic;
       });
       return filteredTopicImg;
+      // return [];
     },
   },
   data() {
@@ -79,6 +105,7 @@ export default {
       value: [],
       // srcVideo: 'http://10.204.226.247:8080/stream?topic=/camera/color/image_raw',
       typeImg: 'sensor_msgs/Image',
+      cameraViewer: null,
     };
   },
   methods: {

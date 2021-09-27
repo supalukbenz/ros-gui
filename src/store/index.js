@@ -19,6 +19,7 @@ export default new Vuex.Store({
     rosbridgeURL: JSON.parse(localStorage.getItem('rosbridgeURL')) || '',
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
     robotConnected: JSON.parse(localStorage.getItem('robotConnected')) || {},
+    logMessage: [],
     // topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
     // msgList: JSON.parse(localStorage.getItem('msgList')) || {},
     // topicMsg: JSON.parse(localStorage.getItem('topicMsg')) || [],
@@ -97,6 +98,9 @@ export default new Vuex.Store({
     getSelectedButtonList: state => {
       return state.selectedButtonList;
     },
+    getLogMessage: state => {
+      return state.logMessage;
+    },
   },
   mutations: {
     setWSAddress(state, payload) {
@@ -167,6 +171,9 @@ export default new Vuex.Store({
     setVariableList(state, payload) {
       state.variableList = payload;
     },
+    setLogMessage(state, payload) {
+      state.logMessage = payload;
+    },
   },
   actions: {
     updateWSAddress({ commit }, payload) {
@@ -225,6 +232,9 @@ export default new Vuex.Store({
     },
     updateVariableList({ commit }, payload) {
       commit('setVariableList', payload);
+    },
+    updateLogMessage({ commit }, payload) {
+      commit('setLogMessage', payload);
     },
   },
   modules: {},

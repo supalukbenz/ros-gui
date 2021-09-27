@@ -143,7 +143,6 @@ export default {
             r => r.buttonId === button.buttonId
           );
           this.rosTopic.subscribe(message => {
-            console.log('message subscribe', message);
             this.subscribeInput = message;
             currentButtonList[indexButtonList].buttonAction.variables = message;
             currentSelectedList[indexSelectedList].buttonAction.variables = message;
@@ -158,6 +157,7 @@ export default {
       }
     },
     removeClickedButtonId(button) {
+      console.log('remove');
       if (button.buttonAction.nodeType === 'subscriber') {
         this.rosTopic.unsubscribe();
         console.log('unsubscribe');
