@@ -1,19 +1,19 @@
 <template>
-  <div class="mb-4">
+  <div class="-mb-3">
     <div class="control_wrapper">
       <div class="flex justify-end">
         <button
           type="button"
           data-toggle="modal"
-          data-target="#topicModal"
-          class="border py-1 px-2 bg-blue-400 text-white font-bold"
+          :data-target="'#' + topicModalId"
+          class="border py-1 px-4 bg-blue-400 text-white font-bold rounded"
           @click="handleSetTopic()"
           v-if="addTopicState"
         >
           Set topic
         </button>
       </div>
-      <div class="modal fade" id="topicModal" role="dialog">
+      <div class="modal fade" :id="topicModalId" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
@@ -23,7 +23,10 @@
               </button>
             </div>
             <div class="modal-body">
-              <TopicListModal v-if="addTopicState && data.source.length > 0"></TopicListModal>
+              <TopicListModal
+                :graphState="graphState"
+                v-if="addTopicState && data.source.length > 0"
+              ></TopicListModal>
               <div
                 v-else
                 class="spinner-border text-blue-300"
@@ -43,11 +46,11 @@
 import TopicListModal from '@/components/graph/TopicListModal.vue';
 // import Loading from '@/components/main/Loading.vue';
 import { mapGetters } from 'vuex';
+import $ from 'jquery';
 
 export default {
   props: {
-    // msgList: Object,
-    // topicList: Object,
+    graphState: String,
   },
   components: {
     TopicListModal,
@@ -59,7 +62,11 @@ export default {
       msgList: 'getMsgList',
       topicList: 'getTopicList',
       data: 'getDataTopic',
+      scatterCloseModal: 'getScatterCloseModal',
     }),
+    topicModalId() {
+      return `topicModal-${this.graphState}`;
+    },
   },
   data() {
     return {
@@ -184,6 +191,14 @@ export default {
         }
       }
       return children;
+    },
+  },
+  watch: {
+    scatterCloseModal(val) {
+      if (val) {
+        $('#topicModal-Graph3d').modal('hide');
+        this.$store.dispatch('updateScatterCloseModal', false);
+      }
     },
   },
 };

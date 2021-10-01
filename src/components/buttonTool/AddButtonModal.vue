@@ -120,7 +120,7 @@
           </div> -->
           <div class="border rounded md-1 py-1 px-2">
             <div class="font-bold text-sm">Variables</div>
-            <div v-if="editState && editedVariable">
+            <div v-if="editState && editedVariable" class="variable-container">
               <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left">
                 <div class="" v-if="typeof editedVariable[key] === 'object'">
                   <span class="text-muted text-sm">{{ key }}/ </span>
@@ -308,6 +308,7 @@ export default {
       let tempObj = obj;
       if (Array.isArray(obj)) {
         tempObj = { ...tempObj };
+        // tempObj = { value: obj.toString() };
       }
       return tempObj;
     },
@@ -415,7 +416,7 @@ export default {
         const robotId = this.robotConnected.id;
         let id = 1;
         if (currentButtonList.length > 0) {
-          const sortedButton = currentButtonList.sort((a, b) => a.buttonId - b.buttonId);
+          const sortedButton = currentButtonList.slice().sort((a, b) => a.buttonId - b.buttonId);
           id = sortedButton[currentButtonList.length - 1].buttonId + 1;
         }
         if (
@@ -586,5 +587,13 @@ export default {
 
 .min-w-20 {
   min-width: 15rem;
+}
+
+.variable-container {
+  max-height: 20rem;
+  overflow: hidden;
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: scroll;
 }
 </style>

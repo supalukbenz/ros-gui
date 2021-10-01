@@ -41,7 +41,7 @@
       :id="menuId"
       aria-labelledby="dropdownMenuButton"
     >
-      <a class="dropdown-item cursor-pointer">Info</a>
+      <!-- <a class="dropdown-item cursor-pointer">Info</a> -->
       <a class="dropdown-item cursor-pointer" @click="handleEditButton()">Edit</a>
       <a class="dropdown-item text-red cursor-pointer" @click="handleRemoveButton()">Remove</a>
     </div>

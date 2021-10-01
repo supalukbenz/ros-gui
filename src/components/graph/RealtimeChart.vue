@@ -1,20 +1,27 @@
 <template>
   <div>
-    <div>
+    <div class="mb-10" v-if="graphType === 'Line'">
       <!-- <apexchart width="500" type="bar" :options="chartOptions" :series="series"></apexchart> -->
+      <h3>Realtime Line Chart</h3>
+      <line-chart v-if="renderGraph" :chartData="data"></line-chart>
+      <line-chart v-else :chartData="dataEmpty"></line-chart>
     </div>
-    <line-chart v-if="renderGraph" :chartData="data"></line-chart>
+    <div v-if="graphType === 'ScatterPlot'">
+      <Graph3d :scatterDataSetList="scatterDataSetList"></Graph3d>
+    </div>
   </div>
 </template>
 
 <script>
 import LineChart from '@/assets/chartjs/LineChart.vue';
+import Graph3d from '@/components/graph/Graph3d.vue';
 import { mapGetters } from 'vuex';
 import ROSLIB from 'roslib';
 
 export default {
   components: {
     LineChart,
+    Graph3d,
   },
   computed: {
     ...mapGetters({
@@ -24,7 +31,14 @@ export default {
       dataTopic: 'getDataTopic',
       rosbridgeURL: 'getRosbridgeURL',
       rosbridge: 'getROS',
+      selectedScatterTopic: 'getSelectedScatterTopic',
     }),
+    selectedScatterTopicLength() {
+      return this.selectedScatterTopic.length;
+    },
+  },
+  props: {
+    graphType: String,
   },
   data() {
     return {
@@ -34,9 +48,16 @@ export default {
         labels: [],
         datasets: [],
       },
+      dataEmpty: {
+        labels: [],
+        datasets: [],
+      },
       pause: false,
       useMsgTimeStamp: false,
       renderGraph: false,
+      graph3dconnected: false,
+      topicScatter: {},
+      scatterDataSetList: [],
     };
   },
   async mounted() {
@@ -147,10 +168,40 @@ export default {
         this.renderGraph = true;
       }
     },
+    async updateScatterPlot(data) {
+      let plot = [];
+      for (let i in data.selection) {
+        const node = this.getNode(data.selection[i], data.source);
+        const rootNode = this.getNode(node.root, data.source);
+        console.log('node', node);
+        console.log('rootNode', rootNode);
+        let topic = await this.addPlot(node.value, rootNode.value, rootNode.type);
+        console.log('topic', topic);
+        const fieldName = data.selection[i].substr(
+          rootNode.value.length + 1,
+          data.selection[i].length
+        );
+        await topic.subscribe(async message => {
+          let fieldValue = await message[fieldName];
+          plot.push(fieldValue);
+          topic.unsubscribe();
+        });
+      }
+      return plot;
+    },
     async reconnectROS() {
       this.ros = await new ROSLIB.Ros({
         url: this.rosbridgeURL,
       });
+    },
+    async addPlot(plot, topicName, topicType) {
+      await this.reconnectROS();
+      let topic = new ROSLIB.Topic({
+        ros: this.ros,
+        name: topicName,
+        messageType: topicType,
+      });
+      return topic;
     },
     async addLine(line, topicName, topicType) {
       await this.reconnectROS();
@@ -198,6 +249,31 @@ export default {
         this.updateLineChart(data);
       },
       deep: true,
+    },
+    selectedScatterTopic: {
+      async handler(data) {
+        const dataScatter = {
+          source: this.dataTopic.source,
+          selection: data,
+        };
+        // if (val <= 0) {
+        // this.topicScatter = {};
+        // }
+        let interval;
+        if (data.length <= 0) {
+          console.log('clear');
+          clearInterval(interval);
+        }
+        interval = setInterval(async () => {
+          const scatterDataSet = await this.updateScatterPlot(dataScatter);
+          this.scatterDataSetList.push(scatterDataSet);
+          // this.scatterDataSet = [];
+        }, 4000);
+      },
+      deep: true,
+    },
+    selectedScatterTopicLength() {
+      // console.log('this.selectedScatterTopic', this.selectedScatterTopic);
     },
   },
 };

@@ -23,7 +23,7 @@
         </div>
         <div>({{ selectedButton.buttonAction.topicName }})</div>
       </div>
-      <div v-if="!moveState" class="tooltip-variable py-1 px-2 text-xs">
+      <div v-if="!moveState" class="tooltip-variable py-1 px-2 text-xs max-w-custom">
         <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left">
           <div class="" v-if="typeof editedVariable[key] === 'object'">
             <span class="text-muted text-sm">{{ key }}/ </span>
@@ -118,6 +118,7 @@ export default {
       let tempObj = obj;
       if (Array.isArray(obj)) {
         tempObj = { ...tempObj };
+        // tempObj = { value: obj.toString() };
       }
       return tempObj;
     },
@@ -190,7 +191,7 @@ export default {
 .tooltip-text,
 .tooltip-variable {
   visibility: hidden;
-  /* max-width: 250px; */
+  /* max-width: 50px; */
   max-width: none;
   white-space: nowrap;
   color: #212529;
@@ -214,6 +215,11 @@ export default {
   top: 90%;
   background: rgba(249, 249, 249, 0.19);
   border: 1px solid rgb(207, 207, 207);
+  max-height: 20rem;
+  overflow: hidden;
+  white-space: nowrap;
+  overflow-x: scroll;
+  overflow-y: scroll;
 }
 
 .border-cliked-button {

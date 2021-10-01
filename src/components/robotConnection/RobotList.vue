@@ -208,11 +208,8 @@ export default {
     this.responseMessage = '';
     this.editState = false;
     if (this.rosState) {
-      const currentRobot = this.robotConnected;
-      this.connect(currentRobot, this.rosbridgeURL);
-      if (!this.ros) {
-        this.resetROSInfo();
-      }
+      // const currentRobot = this.robotConnected;
+      this.connect(this.rosbridgeURL);
     }
   },
   data() {
@@ -274,7 +271,7 @@ export default {
         this.topics = topic;
       });
     },
-    async connect(robot, ws_address) {
+    async connect(ws_address) {
       if (ws_address !== '') {
         this.ros = await new ROSLIB.Ros({
           // url: `ws://${ws_address}:9090`,
@@ -295,12 +292,12 @@ export default {
           // this.responseMessage = 'Error connecting to websocket server';
           this.errorState = true;
           console.log('Error', error);
-          this.disconnect(robot);
+          this.disconnect();
         });
 
         this.ros.on('close', () => {
           this.connected = false;
-          this.disconnect(robot);
+          this.disconnect();
         });
       }
     },
@@ -328,14 +325,15 @@ export default {
       this.$store.dispatch('updateROS', null);
       this.$store.dispatch('updateMsgList', {});
       this.$store.dispatch('updateTopicList', { topics: [], types: [] });
+      this.$store.dispatch('updateDataTopic', {
+        selection: [],
+        source: [],
+        expanded: [],
+      });
     },
-    async disconnect(robot) {
+    async disconnect() {
+      const robotForm = this.robotConnected;
       this.resetROSInfo();
-      const robotForm = {
-        username: robot.username,
-        password: robot.password,
-        ip: robot.ip,
-      };
       await disconnectToRobot(robotForm);
     },
 
@@ -361,17 +359,21 @@ export default {
           ip: robot.ip,
           port: robot.port,
         };
-
+        console.log('robotSelectedInfo', robotSelectedInfo);
         response = await connectToRobot(robotSelectedInfo);
         console.log('this.response', response);
         let responseCommandList = [];
         if (response.status === 200) {
           if (robot.commands.length > 0) {
-            for (const command of robot.commands) {
+            let index = 0;
+            for (let command of robot.commands) {
+              let screenName = `command${index}`;
               robotSelectedInfo.command = command;
+              robotSelectedInfo.screen_name = screenName;
               const res = await runCommand(robotSelectedInfo);
               responseCommandList.push(res);
               console.log('res', res);
+              index++;
             }
             // await Promise.all(
             //   robot.commands.map(async command => {

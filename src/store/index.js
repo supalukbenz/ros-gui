@@ -20,11 +20,6 @@ export default new Vuex.Store({
     robotList: JSON.parse(localStorage.getItem('robotList')) || [],
     robotConnected: JSON.parse(localStorage.getItem('robotConnected')) || {},
     logMessage: [],
-    // topicList: JSON.parse(localStorage.getItem('topicList')) || { topics: [], types: [] },
-    // msgList: JSON.parse(localStorage.getItem('msgList')) || {},
-    // topicMsg: JSON.parse(localStorage.getItem('topicMsg')) || [],
-    // nodeList: JSON.parse(localStorage.getItem('nodeList')) || [],
-    // paramList: JSON.parse(localStorage.getItem('paramList')) || [],
     topicList: { topics: [], types: [] },
     msgList: {},
     topicMsg: [],
@@ -34,8 +29,14 @@ export default new Vuex.Store({
     variableList: [],
     buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
     selectedButtonList: JSON.parse(localStorage.getItem('selectedButtonList')) || [],
-    data: { selection: [], source: [], expanded: [] },
+    data: JSON.parse(localStorage.getItem('dataTopic')) || {
+      selection: [],
+      source: [],
+      expanded: [],
+    },
     selectedTopic: [],
+    selectedScatterTopic: [],
+    scatterCloseModal: false,
   },
   getters: {
     getRobotList: state => {
@@ -101,6 +102,12 @@ export default new Vuex.Store({
     getLogMessage: state => {
       return state.logMessage;
     },
+    getSelectedScatterTopic: state => {
+      return state.selectedScatterTopic;
+    },
+    getScatterCloseModal: state => {
+      return state.scatterCloseModal;
+    },
   },
   mutations: {
     setWSAddress(state, payload) {
@@ -160,6 +167,7 @@ export default new Vuex.Store({
     },
     setDataTopic(state, payload) {
       state.data = payload;
+      localStorage.setItem('dataTopic', JSON.stringify(payload));
     },
     setSelectedTopic(state, payload) {
       state.selectedTopic = payload;
@@ -173,6 +181,12 @@ export default new Vuex.Store({
     },
     setLogMessage(state, payload) {
       state.logMessage = payload;
+    },
+    setSelectedScatterTopic(state, payload) {
+      state.selectedScatterTopic = payload;
+    },
+    setScatterCloseModal(state, payload) {
+      state.scatterCloseModal = payload;
     },
   },
   actions: {
@@ -235,6 +249,12 @@ export default new Vuex.Store({
     },
     updateLogMessage({ commit }, payload) {
       commit('setLogMessage', payload);
+    },
+    updateSelectedScatterTopic({ commit }, payload) {
+      commit('setSelectedScatterTopic', payload);
+    },
+    updateScatterCloseModal({ commit }, payload) {
+      commit('setScatterCloseModal', payload);
     },
   },
   modules: {},

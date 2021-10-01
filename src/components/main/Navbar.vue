@@ -57,27 +57,29 @@ export default {
       return Object.keys(obj).length !== 0;
     },
     async handleRobotDisconnection() {
-      const robotForm = {
-        username: this.robotConnected.username,
-        password: this.robotConnected.password,
-        ip: this.robotConnected.ip,
-      };
+      const robotForm = this.robotConnected;
       try {
         this.ros.close();
+        // await disconnectToRobot(robotForm);
+        this.$store.dispatch('updateRobotConnected', {});
+        this.$store.dispatch('updateRosbridgeURL', '');
+        this.$store.dispatch('updateROS', null);
+        this.$store.dispatch('updateMsgList', {});
+        this.$store.dispatch('updateTopicList', { topics: [], types: [] });
+        this.$store.dispatch('updateDataTopic', {
+          selection: [],
+          source: [],
+          expanded: [],
+        });
         await disconnectToRobot(robotForm);
+        this.$router
+          .push({
+            name: 'Home',
+          })
+          .catch(() => {});
       } catch (e) {
         console.log(e);
       }
-      this.$store.dispatch('updateRobotConnected', {});
-      this.$store.dispatch('updateRosbridgeURL', '');
-      this.$store.dispatch('updateROS', null);
-      this.$store.dispatch('updateMsgList', {});
-      this.$store.dispatch('updateTopicList', { topics: [], types: [] });
-      this.$router
-        .push({
-          name: 'Home',
-        })
-        .catch(() => {});
     },
   },
 };

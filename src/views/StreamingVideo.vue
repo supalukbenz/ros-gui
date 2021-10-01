@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full m-10">
+  <div class="h-full mt-10 mx-10 mb-44">
     <div class="flex justify-end mb-2">
       <button
         class="btn btn-secondary flex flex-row"
@@ -13,7 +13,7 @@
           {{ camActive }} <span class="ml-3"><i class="fas fa-caret-down"></i></span>
         </div>
       </button>
-      <div class="dropdown-menu" aria-labelledby="dropdownCam">
+      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownCam">
         <div class="flex flex-col items-start pr-2 break-all w-full">
           <a
             class="dropdown-item cursor-pointer"

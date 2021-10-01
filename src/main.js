@@ -11,16 +11,32 @@ import '@fortawesome/fontawesome-free/js/all.js';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
-import VueApexCharts from 'vue-apexcharts';
-
 import VueDraggableResizable from 'vue-draggable-resizable';
+import VueHighcharts from 'vue2-highcharts';
+import Highcharts from 'highcharts';
+// import HighchartsVue from 'highcharts-vue';
 var EventEmitter2 = require('eventemitter2');
+import More from 'highcharts/highcharts-more';
+import Highcharts3D from 'highcharts/highcharts-3d';
+import exportingInit from 'highcharts/modules/exporting';
+import exportDataInit from 'highcharts/modules/export-data';
+import accessibilityInit from 'highcharts/modules/accessibility';
 
+exportingInit(Highcharts);
+exportDataInit(Highcharts);
+accessibilityInit(Highcharts);
+More(Highcharts);
+Highcharts3D(Highcharts);
+
+Vue.use(VueHighcharts, { Highcharts });
+
+Vue.component('VueHighcharts', VueHighcharts);
 Vue.config.productionTip = false;
-Vue.use(VueApexCharts);
+// Vue.use(HighchartsVue, {
+//   highcharts: Highcharts,
+// });
 window.EventEmitter2 = EventEmitter2;
 
-Vue.component('apexchart', VueApexCharts);
 Vue.component('vue-draggable-resizable', VueDraggableResizable);
 
 // Vue.use(LoadScript);

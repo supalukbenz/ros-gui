@@ -50,7 +50,7 @@ import CustomizeButton from '@/views/CustomizeButton.vue';
 import Loading from '@/components/main/Loading.vue';
 import ROSLIB from 'roslib';
 import { mapGetters } from 'vuex';
-import $ from 'jquery';
+// import $ from 'jquery';
 
 export default {
   components: {
@@ -104,10 +104,10 @@ export default {
       if (this.errorCount === 30) {
         this.alertError = true;
         this.isConnected = true;
-        setInterval(() => {
-          $('#errorConnectionModal').modal('show');
-        }, 5000);
-        $('#errorConnectionModal').modal('hide');
+        // setInterval(() => {
+        //   $('#errorConnectionModal').modal('show');
+        // }, 5000);
+        // $('#errorConnectionModal').modal('hide');
         clearInterval(interval);
         this.$router.push({
           name: 'Home',
@@ -338,7 +338,14 @@ export default {
       this.loadDataState = true;
     },
     filterROSTopic(topic) {
-      const excludeList = ['/rosapi', '/rosout', '/rosversion', '/run_id', '/rosdistro'];
+      const excludeList = [
+        '/rosapi',
+        '/rosout',
+        '/rosversion',
+        '/run_id',
+        '/rosdistro',
+        // '/rosbridge_websocket',
+      ];
       return !excludeList.includes(topic);
     },
     addZeroToTime(i) {
@@ -352,7 +359,6 @@ export default {
       });
 
       logTopic.subscribe(message => {
-        console.log('message', message);
         let currentLogMsg = this.logMsg;
         if (!this.filterROSTopic(message.name)) {
           return;
@@ -365,7 +371,6 @@ export default {
         message.dateString = `${this.addZeroToTime(date.getHours())}:${this.addZeroToTime(
           date.getMinutes()
         )}:${this.addZeroToTime(date.getSeconds())}.${this.addZeroToTime(date.getMilliseconds())}`;
-        console.log(message.dateString);
         currentLogMsg.push(message);
         this.$store.dispatch('updateLogMessage', currentLogMsg);
       });

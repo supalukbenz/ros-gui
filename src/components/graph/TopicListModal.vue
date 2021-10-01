@@ -1,52 +1,60 @@
 <template>
   <div>
     <div class="h-30r">
-      <treeselect
-        :multiple="true"
-        :options="options"
-        :always-open="true"
-        placeholder="Select topic"
-        v-model="value"
-        :value-consists-of="'ALL'"
-      />
-      <!-- <div
-        v-if="options.length <= 0 && data.length > 0"
-        class="spinner-border text-blue-300"
-        style="width: 2rem; height: 2rem"
-        role="status"
-      ></div> -->
+      <div v-if="graphState === 'LineChart'">
+        <treeselect
+          :multiple="true"
+          :options="options"
+          :always-open="true"
+          placeholder="Select topic(s)"
+          v-model="value"
+          :value-consists-of="'ALL'"
+        />
+      </div>
+      <div v-if="graphState === 'Graph3d'">
+        <div class="text-sm font-bold text-red-500" v-show="threeIndexWarning">
+          * The scatter plot only needs three topics.
+        </div>
+        <treeselect
+          :multiple="true"
+          :options="options"
+          :always-open="true"
+          :flatten-search-results="true"
+          placeholder="Select 3 topics"
+          v-model="scatterValue"
+          :value-consists-of="'ALL'"
+        />
+      </div>
+      <div class="float-right w-72 selected-item" v-show="graphState === 'Graph3d'">
+        <div class="text-left">
+          <span class="font-bold">x:</span> {{ scatterValue[0] ? scatterValue[0] : '-' }}
+        </div>
+        <div class="text-left">
+          <span class="font-bold">y:</span> {{ scatterValue[1] ? scatterValue[1] : '-' }}
+        </div>
+        <div class="text-left">
+          <span class="font-bold">z:</span> {{ scatterValue[2] ? scatterValue[2] : '-' }}
+        </div>
+        <button
+          type="button"
+          @click="submitScatterPlot()"
+          class="
+            cursor-pointer
+            mt-2
+            bg-green-400
+            hover:bg-green-500
+            text-white
+            font-bold
+            rounded
+            px-5
+            py-1
+            mb-3
+          "
+        >
+          Submit
+        </button>
+      </div>
     </div>
-    <!-- <div v-if="data.source.length > 0">
-      <ul class="list-group text-left">
-        <li v-for="(node, index) in sortedDataTopic" :key="index" class="pb-1">
-          <div>
-            <a class="mr-3 text-gray-500 cursor-pointer" @click="expandCheckbox()"
-              ><i class="fas fa-chevron-right"></i
-            ></a>
-            <input
-              :value="node.value"
-              v-model="selectedTopicValue"
-              @click="clickedCheckboxTopic(node)"
-              type="checkbox"
-              class="cursor-pointer"
-            />
-            {{ node.value }}
-            <li v-for="(children, indexChild) in node.children" :key="indexChild">
-              <div class="ml-10">
-                <input
-                  v-if="children.showCheckbox"
-                  v-model="selectedChildren"
-                  :value="children.value"
-                  type="checkbox"
-                  class="cursor-pointer"
-                />
-                <span class="ml-2">/{{ children.label }}</span>
-              </div>
-            </li>
-          </div>
-        </li>
-      </ul>
-    </div> -->
   </div>
 </template>
 
@@ -65,6 +73,12 @@ export default {
       options: 'getSortedTopicData',
       rosbridgeURL: 'getRosbridgeURL',
     }),
+    scatterValueLength() {
+      return this.scatterValue.length;
+    },
+  },
+  props: {
+    graphState: String,
   },
   data() {
     return {
@@ -73,12 +87,19 @@ export default {
       selectedNodes: null,
       selectedTopicValue: [],
       selectedChildren: [],
-      value: null,
+      value: [],
+      scatterValue: [],
+      threeIndexWarning: false,
     };
   },
   async mounted() {},
   methods: {
     expandCheckbox() {},
+    submitScatterPlot() {
+      console.log('clicked');
+      this.$store.dispatch('updateSelectedScatterTopic', this.scatterValue.slice(0, 3));
+      this.$store.dispatch('updateScatterCloseModal', true);
+    },
     // clickedCheckboxTopic(node) {
     //   const children = node.children.forEach(c => {
     //     return c.value;
@@ -94,6 +115,14 @@ export default {
       },
       deep: true,
     },
+    scatterValue: {
+      handler(val) {
+        if (val.length > 3) {
+          this.threeIndexWarning = true;
+        }
+      },
+      deep: true,
+    },
   },
 };
 </script>
@@ -103,15 +132,23 @@ export default {
   height: 30rem;
 }
 
-#topicModal
+.selected-item {
+  z-index: 100;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
+#topicModal-LineChart
   > div
   > div
   > div.modal-body
   > div
   > div
   > div
+  > div
   > div.vue-treeselect__menu-container
   > div {
-  max-height: 27rem !important;
+  max-height: 22rem !important;
 }
 </style>

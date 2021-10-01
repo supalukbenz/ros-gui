@@ -8,9 +8,7 @@ import 'chartjs-plugin-zoom';
 export default {
   extends: Line,
   mixins: [reactiveProp],
-  props: {
-    chartData: Object,
-  },
+  props: ['chartData'],
   data() {
     return {
       topics: {},
@@ -41,11 +39,21 @@ export default {
                   //   y: Math.random() * 100,
                   // });
                 },
-                delay: 2000,
+                // delay: 2000,
+              },
+              ticks: {
+                callback: function (value) {
+                  // console.log(value)
+                  return value;
+                },
+                maxRotation: 0,
+                minRotation: 0,
+                sampleSize: 5,
               },
             },
           ],
         },
+        // events: [],
         tooltips: {
           mode: 'nearest',
           intersect: false,
@@ -69,6 +77,7 @@ export default {
             tension: 0, // disables bezier curves
           },
         },
+
         // layout: {
         //     padding: {
         //         left: 50,
@@ -87,8 +96,21 @@ export default {
   },
   async mounted() {
     // await this.updateSelectedLines();
-    this.renderChart(this.chartData, this.options);
+    this.renderLineChart();
   },
-  methods: {},
+  methods: {
+    renderLineChart() {
+      this.renderChart(this.chartData, this.options);
+    },
+  },
+  watch: {
+    chartData() {
+      this.$nextTick(() => {
+        // this.$data._chart.destroy();
+        this.renderLineChart();
+        // this.$data._chart.update();
+      });
+    },
+  },
 };
 </script>

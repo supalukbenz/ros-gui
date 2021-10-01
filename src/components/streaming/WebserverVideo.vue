@@ -18,20 +18,20 @@
           v-model="value"
           :value-consists-of="'ALL'"
         />
-        <div
+        <!-- <div
           v-if="topicImg.length <= 0 && topicMsg.length > 0"
           class="spinner-border text-blue-300"
           style="width: 2rem; height: 2rem"
           role="status"
-        ></div>
+        ></div> -->
 
-        <!-- <div v-else>
+        <div v-else>
           <input
             type="text"
             class="border w-full px-2 py-1 rounded outline-none"
             placeholder="/topic_name"
           />
-        </div> -->
+        </div>
       </div>
     </div>
     <hr />
@@ -110,7 +110,7 @@ export default {
   },
   methods: {
     srcVideo(topic) {
-      return `http://10.204.226.247:8080/stream?topic=${topic}`;
+      return `http://${this.robotConnected.ip}:8080/stream?topic=${topic}`;
     },
   },
 };
