@@ -32,35 +32,70 @@ export default {
           xAxes: [
             {
               type: 'realtime',
+              time: {
+                parser: 'HH:mm:ss.SSS',
+                unit: 'second',
+                displayFormats: {
+                  millisecond: 'HH:mm:ss',
+                },
+              },
               realtime: {
+                parser: 'hh:mm:ss.ffff',
+
                 onRefresh: () => {
                   // this.data.datasets[0].data.push({
                   //   x: Date.now(),
                   //   y: Math.random() * 100,
                   // });
                 },
-                // delay: 2000,
+                delay: 2000,
               },
               ticks: {
                 callback: function (value) {
                   // console.log(value)
                   return value;
                 },
-                maxRotation: 0,
-                minRotation: 0,
+                maxRotation: 90,
+                minRotation: 50,
                 sampleSize: 5,
               },
             },
           ],
         },
-        // events: [],
+        events: [],
         tooltips: {
           mode: 'nearest',
           intersect: false,
         },
+        pan: {
+          enabled: true,
+          drag: false,
+          mode: 'xy',
+          speed: 10,
+          threshold: 10,
+        },
+        zoom: {
+          enabled: true,
+          drag: false,
+          mode: 'xy',
+          limits: {
+            max: 10,
+            min: 0.5,
+          },
+          rangeMin: {
+            // x: 20,
+            // y: 1000
+          },
+          rangeMax: {
+            // x: 10,
+            // y: 150
+          },
+        },
         animation: {
           duration: 0, // general animation time
         },
+        zoomEnabled: true,
+        animationEnabled: true,
         hover: {
           mode: 'nearest',
           intersect: false,
@@ -69,7 +104,7 @@ export default {
         responsiveAnimationDuration: 0, // animation duration after a resize
         plugins: {
           streaming: {
-            frameRate: 1,
+            frameRate: 30,
           },
         },
         elements: {

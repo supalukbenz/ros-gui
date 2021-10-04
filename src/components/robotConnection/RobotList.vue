@@ -20,6 +20,7 @@
           absolute
           font-semibold
           z-10
+          whitespace-pre-line
         "
         ref="resCard"
       >
@@ -272,6 +273,11 @@ export default {
       });
     },
     async connect(ws_address) {
+      if (this.ros) {
+        this.ros.close(); // Close old connection
+        this.ros = null;
+        return;
+      }
       if (ws_address !== '') {
         this.ros = await new ROSLIB.Ros({
           // url: `ws://${ws_address}:9090`,
@@ -299,6 +305,8 @@ export default {
           this.connected = false;
           this.disconnect();
         });
+      } else {
+        this.disconnect();
       }
     },
     async clickedSimulation(robot) {

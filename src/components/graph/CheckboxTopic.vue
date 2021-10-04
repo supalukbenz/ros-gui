@@ -109,17 +109,19 @@ export default {
           const showCheckbox = true;
           const children = await this.addExpandTopics(topics[i], types[i], topics[i], showCheckbox);
           if (children && children.length > 0) {
-            const currentData = this.data;
-            currentData.source.push({
-              value: topics[i],
-              id: topics[i],
-              label: topics[i],
-              type: types[i],
-              children: children,
-              root: topics[i],
-              leaf: false,
-            });
-            this.$store.dispatch('updateDataTopic', currentData);
+            let currentData = this.data;
+            if (!currentData.source.some(d => d.id === topics[i])) {
+              currentData.source.push({
+                value: topics[i],
+                id: topics[i],
+                label: topics[i],
+                type: types[i],
+                children: children,
+                root: topics[i],
+                leaf: false,
+              });
+              this.$store.dispatch('updateDataTopic', currentData);
+            }
           }
         }
       }

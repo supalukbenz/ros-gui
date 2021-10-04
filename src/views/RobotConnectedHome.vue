@@ -93,26 +93,26 @@ export default {
       return this.$route.name;
     },
   },
-  created() {
+  mounted() {
     this.alertError = false;
     this.rosConnection();
-    const interval = setInterval(() => {
+    setInterval(() => {
       this.rosConnection();
       if (this.ros === null || !this.ros.isConnected) {
         this.errorCount = this.errorCount + 1;
       }
-      if (this.errorCount === 30) {
-        this.alertError = true;
-        this.isConnected = true;
-        // setInterval(() => {
-        //   $('#errorConnectionModal').modal('show');
-        // }, 5000);
-        // $('#errorConnectionModal').modal('hide');
-        clearInterval(interval);
-        this.$router.push({
-          name: 'Home',
-        });
-      }
+      // if (this.errorCount === 100) {
+      //   this.alertError = true;
+      //   this.isConnected = true;
+      //   // setInterval(() => {
+      //   //   $('#errorConnectionModal').modal('show');
+      //   // }, 5000);
+      //   // $('#errorConnectionModal').modal('hide');
+      //   clearInterval(interval);
+      //   this.$router.push({
+      //     name: 'Home',
+      //   });
+      // }
     }, 1000);
     if (this.isConnected) {
       this.loadData();
@@ -136,6 +136,7 @@ export default {
       this.ros.on('connection', async () => {
         await this.loadData();
         await this.setLogMessage();
+
         console.log('connect');
         this.isConnected = true;
         this.$store.dispatch('updateROS', this.ros);
@@ -158,6 +159,7 @@ export default {
     },
     async setTopicList() {
       await this.ros.getTopics(topic => {
+        console.log('topic', topic);
         topic.types.forEach(async (msgName, i) => {
           if (msgName in this.msgList === false) {
             await this.getMsgROSInfo(msgName, 'msgROS', topic.topics[i]);
@@ -334,6 +336,7 @@ export default {
       });
     },
     async loadData() {
+      console.log('loaddata');
       await Promise.all([this.setTopicList(), this.setNodeList(), this.setParams()]);
       this.loadDataState = true;
     },
@@ -344,14 +347,22 @@ export default {
         '/rosversion',
         '/run_id',
         '/rosdistro',
-        // '/rosbridge_websocket',
+        '/rosbridge_websocket',
       ];
       return !excludeList.includes(topic);
     },
     addZeroToTime(i) {
       return i < 10 ? `0${i}` : `${i}`;
     },
+    diffTopicList(newTopic) {
+      const diffTopic = newTopic.filter(n => {
+        return this.topicList.topics.indexOf(n) == -1;
+      });
+      console.log('diffTopicList', diffTopic);
+      return diffTopic;
+    },
     setLogMessage() {
+      console.log('set log');
       const logTopic = new ROSLIB.Topic({
         ros: this.ros,
         name: '/rosout',
@@ -359,11 +370,14 @@ export default {
       });
 
       logTopic.subscribe(message => {
+        console.log(message);
         let currentLogMsg = this.logMsg;
         if (!this.filterROSTopic(message.name)) {
           return;
         }
-
+        if (this.diffTopicList(message.topics).length > 0) {
+          this.loadData();
+        }
         const nameArray = message.name.split('/');
         const date = new Date(message.header.stamp.secs * 1e3 + message.header.stamp.nsecs * 1e-6);
 

@@ -15,7 +15,7 @@
         <div class="text-sm font-bold text-red-500" v-show="threeIndexWarning">
           * The scatter plot only needs three topics.
         </div>
-        <treeselect
+        <!-- <treeselect
           :multiple="true"
           :options="options"
           :always-open="true"
@@ -23,7 +23,7 @@
           placeholder="Select 3 topics"
           v-model="scatterValue"
           :value-consists-of="'ALL'"
-        />
+        /> -->
       </div>
       <div class="float-right w-72 selected-item" v-show="graphState === 'Graph3d'">
         <div class="text-left">

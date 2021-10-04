@@ -29,7 +29,7 @@ export default new Vuex.Store({
     variableList: [],
     buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
     selectedButtonList: JSON.parse(localStorage.getItem('selectedButtonList')) || [],
-    data: JSON.parse(localStorage.getItem('dataTopic')) || {
+    data: {
       selection: [],
       source: [],
       expanded: [],
@@ -167,7 +167,7 @@ export default new Vuex.Store({
     },
     setDataTopic(state, payload) {
       state.data = payload;
-      localStorage.setItem('dataTopic', JSON.stringify(payload));
+      // localStorage.setItem('dataTopic', JSON.stringify(payload));
     },
     setSelectedTopic(state, payload) {
       state.selectedTopic = payload;

@@ -129,12 +129,12 @@ export default {
             if (this.pause) {
               return;
             }
-            // let time = Date.now();
-            // if (this.useMsgTimeStamp && message['header'] && message['header']['stamp']) {
-            //   time = Math.round(
-            //     message.header.stamp.secs * 1000 + message.header.stamp.nsecs / 1e6
-            //   );
-            // }
+            let time = Date.now();
+            if (message['header'] && message['header']['stamp']) {
+              time = Math.round(
+                message.header.stamp.secs * 1000 + message.header.stamp.nsecs / 1e6
+              );
+            }
             let lines = this.topics[topicName].lines;
             for (let l in lines) {
               const fieldName = lines[l].substr(topicName.length + 1, lines[l].length);
@@ -154,7 +154,7 @@ export default {
               this.data.datasets.forEach(dataset => {
                 if (dataset['label'] === lines[l]) {
                   dataset.data.push({
-                    x: new Date().getTime(),
+                    x: time,
                     y: dataMsg,
                   });
                   return;
@@ -232,7 +232,7 @@ export default {
         backgroundColor: bgColor,
         fill: false,
         lineTension: 0,
-        borderDash: [8, 4],
+        // borderDash: [8, 4],
         data: [],
       });
       this.data.labels.push(lineName);
