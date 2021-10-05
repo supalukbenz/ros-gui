@@ -12,6 +12,7 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.css';
 
 import VueDraggableResizable from 'vue-draggable-resizable';
+import VueSlideBar from 'vue-slide-bar';
 import VueHighcharts from 'vue2-highcharts';
 import Highcharts from 'highcharts';
 // import HighchartsVue from 'highcharts-vue';
@@ -31,6 +32,8 @@ Highcharts3D(Highcharts);
 Vue.use(VueHighcharts, { Highcharts });
 
 Vue.component('VueHighcharts', VueHighcharts);
+Vue.component('VueSlideBar', VueSlideBar);
+
 Vue.config.productionTip = false;
 // Vue.use(HighchartsVue, {
 //   highcharts: Highcharts,

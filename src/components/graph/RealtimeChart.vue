@@ -3,8 +3,57 @@
     <div class="mb-10" v-if="graphType === 'Line'">
       <!-- <apexchart width="500" type="bar" :options="chartOptions" :series="series"></apexchart> -->
       <h3>Realtime Line Chart</h3>
-      <line-chart v-if="renderGraph" :chartData="data"></line-chart>
-      <line-chart v-else :chartData="dataEmpty"></line-chart>
+      <line-chart v-if="renderGraph" :framerate="framerate" :chartData="data"></line-chart>
+      <line-chart v-else :framerate="framerate" :chartData="dataEmpty"></line-chart>
+      <div
+        class="
+          flex flex-row
+          items-center
+          border border-l-2
+          bg-gray-100
+          rounded-lg
+          w-fit
+          pl-4
+          pr-5
+          mt-4
+          relative
+          transform-2
+        "
+        :class="[expandFramerate ? 'fade-out h-24' : 'fade-in h-14']"
+      >
+        <span class="text-left font-bold mr-2" :class="[expandFramerate ? '-mt-12' : '']"
+          >Framerate: <span class="" v-if="!expandFramerate">{{ framerate }}</span></span
+        >
+
+        <VueSlideBar
+          v-if="expandFramerate"
+          class="w-72"
+          v-model="framerate"
+          :data="slider.data"
+          :range="slider.range"
+          :processStyle="slider.processStyle"
+          :lineHeight="slider.lineHeight"
+          :tooltipStyles="{ backgroundColor: '#8bc34a', borderColor: '#8bc34a' }"
+        >
+        </VueSlideBar>
+        <div
+          @click="handleFramerateExpand()"
+          class="
+            cursor-pointer
+            bottom-0
+            right-0
+            absolute
+            text-xl
+            mr-2
+            transform
+            color-green
+            hover:text-green-700
+          "
+          :class="[expandFramerate ? 'transform-255d' : 'transform-45d']"
+        >
+          <i class="fas fa-caret-right"></i>
+        </div>
+      </div>
     </div>
     <div v-if="graphType === 'ScatterPlot'">
       <Graph3d :scatterDataSetList="scatterDataSetList"></Graph3d>
@@ -15,13 +64,16 @@
 <script>
 import LineChart from '@/assets/chartjs/LineChart.vue';
 import Graph3d from '@/components/graph/Graph3d.vue';
+import VueSlideBar from 'vue-slide-bar';
 import { mapGetters } from 'vuex';
 import ROSLIB from 'roslib';
+import $ from 'jquery';
 
 export default {
   components: {
     LineChart,
     Graph3d,
+    VueSlideBar,
   },
   computed: {
     ...mapGetters({
@@ -58,6 +110,39 @@ export default {
       graph3dconnected: false,
       topicScatter: {},
       scatterDataSetList: [],
+      framerate: 30,
+      expandFramerate: false,
+      slider: {
+        lineHeight: 7,
+        processStyle: {
+          backgroundColor: '#8bc34a',
+        },
+        data: [1, 10, 20, 30, 40, 50, 60],
+        range: [
+          {
+            label: '1',
+          },
+          {
+            label: '10',
+          },
+          {
+            label: '20',
+            // isHide: true,
+          },
+          {
+            label: '30',
+          },
+          {
+            label: '40',
+          },
+          {
+            label: '50',
+          },
+          {
+            label: '60',
+          },
+        ],
+      },
     };
   },
   async mounted() {
@@ -84,6 +169,12 @@ export default {
         if (res) {
           return res;
         }
+      }
+    },
+    handleFramerateExpand() {
+      this.expandFramerate = !this.expandFramerate;
+      if (this.expandFramerate) {
+        $('.transform-2').toggleClass('transform-active');
       }
     },
     removeLineFromChart(line_name) {
@@ -283,5 +374,74 @@ export default {
 .small {
   max-width: 600px;
   margin: 150px auto;
+}
+
+.border-l-2 {
+  border-left: 3px solid #8bc34a !important;
+}
+
+.color-green {
+  color: #8bc34a;
+}
+
+.fade-in {
+  -webkit-animation: fadeInRight 1s;
+  animation: fadeInRight 1s;
+}
+
+.fade-out {
+  -webkit-animation: fadeInLeft 1s;
+  animation: fadeInLeft 1s;
+}
+
+.transform-255d {
+  transform: rotate(225deg);
+}
+
+.transform-45d {
+  transform: rotate(45deg);
+}
+
+@-webkit-keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+.w-fit {
+  width: fit-content;
 }
 </style>

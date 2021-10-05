@@ -3,12 +3,12 @@ import { Line, mixins } from 'vue-chartjs';
 const { reactiveProp } = mixins;
 // import ROSLIB from 'roslib';
 import 'chartjs-plugin-streaming';
-import 'chartjs-plugin-zoom';
+// import 'chartjs-plugin-zoom';
 
 export default {
   extends: Line,
   mixins: [reactiveProp],
-  props: ['chartData'],
+  props: ['chartData', 'framerate'],
   data() {
     return {
       topics: {},
@@ -23,30 +23,40 @@ export default {
         'rgb(201, 203, 207)', //grey
       ],
       colorIndex: 0,
-    };
-  },
-  computed: {
-    options() {
-      return {
+      options: {
         scales: {
           xAxes: [
             {
+              // type: 'realtime',
+              // realtime: {
+              //   // parser: 'hh:mm:ss.ffff',
+              //   unit: 'millisecond',
+              //   // displayFormats: {
+              //   //   millisecond: 'HH:mm:ss',
+              //   // },
+              //   onRefresh: () => {
+              //     // this.data.datasets[0].data.push({
+              //     //   x: Date.now(),
+              //     //   y: Math.random() * 100,
+              //     // });
+              //   },
+              //   delay: 2000,
+              //   autoSkip: false,
+              // },
               type: 'realtime',
               time: {
-                parser: 'HH:mm:ss.SSS',
-                unit: 'second',
+                unit: 'millisecond',
                 displayFormats: {
-                  millisecond: 'HH:mm:ss',
+                  millisecond: 'hh:mm:ss.SS',
                 },
               },
               realtime: {
-                parser: 'hh:mm:ss.ffff',
-
+                unit: 'millisecond',
                 onRefresh: () => {
-                  // this.data.datasets[0].data.push({
-                  //   x: Date.now(),
-                  //   y: Math.random() * 100,
-                  // });
+                  //     // this.data.datasets[0].data.push({
+                  //     //   x: Date.now(),
+                  //     //   y: Math.random() * 100,
+                  //     // });
                 },
                 delay: 2000,
               },
@@ -57,45 +67,47 @@ export default {
                 },
                 maxRotation: 90,
                 minRotation: 50,
-                sampleSize: 5,
+                autoSkip: false,
               },
             },
           ],
         },
+        responsive: true,
+        maintainAspectRatio: false,
+        zoomEnabled: true,
+        animationEnabled: true,
         events: [],
         tooltips: {
           mode: 'nearest',
           intersect: false,
         },
-        pan: {
-          enabled: true,
-          drag: false,
-          mode: 'xy',
-          speed: 10,
-          threshold: 10,
-        },
-        zoom: {
-          enabled: true,
-          drag: false,
-          mode: 'xy',
-          limits: {
-            max: 10,
-            min: 0.5,
-          },
-          rangeMin: {
-            // x: 20,
-            // y: 1000
-          },
-          rangeMax: {
-            // x: 10,
-            // y: 150
-          },
-        },
+        // pan: {
+        //   enabled: true,
+        //   drag: false,
+        //   mode: 'xy',
+        //   speed: 10,
+        //   threshold: 10,
+        // },
+        // zoom: {
+        //   enabled: true,
+        //   drag: false,
+        //   mode: 'xy',
+        //   limits: {
+        //     max: 10,
+        //     min: 0.5,
+        //   },
+        //   rangeMin: {
+        //     // x: 20,
+        //     // y: 1000
+        //   },
+        //   rangeMax: {
+        //     // x: 10,
+        //     // y: 150
+        //   },
+        // },
         animation: {
           duration: 0, // general animation time
         },
-        zoomEnabled: true,
-        animationEnabled: true,
         hover: {
           mode: 'nearest',
           intersect: false,
@@ -104,7 +116,7 @@ export default {
         responsiveAnimationDuration: 0, // animation duration after a resize
         plugins: {
           streaming: {
-            frameRate: 30,
+            frameRate: this.framerate,
           },
         },
         elements: {
@@ -112,22 +124,120 @@ export default {
             tension: 0, // disables bezier curves
           },
         },
-
-        // layout: {
-        //     padding: {
-        //         left: 50,
-        //         right: 50,
-        //         top: 50,
-        //         bottom: 50
-        //     }
-        // }
-        maintainAspectRatio: false,
-        // legend: {
-        //   display: true,
-        // },
-        responsive: true,
-      };
-    },
+        legend: {
+          display: true,
+        },
+      },
+    };
+  },
+  computed: {
+    // options() {
+    //   return {
+    //     scales: {
+    //       xAxes: [
+    //         {
+    //           // type: 'realtime',
+    //           // realtime: {
+    //           //   // parser: 'hh:mm:ss.ffff',
+    //           //   unit: 'millisecond',
+    //           //   // displayFormats: {
+    //           //   //   millisecond: 'HH:mm:ss',
+    //           //   // },
+    //           //   onRefresh: () => {
+    //           //     // this.data.datasets[0].data.push({
+    //           //     //   x: Date.now(),
+    //           //     //   y: Math.random() * 100,
+    //           //     // });
+    //           //   },
+    //           //   delay: 2000,
+    //           //   autoSkip: false,
+    //           // },
+    //           type: 'realtime',
+    //           time: {
+    //             unit: 'millisecond',
+    //             displayFormats: {
+    //               millisecond: 'hh:mm:ss.SS',
+    //             },
+    //           },
+    //           realtime: {
+    //             unit: 'millisecond',
+    //             onRefresh: () => {
+    //               //     // this.data.datasets[0].data.push({
+    //               //     //   x: Date.now(),
+    //               //     //   y: Math.random() * 100,
+    //               //     // });
+    //             },
+    //             delay: 2000,
+    //           },
+    //           ticks: {
+    //             callback: function (value) {
+    //               // console.log(value)
+    //               return value;
+    //             },
+    //             maxRotation: 90,
+    //             minRotation: 50,
+    //             autoSkip: false,
+    //           },
+    //         },
+    //       ],
+    //     },
+    //     responsive: true,
+    //     maintainAspectRatio: false,
+    //     zoomEnabled: true,
+    //     animationEnabled: true,
+    //     events: [],
+    //     tooltips: {
+    //       mode: 'nearest',
+    //       intersect: false,
+    //     },
+    //     // pan: {
+    //     //   enabled: true,
+    //     //   drag: false,
+    //     //   mode: 'xy',
+    //     //   speed: 10,
+    //     //   threshold: 10,
+    //     // },
+    //     // zoom: {
+    //     //   enabled: true,
+    //     //   drag: false,
+    //     //   mode: 'xy',
+    //     //   limits: {
+    //     //     max: 10,
+    //     //     min: 0.5,
+    //     //   },
+    //     //   rangeMin: {
+    //     //     // x: 20,
+    //     //     // y: 1000
+    //     //   },
+    //     //   rangeMax: {
+    //     //     // x: 10,
+    //     //     // y: 150
+    //     //   },
+    //     // },
+    //     animation: {
+    //       duration: 0, // general animation time
+    //     },
+    //     hover: {
+    //       mode: 'nearest',
+    //       intersect: false,
+    //       animationDuration: 0, // duration of animations when hovering an item
+    //     },
+    //     responsiveAnimationDuration: 0, // animation duration after a resize
+    //     plugins: {
+    //       streaming: {
+    //         frameRate: this.framerate,
+    //       },
+    //     },
+    //     elements: {
+    //       line: {
+    //         tension: 0, // disables bezier curves
+    //       },
+    //     },
+    //     legend: {
+    //       display: true,
+    //     },
+    //   };
+    // },
   },
   async mounted() {
     // await this.updateSelectedLines();
@@ -145,6 +255,10 @@ export default {
         this.renderLineChart();
         // this.$data._chart.update();
       });
+    },
+    framerate(val) {
+      this.options.plugins.streaming.frameRate = val;
+      this.renderLineChart();
     },
   },
 };
