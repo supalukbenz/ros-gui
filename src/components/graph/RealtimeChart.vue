@@ -9,7 +9,7 @@
         class="
           flex flex-row
           items-center
-          border border-l-2
+          border border-l-3
           bg-gray-100
           rounded-lg
           w-fit
@@ -376,7 +376,7 @@ export default {
   margin: 150px auto;
 }
 
-.border-l-2 {
+.border-l-3 {
   border-left: 3px solid #8bc34a !important;
 }
 
@@ -400,23 +400,6 @@ export default {
 
 .transform-45d {
   transform: rotate(45deg);
-}
-
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 @keyframes fadeInLeft {

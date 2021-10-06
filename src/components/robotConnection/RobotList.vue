@@ -130,9 +130,9 @@
                       >
                         <i class="fas fa-edit"></i>
                       </a>
-                      <!-- <button class="border mr-2" @click="clickedSimulation(robot)">
+                      <button class="border mr-2" @click="clickedSimulation(robot)">
                         simulate
-                      </button> -->
+                      </button>
                       <button
                         v-if="robot.id !== robotConnected.id"
                         @click="handleRobotConnection(robot)"

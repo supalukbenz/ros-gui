@@ -22,8 +22,7 @@
       </div>
     </div>
     <!-- <div class="flex flex-row w-full"> -->
-    <SideBar class="float-left h-100"></SideBar>
-    <div v-if="isConnected" class="flex flex-auto flex-col justify-between">
+    <div v-if="isConnected" class="flex flex-auto flex-col justify-between my-4 mx-10">
       <!-- <div class="mr-5 mb-10"> -->
       <Graph v-show="routeName === 'Graph'"></Graph>
       <StreamingVideo v-show="routeName === 'StreamingVideo'"></StreamingVideo>
@@ -42,7 +41,6 @@
 </template>
 
 <script>
-import SideBar from '@/components/main/SideBar.vue';
 import LogMessage from '@/components/main/LogMessage.vue';
 import Graph from '@/views/Graph.vue';
 import StreamingVideo from '@/views/StreamingVideo.vue';
@@ -54,7 +52,6 @@ import { mapGetters } from 'vuex';
 
 export default {
   components: {
-    SideBar,
     CustomizeButton,
     Graph,
     StreamingVideo,

@@ -25,6 +25,7 @@
         border-tran
         overflow-hidden
         rounded-sm
+        relative
       "
       :id="buttonId"
       :style="{
@@ -199,14 +200,10 @@ export default {
     },
     buttonRightClick() {
       $(`#${this.buttonId}`)
-        .on('contextmenu', e => {
-          var top = e.pageY;
-          var left = e.pageX;
+        .on('contextmenu', () => {
           $(`#${this.menuId}`)
             .css({
               display: 'block',
-              top: top,
-              left: left,
             })
             .addClass('show');
           return false;
@@ -230,7 +227,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 .border-tran {
   border: 2px solid transparent;
 }
@@ -241,5 +238,12 @@ export default {
 
 .text-red {
   color: rgb(228, 57, 57) !important;
+}
+.dropdownRightButton {
+  /* position: static !important; */
+}
+
+.modal-backdrop {
+  z-index: 0 !important;
 }
 </style>

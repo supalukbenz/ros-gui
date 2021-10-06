@@ -1,24 +1,50 @@
 <template>
   <div class="h-20 bg-blue-custom flex items-center px-10 flex-row justify-between z-50 relative">
     <router-link class="cursor-pointer" to="/">
-      <div class="flex items-end">
+      <div class="flex items-end relative">
         <img class="w-10 h-auto" src="@/assets/images/robot-icon.png" alt="robotIcon" />
-        <div class="font-bold text-2xl text-blue">ROS</div>
-        <div class="text-2xl text-white">GUI</div>
+        <!-- <div class="font-bold text-2xl text-blue">ROS</div>
+        <div class="text-2xl text-white">GUI</div> -->
+        <div class="absolute left-0 bg-cloud w-24 h-10"></div>
+        <div class="ros-txt font-bold text-2xl text-white">ROS</div>
+        <div class="ml-1 text-2xl text-white">GUI</div>
       </div>
     </router-link>
-    <div class="flex items-end">
-      <div class="mr-4 font-bold text-xl text-white hover:underline cursor-pointer">Robot List</div>
-      <div v-show="objectNotEmpty(robotConnected)">
+    <div class="flex items-end" v-show="objectNotEmpty(robotConnected)">
+      <div
+        class="menu mr-4 font-bold text-xl text-white cursor-pointer"
+        :class="{ 'selected-menu': pageName === 'Graph' }"
+        @click="changePage('Graph')"
+      >
+        Graph
+      </div>
+      <div
+        class="menu mr-4 font-bold text-xl text-white cursor-pointer"
+        :class="{ 'selected-menu': pageName === 'StreamingVideo' }"
+        @click="changePage('StreamingVideo')"
+      >
+        Streaming Video
+      </div>
+      <div
+        class="menu mr-4 font-bold text-xl text-white cursor-pointer"
+        :class="{ 'selected-menu': pageName === 'CustomizeButton' }"
+        @click="changePage('CustomizeButton')"
+      >
+        Customize Button
+      </div>
+      <!-- <div class="menu mr-4 font-bold text-xl text-white cursor-pointer">Robot List</div> -->
+      <div>
         <button
-          class="w-48 border-2 border-black bg-white rounded-3xl p-1"
+          class="border-2 selected-menu overflow-hidden bg-white rounded-3xl px-3 py-1"
           type="button"
           data-toggle="dropdown"
           id="dropdownMenuLink"
           aria-haspopup="true"
           aria-expanded="false"
         >
-          <div class="font-bold text-xl">{{ robotConnected.robotName }}</div>
+          <div class="font-bold text-xl">
+            {{ robotConnected.robotName }}
+          </div>
         </button>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
           <div class="w-52 flex flex-col items-start pl-2 break-all">
@@ -51,10 +77,24 @@ export default {
       robotConnected: 'getRobotConnected',
       ros: 'getROS',
     }),
+    pageName() {
+      return this.$route.name;
+    },
+    robotName() {
+      return this.$route.params.robotName;
+    },
   },
   methods: {
     objectNotEmpty(obj) {
       return Object.keys(obj).length !== 0;
+    },
+    changePage(page) {
+      this.$router
+        .push({
+          name: page,
+          params: { robotName: this.robotName },
+        })
+        .catch(() => {});
     },
     async handleRobotDisconnection() {
       const robotForm = this.robotConnected;
@@ -88,9 +128,29 @@ export default {
 <style scoped>
 .bg-blue-custom {
   background: #485a73;
+  /* background: #6c605b; */
+}
+
+.bg-cloud {
+  background: #dea01e;
+  z-index: -1;
 }
 
 .text-blue {
   color: #c2c2c2;
+}
+
+.ros-txt {
+  letter-spacing: 2px;
+}
+.menu {
+  border-bottom: 2px solid transparent;
+}
+.menu:hover {
+  border-color: #dea01e;
+}
+
+.selected-menu {
+  border-color: #dea01e !important;
 }
 </style>

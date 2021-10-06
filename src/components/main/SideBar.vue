@@ -1,32 +1,61 @@
 <template>
-  <div class="text-left py-4 px-3 z-0">
+  <div class="text-left py-4 px-3 z-0 border hidden">
     <div>
-      <div class="font-semibold text-2xl">Robot Tools</div>
+      <div class="flex flex-row justify-between items-center">
+        <div class="font-semibold text-2xl">Robot Tools</div>
+        <div @click="handleMenu()"><i class="fas fa-bars"></i></div>
+      </div>
       <hr />
       <div class="mt-4">
         <div
-          class="flex items-center font-bold text-xl cursor-pointer text-blue-custom"
+          class="
+            flex
+            justify-between
+            items-center
+            font-bold
+            text-xl
+            cursor-pointer
+            text-blue-custom
+          "
           :class="{ 'text-gray-400': pageName !== 'Graph' }"
           @click="changePage('Graph')"
         >
+          <span v-if="handleMenu" class="ml-2">Graph</span>
           <i class="fas fa-chart-area"></i>
-          <span class="ml-2">Graph</span>
         </div>
         <div
-          class="flex items-center font-bold text-xl mt-3 text-blue-custom cursor-pointer"
+          class="
+            flex
+            justify-between
+            items-center
+            font-bold
+            text-xl
+            mt-3
+            text-blue-custom
+            cursor-pointer
+          "
           :class="{ 'text-gray-400': pageName !== 'StreamingVideo' }"
           @click="changePage('StreamingVideo')"
         >
+          <span v-if="handleMenu" class="ml-2">Streaming Video</span>
           <i class="fas fa-photo-video"></i>
-          <span class="ml-2">Streaming Video</span>
         </div>
         <div
-          class="flex items-center font-bold text-xl mt-3 cursor-pointer text-blue-custom"
+          class="
+            flex
+            justify-between
+            items-center
+            font-bold
+            text-xl
+            mt-3
+            cursor-pointer
+            text-blue-custom
+          "
           :class="{ 'text-gray-400': pageName !== 'CustomizeButton' }"
           @click="changePage('CustomizeButton')"
         >
+          <span v-if="handleMenu" class="ml-2">Customize Button</span>
           <i class="fas fa-pencil-alt"></i>
-          <span class="ml-2">Customize Button</span>
         </div>
       </div>
     </div>
@@ -49,7 +78,9 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      hideMenu: false,
+    };
   },
   mounted() {},
   methods: {
@@ -60,6 +91,9 @@ export default {
           params: { robotName: this.robotName },
         })
         .catch(() => {});
+    },
+    handleMenu() {
+      this.hideMenu = !this.hideMenu;
     },
   },
 };
