@@ -47,8 +47,7 @@ $ npm run serve
 Open the ROS UI project at [http://localhost:8080/](http://localhost:8080/)
 
 
-> **In case of starting the backend server manually**
-
- - Go and follow the instructions at [https://github.com/supalukbenz/ros-gui-backend](https://github.com/supalukbenz/ros-gui-backend)
+> **In case of starting the backend server manually**.
+Go and follow the instructions at [https://github.com/supalukbenz/ros-gui-backend](https://github.com/supalukbenz/ros-gui-backend)
 
 
