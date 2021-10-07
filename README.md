@@ -6,7 +6,7 @@ ROS GUI is a web browser tool for communicating and controlling robots via [ROS]
 
 Before using this project, make sure that the robot has the following packages:
 
-1. [rosbridge_suite](http://wiki.ros.org/rosbridge_suite) is a specification for sending JSON based commands to ROS.
+1. [rosbridge_suite](http://wiki.ros.org/rosbridge_suite) is a collection of packages that implement the rosbridge protocol and provides a WebSocket transport layer.
    - Rosbridge is available as a debian. To install:
 
      ```sudo apt-get install ros-<rosdistro>-rosbridge-server```
