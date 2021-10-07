@@ -2,6 +2,14 @@
 
 ROS GUI is a web browser tool for communicating and controlling robots via [ROS](http://wiki.ros.org/Documentation). The interaction between the browser and ROS uses [roslibjs](https://github.com/RobotWebTools/roslibjs) with the WebSockets as an intermediary. 
 
+**Features**
+
+1. **Realtime graph**: Display values from selected ROS topics on a line graph in real-time.
+
+2. **Streaming video**: Stream video of ROS image topic.
+
+3. **Customize button**: Create and customize buttons to control or subscribe robot.
+
 ## Requirements
 
 Before using this project, make sure that the robot has the following packages:
@@ -39,14 +47,8 @@ $ npm run serve
 Open the ROS UI project at [http://localhost:8080/](http://localhost:8080/)
 
 
-***In case of starting the backend server manually**
+> **In case of starting the backend server manually**
 
-   - Go and follow the instructions at [https://github.com/supalukbenz/ros-gui-backend](https://github.com/supalukbenz/ros-gui-backend)
+ - Go and follow the instructions at [https://github.com/supalukbenz/ros-gui-backend](https://github.com/supalukbenz/ros-gui-backend)
 
-## Features
-**1. Realtime graph**: Display values from selected ROS topics on a line graph in real-time.
-
-**2. Streaming video**: Stream video of ROS image topic.
-
-**3. Customize button**: Create and customize buttons to control or subscribe robot.
 
