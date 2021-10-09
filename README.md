@@ -4,11 +4,11 @@ ROS GUI is a web browser tool for communicating and controlling robots via [ROS]
 
 **Features**
 
-1. **Realtime graph**: Display values from selected ROS topics on a line graph in real-time.
+- **Realtime graph**: Display values from selected ROS topics on a line graph in real-time.
 
-2. **Streaming video**: Stream video of ROS image topic.
+- **Streaming video**: Stream video of ROS image topic.
 
-3. **Customize button**: Create and customize buttons to control or subscribe robot.
+- **Customize button**: Create and customize buttons to control or subscribe robot.
 
 ## Requirements
 
