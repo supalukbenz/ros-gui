@@ -236,6 +236,18 @@ export default {
     msgTypeList() {
       return this.filteredMsg.length > 0 ? this.filteredMsg : this.filteredMsgByTopic;
     },
+    filterParamList() {
+      let tempParams = [];
+      for (let p of this.paramList) {
+        if (this.filterROSTopic(p?.node) || this.filterROSTopic(p?.name)) {
+          if (!tempParams.some(t => t.name.includes(p.name))) {
+            tempParams.push(p);
+          }
+        }
+      }
+      console.log('tempParams', tempParams);
+      return tempParams;
+    },
     // keyVariableObject() {
     //   return Object.keys(this.editedVariable);
     // },

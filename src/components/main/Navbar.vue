@@ -110,6 +110,7 @@ export default {
           selection: [],
           source: [],
           expanded: [],
+          arrayIndexTopic: [],
         });
         await disconnectToRobot(robotForm);
         this.$router

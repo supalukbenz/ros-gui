@@ -33,10 +33,12 @@ export default new Vuex.Store({
       selection: [],
       source: [],
       expanded: [],
+      arrayIndexTopic: [],
     },
     selectedTopic: [],
     selectedScatterTopic: [],
     scatterCloseModal: false,
+    lineGraphCloseModal: false,
   },
   getters: {
     getRobotList: state => {
@@ -107,6 +109,9 @@ export default new Vuex.Store({
     },
     getScatterCloseModal: state => {
       return state.scatterCloseModal;
+    },
+    getLineGraphCloseModal: state => {
+      return state.lineGraphCloseModal;
     },
   },
   mutations: {
@@ -188,6 +193,9 @@ export default new Vuex.Store({
     setScatterCloseModal(state, payload) {
       state.scatterCloseModal = payload;
     },
+    setLineGraphCloseModal(state, payload) {
+      state.lineGraphCloseModal = payload;
+    },
   },
   actions: {
     updateWSAddress({ commit }, payload) {
@@ -255,6 +263,9 @@ export default new Vuex.Store({
     },
     updateScatterCloseModal({ commit }, payload) {
       commit('setScatterCloseModal', payload);
+    },
+    updateLineGraphCloseModal({ commit }, payload) {
+      commit('setLineGraphCloseModal', payload);
     },
   },
   modules: {},

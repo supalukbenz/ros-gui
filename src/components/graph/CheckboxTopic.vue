@@ -63,6 +63,7 @@ export default {
       topicList: 'getTopicList',
       data: 'getDataTopic',
       scatterCloseModal: 'getScatterCloseModal',
+      lineGraphCloseModal: 'getLineGraphCloseModal',
     }),
     topicModalId() {
       return `topicModal-${this.graphState}`;
@@ -200,6 +201,12 @@ export default {
       if (val) {
         $('#topicModal-Graph3d').modal('hide');
         this.$store.dispatch('updateScatterCloseModal', false);
+      }
+    },
+    lineGraphCloseModal(val) {
+      if (val) {
+        $('#topicModal-LineChart').modal('hide');
+        this.$store.dispatch('updateLineGraphCloseModal', false);
       }
     },
   },

@@ -88,6 +88,9 @@ export default {
     selectedScatterTopicLength() {
       return this.selectedScatterTopic.length;
     },
+    dataSelection() {
+      return this.dataTopic.selection;
+    },
   },
   props: {
     graphType: String,
@@ -104,6 +107,7 @@ export default {
         labels: [],
         datasets: [],
       },
+      dataArray: [],
       pause: false,
       useMsgTimeStamp: false,
       renderGraph: false,
@@ -213,7 +217,12 @@ export default {
         const node = this.getNode(data.selection[i], data.source);
         const rootNode = this.getNode(node.root, data.source);
         if (!node['children']) {
-          await this.addLine(node.value, rootNode.value, rootNode.type);
+          let nodeValue = node.value;
+          if (data.arrayIndexTopic.length > 0) {
+            const topic = data.arrayIndexTopic.find(a => a.value === nodeValue);
+            nodeValue = `${topic.value}/${topic.index}`;
+          }
+          await this.addLine(nodeValue, rootNode.value, rootNode.type);
         }
         for (let topicName in this.topics) {
           this.topics[topicName].topic.subscribe(message => {
@@ -234,11 +243,25 @@ export default {
               for (let f in field) {
                 dataMsg = dataMsg[field[f]];
               }
-
+              const value = data.selection[i];
+              console.log('dataMsg', dataMsg);
+              if (data.arrayIndexTopic.length > 0) {
+                const topic = data.arrayIndexTopic.find(a => a.value === value);
+                console.log('value', value);
+                console.log('topic', topic);
+                if (Array.isArray(dataMsg)) {
+                  console.log('dataMsg.length', dataMsg.length);
+                  if (dataMsg.length < topic.index) {
+                    dataMsg = dataMsg[topic.index];
+                  }
+                }
+              }
               if (Array.isArray(dataMsg)) {
                 lines.splice(l, 1);
+                console.log('array');
               }
               if (!this.isNumeric(dataMsg)) {
+                console.log('isNumeric');
                 return;
               }
 
@@ -336,11 +359,16 @@ export default {
   watch: {
     dataTopic: {
       handler(data) {
+        console.log('dataTopic', data);
         this.renderGraph = false;
         this.updateLineChart(data);
       },
       deep: true,
     },
+    // dataSelectionLength() {
+    //   this.renderGraph = false;
+    //   this.updateLineChart(this.dataTopic);
+    // },
     selectedScatterTopic: {
       async handler(data) {
         const dataScatter = {

@@ -1,8 +1,26 @@
 <template>
-  <div>
-    <div class="h-30r">
-      <div v-if="graphState === 'LineChart'">
+  <div class="overflow-y-scroll">
+    <div class="">
+      <div v-if="graphState === 'LineChart'" class="h-full">
+        <div v-if="arrayTopicList.length > 0" class="text-left border px-6 py-1 mb-2 rounded">
+          <div class="font-bold text-red-600">* Array index:</div>
+          <div
+            v-for="(array, index) in arrayTopicList"
+            :key="index"
+            class="grid grid-cols-3 gap-2 mb-1"
+          >
+            <span>{{ array.value }}</span>
+            <input
+              type="number"
+              v-model="array.index"
+              class="border border-black w-20 pl-2"
+              placeholder="index"
+            />
+            <div></div>
+          </div>
+        </div>
         <treeselect
+          class="relative"
           :multiple="true"
           :options="options"
           :always-open="true"
@@ -10,6 +28,21 @@
           v-model="value"
           :value-consists-of="'ALL'"
         />
+        <div class="bottom-0">
+          <button
+            type="button"
+            class="mt-2 text-white font-bold rounded px-5 py-1 mb-3"
+            :class="[
+              indexNotNull
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-400 hover:bg-green-500 cursor-pointer',
+            ]"
+            :disabled="indexNotNull"
+            @click="submitListGraph()"
+          >
+            Submit
+          </button>
+        </div>
       </div>
       <div v-if="graphState === 'Graph3d'">
         <div class="text-sm font-bold text-red-500" v-show="threeIndexWarning">
@@ -76,6 +109,14 @@ export default {
     scatterValueLength() {
       return this.scatterValue.length;
     },
+    indexNotNull() {
+      if (this.arrayTopicList.length > 0) {
+        const filterNullIndex = this.arrayTopicList.filter(a => a.index === '' || a.index < 0);
+        console.log('filterNullIndex', filterNullIndex.length <= 0);
+        return filterNullIndex.length > 0;
+      }
+      return false;
+    },
   },
   props: {
     graphState: String,
@@ -90,6 +131,7 @@ export default {
       value: [],
       scatterValue: [],
       threeIndexWarning: false,
+      arrayTopicList: [],
     };
   },
   async mounted() {},
@@ -100,18 +142,57 @@ export default {
       this.$store.dispatch('updateSelectedScatterTopic', this.scatterValue.slice(0, 3));
       this.$store.dispatch('updateScatterCloseModal', true);
     },
-    // clickedCheckboxTopic(node) {
-    //   const children = node.children.forEach(c => {
-    //     return c.value;
-    //   });
-    // },
+    submitListGraph() {
+      let currentData = this.data;
+      let currentArrayTopicList = this.arrayTopicList;
+      // let currentValue = this.value;
+      // if (this.arrayTopicList.length > 0) {
+      //   this.addArrayIndexTopic(this.value);
+      // }
+      //   for (let a of this.arrayTopicList) {
+      //     const topic = `${a.value}/${a.index}`;
+      //     currentValue.push(topic);
+      //   }
+      // }
+      // console.log('currentValue', currentValue);
+      currentData.arrayIndexTopic = currentArrayTopicList;
+      currentData.selection = this.value;
+      console.log('currentData.selection');
+      this.$store.dispatch('updateDataTopic', currentData);
+      this.$store.dispatch('updateLineGraphCloseModal', true);
+    },
+    getNode(value, source, children_key = 'children') {
+      for (let i in source) {
+        let res = null;
+        if (source[i].value === value) {
+          res = source[i];
+        } else if (source[i][children_key]) {
+          res = this.getNode(value, source[i][children_key]);
+        }
+        if (res) {
+          return res;
+        }
+      }
+    },
   },
   watch: {
     value: {
       handler(val) {
-        const currentData = this.data;
-        currentData.selection = val;
-        this.$store.dispatch('updateDataTopic', currentData);
+        this.arrayTopicList = [];
+        if (val.length > 0) {
+          for (let v of val) {
+            console.log('v', v);
+            let node = this.getNode(v, this.data.source);
+            if (node.array >= 0) {
+              const arr = {
+                value: v,
+                index: '',
+              };
+
+              this.arrayTopicList.push(arr);
+            }
+          }
+        }
       },
       deep: true,
     },
@@ -129,7 +210,7 @@ export default {
 
 <style>
 .h-30r {
-  height: 30rem;
+  min-height: 30rem;
 }
 
 .selected-item {
@@ -149,6 +230,19 @@ export default {
   > div
   > div.vue-treeselect__menu-container
   > div {
-  max-height: 22rem !important;
+  max-height: 20rem !important;
+  position: relative !important;
+}
+
+#topicModal-LineChart
+  > div
+  > div
+  > div.modal-body
+  > div
+  > div
+  > div.h-full
+  > div.relative.vue-treeselect.vue-treeselect--multi.vue-treeselect--searchable.vue-treeselect--open.vue-treeselect--open-below
+  > div.vue-treeselect__menu-container {
+  position: relative !important;
 }
 </style>

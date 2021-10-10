@@ -205,12 +205,15 @@ export default {
     Loading,
     // StatusCard,
   },
-  created() {
+  mounted() {
     this.responseMessage = '';
     this.editState = false;
     if (this.rosState) {
       // const currentRobot = this.robotConnected;
       this.connect(this.rosbridgeURL);
+    }
+    if (this.ros && !this.ros.isConnected) {
+      this.disconnect();
     }
   },
   data() {
@@ -292,7 +295,6 @@ export default {
           this.$store.dispatch('updateROS', this.ros);
           // this.setTopicList();
         });
-        console.log('ros robotlist, ', this.ros);
 
         this.ros.on('error', error => {
           // this.responseMessage = 'Error connecting to websocket server';
@@ -337,6 +339,7 @@ export default {
         selection: [],
         source: [],
         expanded: [],
+        arrayIndexTopic: [],
       });
     },
     async disconnect() {
