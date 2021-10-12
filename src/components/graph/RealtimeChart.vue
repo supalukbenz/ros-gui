@@ -84,6 +84,7 @@ export default {
       rosbridgeURL: 'getRosbridgeURL',
       rosbridge: 'getROS',
       selectedScatterTopic: 'getSelectedScatterTopic',
+      lineGraphCloseModal: 'getLineGraphCloseModal',
     }),
     selectedScatterTopicLength() {
       return this.selectedScatterTopic.length;
@@ -220,7 +221,9 @@ export default {
           let nodeValue = node.value;
           if (data.arrayIndexTopic.length > 0) {
             const topic = data.arrayIndexTopic.find(a => a.value === nodeValue);
-            nodeValue = `${topic.value}/${topic.index}`;
+            if (topic !== undefined) {
+              nodeValue = `${topic.value}/${topic.index}`;
+            }
           }
           await this.addLine(nodeValue, rootNode.value, rootNode.type);
         }
@@ -244,15 +247,13 @@ export default {
                 dataMsg = dataMsg[field[f]];
               }
               const value = data.selection[i];
-              console.log('dataMsg', dataMsg);
               if (data.arrayIndexTopic.length > 0) {
                 const topic = data.arrayIndexTopic.find(a => a.value === value);
-                console.log('value', value);
-                console.log('topic', topic);
-                if (Array.isArray(dataMsg)) {
-                  console.log('dataMsg.length', dataMsg.length);
-                  if (dataMsg.length < topic.index) {
-                    dataMsg = dataMsg[topic.index];
+                if (topic !== undefined) {
+                  if (Array.isArray(dataMsg)) {
+                    if (dataMsg.length < topic.index) {
+                      dataMsg = dataMsg[topic.index];
+                    }
                   }
                 }
               }
@@ -263,6 +264,8 @@ export default {
               if (!this.isNumeric(dataMsg)) {
                 console.log('isNumeric');
                 return;
+              } else {
+                // dataMsg = Number(dataMsg.toLocaleString('fullwide', { useGrouping: false }));
               }
 
               this.data.datasets.forEach(dataset => {
@@ -346,6 +349,7 @@ export default {
         backgroundColor: bgColor,
         fill: false,
         lineTension: 0,
+        // spanGaps: true,
         // borderDash: [8, 4],
         data: [],
       });
@@ -359,11 +363,16 @@ export default {
   watch: {
     dataTopic: {
       handler(data) {
-        console.log('dataTopic', data);
         this.renderGraph = false;
         this.updateLineChart(data);
       },
       deep: true,
+    },
+    lineGraphCloseModal(val) {
+      if (val) {
+        this.renderGraph = false;
+        this.updateLineChart(this.dataTopic);
+      }
     },
     // dataSelectionLength() {
     //   this.renderGraph = false;

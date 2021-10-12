@@ -157,7 +157,6 @@ export default {
       // console.log('currentValue', currentValue);
       currentData.arrayIndexTopic = currentArrayTopicList;
       currentData.selection = this.value;
-      console.log('currentData.selection');
       this.$store.dispatch('updateDataTopic', currentData);
       this.$store.dispatch('updateLineGraphCloseModal', true);
     },
@@ -177,21 +176,32 @@ export default {
   },
   watch: {
     value: {
-      handler(val) {
-        this.arrayTopicList = [];
+      handler(val, oldVal) {
         if (val.length > 0) {
+          let diffVal = oldVal.filter(x => !val.includes(x));
+          if (diffVal.length > 0) {
+            for (let v of diffVal) {
+              if (this.arrayTopicList.some(a => a.value === v)) {
+                const indexOldVal = this.arrayTopicList.findIndex(a => a.value === v);
+                this.arrayTopicList.splice(indexOldVal, 1);
+              }
+            }
+          }
+          // }
           for (let v of val) {
-            console.log('v', v);
             let node = this.getNode(v, this.data.source);
             if (node.array >= 0) {
               const arr = {
                 value: v,
                 index: '',
               };
-
-              this.arrayTopicList.push(arr);
+              if (!this.arrayTopicList.some(a => a.value === v)) {
+                this.arrayTopicList.push(arr);
+              }
             }
           }
+        } else {
+          this.arrayTopicList = [];
         }
       },
       deep: true,

@@ -23,10 +23,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <TopicListModal
-                :graphState="graphState"
-                v-if="addTopicState && data.source.length > 0"
-              ></TopicListModal>
+              <TopicListModal :graphState="graphState" v-if="addTopicState"></TopicListModal>
               <div
                 v-else
                 class="spinner-border text-blue-300"
