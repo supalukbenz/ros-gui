@@ -1,10 +1,37 @@
 <template>
   <div>
+    <div class="rounded-full border-2 flex flex-row mb-2 text-sm font-bold">
+      <div
+        class="
+          w-1/2
+          flex
+          justify-center
+          border-r
+          py-1
+          rounded-l-full
+          border-green-500
+          cursor-pointer
+          hover:bg-green-600
+        "
+        :class="[buttonMode === 'Topic' ? 'bg-green-500 text-white' : 'bg-gray-400 text-gray-200']"
+      >
+        Topic
+      </div>
+      <div
+        class="w-1/2 flex justify-center py-1 rounded-r-full cursor-pointer hover:bg-green-600"
+        :class="[buttonMode === 'Param' ? 'bg-green-500 text-white' : 'bg-gray-400 text-gray-200']"
+      >
+        Param
+      </div>
+    </div>
     <div
       :class="[windowWidth < 992 ? 'flex-col' : 'flex-row']"
       class="flex py-2 px-4 justify-center"
     >
-      <div class="flex justify-start items-start flex-col mr-4 pt-2 min-w-20">
+      <div
+        class="flex justify-start items-start flex-col mr-4 min-w-20"
+        v-if="buttonMode === 'Topic'"
+      >
         <div class="w-full h-full">
           <div class="grid grid-rows-2 grid-cols-2">
             <div class="text-left">
@@ -147,9 +174,73 @@
           ></VariableNodeForm>
         </div>
       </div>
+      <div class="flex justify-start items-start flex-col mr-4 min-w-20" v-else>
+        <div class="grid grid-cols-2 w-full">
+          <div class="text-left">
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="inlineRadioOptions"
+                id="setAction"
+                value="Set"
+                v-model="paramAction"
+              />
+              <label class="form-check-label" for="setAction">Set</label>
+            </div>
+          </div>
+          <div class="text-left">
+            <div class="form-check form-check-inline">
+              <input
+                class="form-check-input"
+                type="radio"
+                name="inlineRadioOptions"
+                id="getAction"
+                value="Get"
+                v-model="paramAction"
+              />
+              <label class="form-check-label" for="getAction">Get</label>
+            </div>
+          </div>
+        </div>
+        <div class="w-full flex flex-col items-start mt-2 relative">
+          <div class="font-bold">Parameter name</div>
+          <input
+            type="text"
+            class="border rounded w-full px-2 py-1"
+            data-display="static"
+            data-toggle="dropdown"
+            :id="dropdownParamId"
+            aria-haspopup="true"
+            aria-expanded="false"
+            placeholder="/parameter_name"
+            v-model="paramName"
+          />
+          <div class="dropdown-menu" :aria-labelledby="dropdownParamId">
+            <div class="w-72 max-h-15 overflow-y-scroll flex flex-col items-start break-all">
+              <div v-for="(param, pIndex) in params" :key="pIndex" class="w-full h-full">
+                <div
+                  @click="selectedParam(param)"
+                  v-if="param"
+                  class="cursor-pointer hover:bg-gray-100 pl-2 pb-1"
+                >
+                  {{ param.name }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="font-bold mt-2">Value</div>
+        <input
+          type="text"
+          :disabled="paramAction === 'get'"
+          class="border rounded w-full px-2 py-1"
+          v-model="paramValue"
+        />
+      </div>
       <div
-        :class="[windowWidth < 992 ? 'mt-4' : 'w-72']"
-        class="flex flex-col justify-between items-start pt-2 pl-4 pb-1"
+        :class="[windowWidth < 992 ? 'mt-4' : 'w-72 pl-4']"
+        class="flex flex-col justify-between items-start pb-1"
       >
         <div class="flex justify-center items-center w-full h-full bg-gray-100 min-h-10">
           <button
@@ -171,7 +262,9 @@
             <input v-model="buttonName" type="text" class="border rounded px-2 py-1 w-full" />
             <div class="flex flex-row items-center">
               <input v-model="sameName" type="checkbox" @change="handleSameName()" />
-              <span class="ml-1 text-sm">use the same name as topic</span>
+              <span class="ml-1 text-sm"
+                >use the same name as {{ buttonMode === 'Topic' ? 'topic' : 'param' }}</span
+              >
             </div>
           </div>
           <div class="w-72 flex flex-row items-start mt-2">
@@ -236,21 +329,6 @@ export default {
     msgTypeList() {
       return this.filteredMsg.length > 0 ? this.filteredMsg : this.filteredMsgByTopic;
     },
-    filterParamList() {
-      let tempParams = [];
-      for (let p of this.paramList) {
-        if (this.filterROSTopic(p?.node) || this.filterROSTopic(p?.name)) {
-          if (!tempParams.some(t => t.name.includes(p.name))) {
-            tempParams.push(p);
-          }
-        }
-      }
-      console.log('tempParams', tempParams);
-      return tempParams;
-    },
-    // keyVariableObject() {
-    //   return Object.keys(this.editedVariable);
-    // },
     filteredMsgByTopic() {
       let msg = [];
       if (this.topicName !== '') {
@@ -265,6 +343,11 @@ export default {
         return [];
       }
     },
+    params() {
+      return this.filteredInputParams.length > 0
+        ? this.filteredInputParams
+        : this.filterTopicParamList();
+    },
     filterNode() {
       return this.filteredNodeTopic.topics.length > 0
         ? this.filteredNodeTopic
@@ -275,6 +358,9 @@ export default {
     },
     dropdownTopicId() {
       return `dropdown-topic${this.index}`;
+    },
+    dropdownParamId() {
+      return `dropdown-param${this.index}`;
     },
   },
   props: {
@@ -302,7 +388,11 @@ export default {
       topicSelected: {},
       showVariable: false,
       keyVariableObject: [],
-      // nodeInfo: {},
+      buttonMode: 'Param',
+      paramAction: 'Set',
+      paramName: '',
+      filteredInputParams: [],
+      paramValue: '',
     };
   },
   created() {
@@ -327,6 +417,15 @@ export default {
     setVariable(form) {
       console.log('add button', form.name, form.value);
     },
+    filterTopicParamList() {
+      let paramTemp = [];
+      if (this.paramList.length > 0) {
+        const filterTopicNode = this.paramList.filter(p => this.filterROSTopic(p?.node));
+        const filterTopicName = filterTopicNode.filter(p => this.filterROSTopic(p?.name));
+        paramTemp = filterTopicName;
+      }
+      return paramTemp;
+    },
     nodeTopicList() {
       let nodeFormTemp = {
         publishing: [],
@@ -345,7 +444,7 @@ export default {
           return n;
         });
 
-        const nodes = filtedNodes.map(n => {
+        let nodes = filtedNodes.map(n => {
           n.topics = n.publishing.concat(n.subscribing).map(name => {
             return this.topicMsg.find(m => m?.name === name);
           });
@@ -374,16 +473,8 @@ export default {
             ) {
               nodeFormTemp.topics.push(topic);
             }
-            // nodeFormTemp.topics.push(topic);
           });
         });
-        // nodeFormTemp.topics = await nodeFormTemp.topics.filter(
-        //   (elem, index, self) =>
-        //     self.findIndex(t => {
-        //       return t.name === elem.name && t.type === elem.type;
-        //     }) === index
-        // );
-        // nodeInfo = nodeFormTemp;
       }
       return nodeFormTemp;
     },
@@ -414,7 +505,6 @@ export default {
     handleButtonFormSubmit() {
       let currentButtonList = this.buttonList;
       let variables = {};
-      console.log('variableList', this.variableList);
       if (this.variableList.length > 0) {
         let mapVariable = this.variableList[0];
         this.variableList.forEach(v => {
@@ -423,7 +513,6 @@ export default {
         variables = mapVariable;
         console.log('mapVariable', mapVariable);
       }
-      console.log('variables add button', variables);
       if (!this.editState) {
         const robotId = this.robotConnected.id;
         let id = 1;
@@ -431,25 +520,16 @@ export default {
           const sortedButton = currentButtonList.slice().sort((a, b) => a.buttonId - b.buttonId);
           id = sortedButton[currentButtonList.length - 1].buttonId + 1;
         }
-        if (
-          this.nodeType !== '' &&
-          this.nodeAction !== '' &&
-          this.topicName !== '' &&
-          this.topicName !== '/'
-        ) {
+        const checkInput =
+          this.buttonMode === 'Topic' ? this.checkTopicInput() : this.checkParamInput();
+
+        if (checkInput) {
           if (this.buttonName === '') {
             this.buttonName = this.topicName;
           }
-          const btnForm = {
+          let btnForm = {
             buttonId: id,
             robotId: robotId,
-            buttonAction: {
-              nodeType: this.nodeType,
-              nodeAction: this.nodeAction,
-              msgType: this.msg,
-              topicName: this.topicName,
-              variables: variables,
-            },
             buttonStyle: {
               width: this.widthButton,
               height: this.heightButton,
@@ -457,49 +537,63 @@ export default {
               color: this.textColorButton,
             },
             buttonName: this.buttonName,
-            listState: true,
+            buttonMode: this.buttonMode,
+            buttonAction: {
+              nodeType: this.nodeType,
+              nodeAction: this.nodeAction,
+              msgType: this.msg,
+              topicName: this.topicName,
+              variables: variables,
+              paramName: this.paramName,
+              paramValue: this.paramValue,
+              paramAction: this.paramAction,
+            },
           };
+          console.log('btnForm', btnForm);
           currentButtonList.push(btnForm);
         }
         this.$store.dispatch('updateCloseAddButtonModal', true);
         this.setEmptyButtonForm();
       } else {
-        currentButtonList.map(b => {
-          if (b.buttonId === this.buttonInfo.buttonId) {
-            console.log('if b.buttonId === this.buttonInfo.buttonId');
-            b.buttonAction.nodeType = this.nodeType;
-            b.buttonAction.nodeAction = this.nodeAction;
-            b.buttonAction.msgType = this.msg;
-            b.buttonAction.topicName = this.topicName;
-            b.buttonName = this.buttonName;
-            b.buttonStyle.width = this.widthButton;
-            b.buttonStyle.height = this.heightButton;
-            b.buttonStyle.bg = this.bgButton;
-            b.buttonStyle.color = this.textColorButton;
-            if (this.variableList.length > 0) {
-              b.buttonAction.variables = variables;
-            }
-          }
-          return b;
-        });
-        let currentSelectedList = this.selectedButtonList;
-        currentSelectedList.map(b => {
-          if (b.buttonId === this.buttonInfo.buttonId) {
-            b.buttonAction.nodeType = this.nodeType;
-            b.buttonAction.nodeAction = this.nodeAction;
-            b.buttonAction.msgType = this.msg;
-            b.buttonAction.topicName = this.topicName;
-            b.buttonName = this.buttonName;
-            b.buttonStyle.width = this.widthButton;
-            b.buttonStyle.height = this.heightButton;
-            b.buttonStyle.bg = this.bgButton;
-            b.buttonStyle.color = this.textColorButton;
-            if (this.variableList.length > 0) {
-              b.buttonAction.variables = variables;
-            }
-          }
-          return b;
-        });
+        // currentButtonList.map(b => {
+        //   if (b.buttonId === this.buttonInfo.buttonId) {
+        //     b.buttonAction.nodeType = this.nodeType;
+        //     b.buttonAction.nodeAction = this.nodeAction;
+        //     b.buttonAction.msgType = this.msg;
+        //     b.buttonAction.topicName = this.topicName;
+        //     b.buttonName = this.buttonName;
+        //     b.buttonStyle.width = this.widthButton;
+        //     b.buttonStyle.height = this.heightButton;
+        //     b.buttonStyle.bg = this.bgButton;
+        //     b.buttonStyle.color = this.textColorButton;
+        //     b.buttonMode = this.buttonMode;
+        //     if (this.variableList.length > 0) {
+        //       b.buttonAction.variables = variables;
+        //     }
+        //   }
+        //   return b;
+        // });
+        // let currentSelectedList = this.selectedButtonList;
+        // currentSelectedList.map(b => {
+        //   if (b.buttonId === this.buttonInfo.buttonId) {
+        //     b.buttonAction.nodeType = this.nodeType;
+        //     b.buttonAction.nodeAction = this.nodeAction;
+        //     b.buttonAction.msgType = this.msg;
+        //     b.buttonAction.topicName = this.topicName;
+        //     b.buttonName = this.buttonName;
+        //     b.buttonStyle.width = this.widthButton;
+        //     b.buttonStyle.height = this.heightButton;
+        //     b.buttonStyle.bg = this.bgButton;
+        //     b.buttonStyle.color = this.textColorButton;
+        //     b.buttonMode = this.buttonMode;
+        //     if (this.variableList.length > 0) {
+        //       b.buttonAction.variables = variables;
+        //     }
+        //   }
+        //   return b;
+        // });
+        currentButtonList = this.setInputValue(currentButtonList, variables);
+        let currentSelectedList = this.setInputValue(this.selectedButtonList, variables);
         this.$store.dispatch('updateCloseEditButtonModal', true);
         this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
       }
@@ -519,16 +613,66 @@ export default {
       this.textColorButton = '#2C3E50';
       this.heightButton = 48;
       this.filteredMsg = [];
+      this.paramAction = 'Set';
+      this.paramValue = '';
+      this.paramName = '';
+      this.buttonMode = 'Topic';
       this.$store.dispatch('updateVariableList', []);
     },
+    setInputValue(buttonList, variables) {
+      let tempButtonList = buttonList;
+      const mapButtonList = tempButtonList.map(b => {
+        if (b.buttonId === this.buttonInfo.buttonId) {
+          b.buttonAction.nodeType = this.nodeType;
+          b.buttonAction.nodeAction = this.nodeAction;
+          b.buttonAction.msgType = this.msg;
+          b.buttonAction.topicName = this.topicName;
+          b.buttonAction.paramName = this.paramName;
+          b.buttonAction.paramValue = this.paramValue;
+          b.buttonAction.paramAction = this.paramAction;
+          b.buttonName = this.buttonName;
+          b.buttonStyle.width = this.widthButton;
+          b.buttonStyle.height = this.heightButton;
+          b.buttonStyle.bg = this.bgButton;
+          b.buttonStyle.color = this.textColorButton;
+          b.buttonMode = this.buttonMode;
+          if (this.variableList.length > 0) {
+            b.buttonAction.variables = variables;
+          }
+        }
+        return b;
+      });
+      return mapButtonList;
+    },
     handleSameName() {
-      this.buttonName = this.topicName;
+      if (this.buttonMode === 'Topic') {
+        this.buttonName = this.topicName;
+      } else {
+        this.buttonName = this.paramName;
+        this.widthButton = 160;
+      }
+    },
+    checkTopicInput() {
+      return (
+        this.nodeType !== '' &&
+        this.nodeAction !== '' &&
+        this.topicName !== '' &&
+        this.topicName !== '/'
+      );
+    },
+    checkParamInput() {
+      return this.paramAction === 'Set'
+        ? this.paramValue !== '' && this.paramName !== ''
+        : this.paramName !== '';
     },
     selectedMsgItem(item) {
       this.msg = item;
     },
     selectedNodeMsg(topic) {
       this.topicName = topic.name;
+    },
+    selectedParam(param) {
+      this.paramName = param.name;
     },
     setEditInfo(state) {
       if (state) {
@@ -542,6 +686,10 @@ export default {
         this.heightButton = this.buttonInfo.buttonStyle.height;
         this.bgButton = this.buttonInfo.buttonStyle.bg;
         this.textColorButton = this.buttonInfo.buttonStyle.color;
+        this.buttonMode = this.buttonInfo.buttonMode;
+        this.paramAction = this.buttonInfo.buttonAction.paramAction;
+        this.paramValue = this.buttonInfo.buttonAction.paramValue;
+        this.paramName = this.buttonInfo.buttonAction.paramName;
         this.keyVariableObject = Object.keys(this.buttonInfo.buttonAction.variables);
         console.log('this.editedVariable', this.editedVariable['header']);
       } else {
@@ -578,6 +726,17 @@ export default {
       } else {
         this.msg = '';
         this.filteredNodeTopic.topics = this.nodeTopicList().topics;
+      }
+    },
+    paramName(val) {
+      if (val !== '') {
+        this.filteredInputParams = this.filterTopicParamList().filter(p => {
+          if (p) {
+            return p.name.includes(val);
+          }
+        });
+      } else {
+        this.filteredInputParams = this.filterTopicParamList();
       }
     },
     editState(val) {

@@ -19,11 +19,25 @@
       </button>
       <div v-if="!moveState" class="tooltip-text py-1 px-2 text-xs">
         <div>
-          {{ selectedButton.buttonAction.nodeAction }}/{{ selectedButton.buttonAction.nodeType }}
+          {{
+            selectedButton.buttonMode === 'Topic'
+              ? selectedButton.buttonAction.nodeAction / selectedButton.buttonAction.nodeType
+              : selectedButton.buttonAction.paramAction
+          }}
+          <!-- {{ selectedButton.buttonAction.nodeAction }}/{{ selectedButton.buttonAction.nodeType }} -->
         </div>
-        <div>({{ selectedButton.buttonAction.topicName }})</div>
+        <!-- <div>({{ selectedButton.buttonAction.topicName }})</div> -->
+        {{
+          selectedButton.buttonMode === 'Topic'
+            ? selectedButton.buttonAction.topicName
+            : selectedButton.buttonAction.paramName
+        }}
       </div>
-      <div v-if="!moveState" class="tooltip-variable py-1 px-2 text-xs max-w-custom">
+
+      <div
+        v-if="!moveState && selectedButton.buttonMode === 'Topic'"
+        class="tooltip-variable py-1 px-2 text-xs max-w-custom"
+      >
         <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left">
           <div class="" v-if="typeof editedVariable[key] === 'object'">
             <span class="text-muted text-sm">{{ key }}/ </span>
@@ -33,6 +47,13 @@
             <span class="font-bold text-sm">{{ key }}: </span>{{ editedVariable[key] }}
           </div>
         </div>
+      </div>
+
+      <div
+        v-if="!moveState && selectedButton.buttonMode === 'Param'"
+        class="tooltip-variable py-1 px-2 text-xs max-w-custom"
+      >
+        Value: {{ selectedButton.buttonAction.paramValue }}
       </div>
     </div>
     <div class="flex justify-end remove-h">
@@ -106,6 +127,7 @@ export default {
     return {
       clikedButtonIdList: [],
       rosTopic: null,
+      rosParam: null,
     };
   },
   props: {
@@ -130,42 +152,59 @@ export default {
         if (!this.clickedState(button.selectedId)) {
           this.clikedButtonIdList.push(button.selectedId);
         }
-        this.rosTopic = new ROSLIB.Topic({
-          ros: this.ros,
-          name: button.buttonAction.topicName,
-          messageType: button.buttonAction.msgType,
-        });
-        if (button.buttonAction.nodeType === 'subscriber') {
-          let currentButtonList = this.buttonList;
-          let currentSelectedList = this.selectedButtonList;
-          const indexButtonList = currentButtonList.findIndex(r => r.buttonId === button.buttonId);
-
-          const indexSelectedList = currentSelectedList.findIndex(
-            r => r.buttonId === button.buttonId
-          );
-          this.rosTopic.subscribe(message => {
-            this.subscribeInput = message;
-            currentButtonList[indexButtonList].buttonAction.variables = message;
-            currentSelectedList[indexSelectedList].buttonAction.variables = message;
-            this.$store.dispatch('updateButtonList', currentButtonList);
-            this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
+        if (button.buttonMode === 'Topic') {
+          this.rosTopic = new ROSLIB.Topic({
+            ros: this.ros,
+            name: button.buttonAction.topicName,
+            messageType: button.buttonAction.msgType,
           });
+          if (button.buttonAction.nodeType === 'subscriber') {
+            let currentButtonList = this.buttonList;
+            let currentSelectedList = this.selectedButtonList;
+            const indexButtonList = currentButtonList.findIndex(
+              r => r.buttonId === button.buttonId
+            );
+
+            const indexSelectedList = currentSelectedList.findIndex(
+              r => r.buttonId === button.buttonId
+            );
+            this.rosTopic.subscribe(message => {
+              this.subscribeInput = message;
+              currentButtonList[indexButtonList].buttonAction.variables = message;
+              currentSelectedList[indexSelectedList].buttonAction.variables = message;
+              this.$store.dispatch('updateButtonList', currentButtonList);
+              this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
+            });
+          } else {
+            const message = new ROSLIB.Message(button.buttonAction.variables);
+            console.log('message', message);
+            this.rosTopic.publish(message);
+          }
         } else {
-          const message = new ROSLIB.Message(button.buttonAction.variables);
-          console.log('message', message);
-          this.rosTopic.publish(message);
+          console.log('param');
+          this.rosParam = new ROSLIB.Param({
+            ros: this.ros,
+            name: button.buttonAction.paramName,
+          });
+          if (button.buttonAction.paramAction === 'Set') {
+            this.rosParam.set(button.buttonAction.paramValue);
+          }
         }
       }
     },
     removeClickedButtonId(button) {
-      console.log('remove');
-      if (button.buttonAction.nodeType === 'subscriber') {
-        this.rosTopic.unsubscribe();
-        console.log('unsubscribe');
+      if (button.buttonMode === 'Topic') {
+        if (button.buttonAction.nodeType === 'subscriber') {
+          this.rosTopic.unsubscribe();
+          console.log('unsubscribe');
+        } else {
+          const message = new ROSLIB.Message({});
+          this.rosTopic.publish(message);
+        }
       } else {
-        const message = new ROSLIB.Message({});
-        console.log('delete message', message);
-        this.rosTopic.publish(message);
+        if (button.buttonAction.paramAction === 'Set') {
+          this.rosParam.set(null);
+        }
       }
       const index = this.clikedButtonIdList.findIndex(id => id === button.selectedId);
       if (index >= 0) {
