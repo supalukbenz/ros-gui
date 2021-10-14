@@ -186,8 +186,10 @@ export default {
             ros: this.ros,
             name: button.buttonAction.paramName,
           });
+          console.log('rosParam', this.rosParam);
           if (button.buttonAction.paramAction === 'Set') {
-            this.rosParam.set(button.buttonAction.paramValue);
+            this.rosParam.set(Number(button.buttonAction.paramValue));
+            console.log('Set');
           }
         }
       }

@@ -14,12 +14,14 @@
           hover:bg-green-600
         "
         :class="[buttonMode === 'Topic' ? 'bg-green-500 text-white' : 'bg-gray-400 text-gray-200']"
+        @click="changeMode('Topic')"
       >
         Topic
       </div>
       <div
         class="w-1/2 flex justify-center py-1 rounded-r-full cursor-pointer hover:bg-green-600"
         :class="[buttonMode === 'Param' ? 'bg-green-500 text-white' : 'bg-gray-400 text-gray-200']"
+        @click="changeMode('Param')"
       >
         Param
       </div>
@@ -338,6 +340,9 @@ export default {
           }
         });
         msg = msg.filter(Boolean);
+        msg = msg.filter((m, index) => {
+          return msg.indexOf(m) === index;
+        });
         return msg;
       } else {
         return [];
@@ -406,6 +411,9 @@ export default {
     this.nodeInfo = this.setNodeInfo();
   },
   methods: {
+    changeMode(mode) {
+      this.buttonMode = mode;
+    },
     handleArray(obj) {
       let tempObj = obj;
       if (Array.isArray(obj)) {

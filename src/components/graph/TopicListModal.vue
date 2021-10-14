@@ -7,9 +7,9 @@
           <div
             v-for="(array, index) in arrayTopicList"
             :key="index"
-            class="grid grid-cols-3 gap-2 mb-1"
+            class="grid grid-cols-4 gap-2 mb-1"
           >
-            <span>{{ array.value }}</span>
+            <div class="col-span-2">{{ array.value }}</div>
             <input
               type="number"
               v-model="array.index"

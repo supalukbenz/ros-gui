@@ -243,6 +243,7 @@ export default {
               const fieldName = lines[l].substr(topicName.length + 1, lines[l].length);
               const field = fieldName.split('/');
               let dataMsg = message;
+              console.log('dataMsg', dataMsg);
               for (let f in field) {
                 dataMsg = dataMsg[field[f]];
               }
