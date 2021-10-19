@@ -242,7 +242,6 @@ export default {
       });
     },
     forward() {
-      console.log('forward');
       this.message = new ROSLIB.Message({
         linear: { x: 1, y: 0, z: 0 },
         angular: { x: 0, y: 0, z: 0 },

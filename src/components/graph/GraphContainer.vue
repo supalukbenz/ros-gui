@@ -180,18 +180,18 @@ export default {
 }
 
 .tab-color {
-  background: #485a73;
+  background: #3f13a6;
   color: #ffffff !important;
   font-weight: 600;
   border: 1px solid #dee2e6 !important;
 }
 
 .tab-color:hover {
-  color: #485a73 !important;
+  color: #3f13a6 !important;
   background: #ffffff;
 }
 
 .text-blue-custom {
-  color: #485a73;
+  color: #3f13a6;
 }
 </style>

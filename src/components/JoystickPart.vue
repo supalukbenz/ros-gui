@@ -47,8 +47,6 @@ export default {
   },
   methods: {
     moveAction(linear, angular) {
-      console.log(linear);
-      console.log(angular);
       if (this.twist) {
         if (linear !== undefined && angular !== undefined) {
           this.twist.linear.x = linear;
@@ -62,7 +60,6 @@ export default {
     },
     createJoystick() {
       if (this.ros !== null) {
-        console.log('Joy');
 
         this.twist = new ROSLIB.Message({
           linear: {

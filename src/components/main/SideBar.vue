@@ -108,6 +108,6 @@ export default {
 }
 
 .text-blue-custom:hover {
-  color: #485a73;
+  color: #3f13a6;
 }
 </style>

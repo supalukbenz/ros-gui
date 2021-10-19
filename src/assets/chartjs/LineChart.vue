@@ -66,7 +66,6 @@ export default {
               },
               ticks: {
                 callback: value => {
-                  // console.log(value)
                   return value;
                 },
                 maxRotation: 90,

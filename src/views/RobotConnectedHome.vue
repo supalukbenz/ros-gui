@@ -22,9 +22,9 @@
       </div>
     </div>
     <!-- <div class="flex flex-row w-full"> -->
-    <div v-if="isConnected" class="flex flex-auto flex-col justify-between my-4 mx-10">
+    <div v-if="isConnected" class="flex flex-auto flex-col justify-between py-4 mx-10">
       <!-- <div class="mr-5 mb-10"> -->
-      <Graph v-show="routeName === 'Graph'"></Graph>
+      <Graph class="z-50" v-show="routeName === 'Graph'"></Graph>
       <StreamingVideo v-show="routeName === 'StreamingVideo'"></StreamingVideo>
       <CustomizeButton v-show="routeName === 'CustomizeButton'"></CustomizeButton>
       <!-- </div> -->
@@ -134,18 +134,15 @@ export default {
         await this.loadData();
         await this.setLogMessage();
 
-        console.log('connect');
         this.isConnected = true;
         this.$store.dispatch('updateROS', this.ros);
       });
 
       this.ros.on('error', () => {
-        console.log('error');
         this.isConnected = false;
       });
 
       this.ros.on('close', () => {
-        console.log('close');
         this.isConnected = false;
       });
     },
@@ -156,7 +153,6 @@ export default {
     },
     async setTopicList() {
       await this.ros.getTopics(topic => {
-        console.log('topic', topic);
         topic.types.forEach(async (msgName, i) => {
           if (msgName in this.msgList === false) {
             await this.getMsgROSInfo(msgName, 'msgROS', topic.topics[i]);
@@ -165,7 +161,6 @@ export default {
             await this.getMsgROSInfo(msgName, 'topicMsgROS', topic.topics[i]);
           }
         });
-
         this.$store.dispatch('updateTopicList', topic);
         // this.topics = topic;
       });
@@ -333,7 +328,6 @@ export default {
       });
     },
     async loadData() {
-      console.log('loaddata');
       await Promise.all([this.setTopicList(), this.setNodeList(), this.setParams()]);
       this.loadDataState = true;
     },
@@ -355,11 +349,10 @@ export default {
       const diffTopic = newTopic.filter(n => {
         return this.topicList.topics.indexOf(n) == -1;
       });
-      console.log('diffTopicList', diffTopic);
+
       return diffTopic;
     },
     setLogMessage() {
-      console.log('set log');
       const logTopic = new ROSLIB.Topic({
         ros: this.ros,
         name: '/rosout',
@@ -367,7 +360,6 @@ export default {
       });
 
       logTopic.subscribe(message => {
-        console.log(message);
         let currentLogMsg = this.logMsg;
         if (!this.filterROSTopic(message.name)) {
           return;

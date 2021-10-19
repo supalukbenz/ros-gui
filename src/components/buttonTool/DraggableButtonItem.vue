@@ -177,19 +177,15 @@ export default {
             });
           } else {
             const message = new ROSLIB.Message(button.buttonAction.variables);
-            console.log('message', message);
             this.rosTopic.publish(message);
           }
         } else {
-          console.log('param');
           this.rosParam = new ROSLIB.Param({
             ros: this.ros,
             name: button.buttonAction.paramName,
           });
-          console.log('rosParam', this.rosParam);
           if (button.buttonAction.paramAction === 'Set') {
             this.rosParam.set(Number(button.buttonAction.paramValue));
-            console.log('Set');
           }
         }
       }
@@ -198,14 +194,13 @@ export default {
       if (button.buttonMode === 'Topic') {
         if (button.buttonAction.nodeType === 'subscriber') {
           this.rosTopic.unsubscribe();
-          console.log('unsubscribe');
         } else {
           const message = new ROSLIB.Message({});
           this.rosTopic.publish(message);
         }
       } else {
         if (button.buttonAction.paramAction === 'Set') {
-          this.rosParam.set(null);
+          this.rosParam.set(0);
         }
       }
       const index = this.clikedButtonIdList.findIndex(id => id === button.selectedId);

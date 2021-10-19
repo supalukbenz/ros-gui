@@ -2,7 +2,6 @@ import axios from 'axios';
 
 async function connectToRobot(form) {
   const response = await axios.post('connect', form);
-  console.log('response', response);
   const resInfo = {
     status: response.status,
     data: response.data,
@@ -16,7 +15,6 @@ async function disconnectToRobot(form) {
     status: response.status,
     data: response.data,
   };
-  console.log('disconnect');
   return resInfo;
 }
 

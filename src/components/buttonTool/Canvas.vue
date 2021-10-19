@@ -56,20 +56,14 @@ export default {
   },
   methods: {
     onDragstop(x, y, button) {
-      console.log(x, y);
-      console.log(button.buttonStyle.buttonName);
       let currentSelectedBtnList = this.selectedButtonList.map(b => {
         if (Number(b.selectedId) === Number(button.selectedId)) {
-          console.log('if');
           b.buttonPosition.xPos = x;
           b.buttonPosition.yPos = y;
         }
         return b;
       });
       this.$store.dispatch('updateSelectedButtonList', currentSelectedBtnList);
-    },
-    onDrag(x, y) {
-      console.log('drag', x, y);
     },
   },
 };

@@ -112,7 +112,6 @@ export default {
     indexNotNull() {
       if (this.arrayTopicList.length > 0) {
         const filterNullIndex = this.arrayTopicList.filter(a => a.index === '' || a.index < 0);
-        console.log('filterNullIndex', filterNullIndex.length <= 0);
         return filterNullIndex.length > 0;
       }
       return false;
@@ -138,7 +137,6 @@ export default {
   methods: {
     expandCheckbox() {},
     submitScatterPlot() {
-      console.log('clicked');
       this.$store.dispatch('updateSelectedScatterTopic', this.scatterValue.slice(0, 3));
       this.$store.dispatch('updateScatterCloseModal', true);
     },
@@ -154,7 +152,6 @@ export default {
       //     currentValue.push(topic);
       //   }
       // }
-      // console.log('currentValue', currentValue);
       currentData.arrayIndexTopic = currentArrayTopicList;
       currentData.selection = this.value;
       this.$store.dispatch('updateDataTopic', currentData);

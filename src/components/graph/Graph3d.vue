@@ -149,7 +149,6 @@ export default {
   watch: {
     scatterDataSetList(val) {
       if (this.selectedScatterTopic.length === val.length) {
-        console.log('val', val);
         this.renderScatterChart(val);
       }
     },

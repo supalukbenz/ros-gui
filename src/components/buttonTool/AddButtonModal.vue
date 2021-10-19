@@ -519,7 +519,6 @@ export default {
           mapVariable = _.merge(mapVariable, v);
         });
         variables = mapVariable;
-        console.log('mapVariable', mapVariable);
       }
       if (!this.editState) {
         const robotId = this.robotConnected.id;
@@ -557,7 +556,6 @@ export default {
               paramAction: this.paramAction,
             },
           };
-          console.log('btnForm', btnForm);
           currentButtonList.push(btnForm);
         }
         this.$store.dispatch('updateCloseAddButtonModal', true);
@@ -699,7 +697,6 @@ export default {
         this.paramValue = this.buttonInfo.buttonAction.paramValue;
         this.paramName = this.buttonInfo.buttonAction.paramName;
         this.keyVariableObject = Object.keys(this.buttonInfo.buttonAction.variables);
-        console.log('this.editedVariable', this.editedVariable['header']);
       } else {
         this.setEmptyButtonForm();
       }

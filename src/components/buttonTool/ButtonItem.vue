@@ -148,26 +148,33 @@ export default {
   },
   methods: {
     addSelectedButton() {
-      let currentSelectedButton = this.selectedButtonList;
+      let currentSelectedButton = this.selectedButtonList.map(o => ({ ...o }));
       let selectedId = 1;
       if (currentSelectedButton.length > 0) {
-        const sortedButton = currentSelectedButton.sort((a, b) => a.selectedId - b.selectedId);
+        let sortedButton = currentSelectedButton.sort((a, b) => a.selectedId - b.selectedId);
+        console.log('sortedButton', sortedButton);
         selectedId = sortedButton[currentSelectedButton.length - 1].selectedId + 1;
         console.log('selectedId', selectedId);
       }
-      let currentButton = this.buttonInfo;
-      currentButton.selectedId = selectedId;
-      currentButton.buttonPosition = {
+      // let currentButton = this.buttonInfo;
+      let newButton = {
+        buttonAction: this.buttonInfo.buttonAction,
+        buttonId: this.buttonInfo.buttonId,
+        butttonMode: this.buttonInfo.buttonMode,
+        buttonName: this.buttonInfo.buttonName,
+        buttonStyle: this.buttonInfo.buttonStyle,
+        robotId: this.buttonInfo.robotId,
+      };
+      newButton.selectedId = selectedId;
+      newButton.buttonPosition = {
         xPos: 0,
         yPos: 0,
       };
-      currentSelectedButton.push(currentButton);
-      console.log(currentButton);
+      currentSelectedButton.push(newButton);
       this.$store.dispatch('updateSelectedButtonList', currentSelectedButton);
     },
     handlerRightClick() {
       // this.editState = true;
-      // console.log('this', this.modalId);
       // $(`#${this.modalId}`).modal('show');
     },
     handleEditButton() {
@@ -217,7 +224,6 @@ export default {
   watch: {
     closeEditButtonModal(val) {
       if (val) {
-        console.log('close modal');
         $(`#${this.modalId}`).modal('hide');
         this.editState = false;
         // this.$store.dispatch('updateCloseEditButtonModal', false);

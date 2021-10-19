@@ -6,7 +6,7 @@
           type="button"
           data-toggle="modal"
           :data-target="'#' + topicModalId"
-          class="border py-1 px-4 bg-blue-400 text-white font-bold rounded"
+          class="border py-1 px-4 bg-purple-custom text-white font-bold rounded"
           @click="handleSetTopic()"
           v-if="addTopicState"
         >
@@ -74,7 +74,6 @@ export default {
     };
   },
   async mounted() {
-    // console.log('topicList.topics', this.topicList.topics.length);
     await this.addTopic();
     this.addTopicState = true;
     // this.loadingState = false;

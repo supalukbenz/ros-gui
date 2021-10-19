@@ -47,16 +47,16 @@
       </div>
       <div class="form-group">
         <div class="text-left font-semibold">Command</div>
-        <div class="mb-1">
+        <div class="mb-4">
           <div v-if="commandList.length > 0">
-            <div v-for="(c, index) in commandList" :key="index" class="text-left">
-              <div>
-                $ {{ c
-                }}<span
-                  @click="removeCommand(index)"
-                  class="ml-5 text-red-500 text-sm cursor-pointer"
-                  ><i class="fas fa-minus-circle"></i
-                ></span>
+            <div
+              v-for="(c, index) in commandList"
+              :key="index"
+              class="text-left flex flex-row justify-between items-center border-b mb-1"
+            >
+              <div class="w-11/12 break-words text-sm">$ {{ c }}</div>
+              <div @click="removeCommand(index)" class="text-red-500 text-sm cursor-pointer">
+                <i class="fas fa-minus-circle"></i>
               </div>
             </div>
           </div>
@@ -70,7 +70,7 @@
             placeholder="roslaunch <package_name> <launch_file>"
           />
           <div
-            class="text-green-500 hover:text-green-700 cursor-pointer w-10 text-xl"
+            class="text-green-500 hover:text-green-700 cursor-pointer w-10 text-xl flex justify-end"
             title="add command"
             @click="addCommand()"
           >
@@ -213,6 +213,8 @@ export default {
     },
     setEmptyRobotForm() {
       this.robotName = '';
+      this.command = '';
+      this.commandList = [];
       this.robotIP = '';
       this.username = '';
       this.password = '';
@@ -264,11 +266,11 @@ export default {
 }
 
 .bg-blue-custom {
-  background: #485a73;
+  background: #3f13a6;
 }
 
 .bg-blue-custom:hover {
-  background: #3c4b5f;
+  background: #3f13a6;
 }
 
 .border-red {

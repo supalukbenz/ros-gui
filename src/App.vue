@@ -42,4 +42,12 @@ html {
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+
+.bg-purple-custom {
+  background: #3f13a6;
+}
+
+.text-purple-custom {
+  color: #3f13a6;
+}
 </style>

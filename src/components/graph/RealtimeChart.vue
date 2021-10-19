@@ -243,7 +243,6 @@ export default {
               const fieldName = lines[l].substr(topicName.length + 1, lines[l].length);
               const field = fieldName.split('/');
               let dataMsg = message;
-              console.log('dataMsg', dataMsg);
               for (let f in field) {
                 dataMsg = dataMsg[field[f]];
               }
@@ -260,10 +259,8 @@ export default {
               }
               if (Array.isArray(dataMsg)) {
                 lines.splice(l, 1);
-                console.log('array');
               }
               if (!this.isNumeric(dataMsg)) {
-                console.log('isNumeric');
                 return;
               } else {
                 // dataMsg = Number(dataMsg.toLocaleString('fullwide', { useGrouping: false }));
@@ -291,10 +288,7 @@ export default {
       for (let i in data.selection) {
         const node = this.getNode(data.selection[i], data.source);
         const rootNode = this.getNode(node.root, data.source);
-        console.log('node', node);
-        console.log('rootNode', rootNode);
         let topic = await this.addPlot(node.value, rootNode.value, rootNode.type);
-        console.log('topic', topic);
         const fieldName = data.selection[i].substr(
           rootNode.value.length + 1,
           data.selection[i].length
@@ -333,7 +327,6 @@ export default {
           lines: [line],
         };
       } else {
-        // console.log(line_name, this.topics[topic_name].lines, this.topics[topic_name].lines.includes(topic_name))
         if (!this.topics[topicName].lines.includes(line)) {
           this.topics[topicName].lines.push(line);
         } else {
@@ -390,7 +383,6 @@ export default {
         // }
         let interval;
         if (data.length <= 0) {
-          console.log('clear');
           clearInterval(interval);
         }
         interval = setInterval(async () => {

@@ -46,22 +46,31 @@
         <button
           type="button"
           @click="$refs.file.click()"
-          class="mr-3 py-1 px-3 rounded-lg border-2 border-gray-500 font-bold hover:bg-gray-100"
+          class="
+            w-12
+            h-10
+            rounded-l-lg
+            border
+            font-bold
+            text-gray-500
+            hover:bg-gray-100 hover:text-gray-700
+          "
         >
-          Import <i class="fas fa-upload ml-1"></i>
+          <i class="fas fa-upload"></i>
         </button>
         <a
           id="exportBtn"
           class="
             mr-10
-            py-1
-            px-3
-            rounded-lg
-            bg-gray-500
-            hover:bg-gray-600
-            border-2 border-gray-500
-            text-white
-            font-bold
+            border
+            w-12
+            h-10
+            rounded-r-lg
+            text-gray-500
+            hover:bg-gray-100 hover:text-gray-700
+            flex
+            justify-center
+            items-center
             cursor-pointer
           "
           @click="exportButtonList()"
@@ -72,7 +81,7 @@
           @click="handleChangePosition()"
           :class="[moveState ? 'bg-clicked-btn' : 'bg-button-move']"
           type="button"
-          class="border-green shadow rounded-full w-10 h-10 z-40"
+          class="border-purple-custom shadow rounded-full w-10 h-10 z-40"
         >
           <span v-show="!moveState"><i class="fas fa-arrows-alt"></i></span>
           <span v-show="moveState"><i class="fas fa-save"></i></span>
@@ -90,9 +99,8 @@
           class="bg-container wh-custom m-10 relative"
           :class="[moveState ? 'bg-canvas' : 'bg-white']"
         >
-          <div id="parent" class="wh-custom border-2 canvas">
+          <div id="parent" class="wh-custom border-2 canvas relative">
             <vue-draggable-resizable
-              @dragstop="(x, y) => onDragstop(x, y, selectedButton)"
               v-for="(selectedButton, index) in filterSelectedButtonList"
               :key="index"
               :x="Math.abs(selectedButton.buttonPosition.xPos)"
@@ -103,10 +111,11 @@
                 width: selectedButton.buttonStyle.width + 'px',
                 height: selectedButton.buttonStyle.height + 'px',
               }"
+              @dragstop="(x, y) => onDragstop(x, y, selectedButton)"
               :parent="true"
               :resizable="false"
               :draggable="moveState"
-              class="flex flex-row rounded font-bold cursor-pointer z-auto"
+              class="rounded font-bold cursor-pointer z-auto absolute"
             >
               <DraggableButtonItem
                 :moveState="moveState"
@@ -207,13 +216,10 @@ export default {
     updatePositionButton(left, top, button) {
       // let x = (left / this.$refs.parent.offsetWidth) * 100;
       // let y = (top / this.$refs.parent.offsetHeight) * 100;
-      console.log(this.$refs.parent.offsetHeight);
       let x = left;
       let y = top;
-      console.log(x, y);
       let currentSelectedBtnList = this.selectedButtonList.map(b => {
         if (Number(b.selectedId) === Number(button.selectedId)) {
-          console.log('if');
           b.buttonPosition.xPos = Math.abs(x);
           b.buttonPosition.yPos = Math.abs(y);
         }
@@ -222,17 +228,7 @@ export default {
       this.$store.dispatch('updateSelectedButtonList', currentSelectedBtnList);
     },
     onDragstop(x, y, button) {
-      console.log(x, y);
       this.updatePositionButton(x, y, button);
-    },
-    onDrag(x, y) {
-      console.log('drag', x, y);
-    },
-    onResizing(left, top, width, height, selectedButton) {
-      let w = (width / this.$refs.parent.offsetWidth) * 100;
-      let h = (height / this.$refs.parent.offsetHeight) * 100;
-
-      console.log(selectedButton.selectedId, w, h);
     },
     handleButtonListShowing() {
       this.showButtonList = !this.showButtonList;
@@ -268,11 +264,8 @@ export default {
       const reader = new FileReader();
       reader.onload = e => {
         this.fileUpload = JSON.parse(e.target.result);
-        // console.log('JSON.parse(this.fileUpload)', JSON.parse(this.fileUpload));
       };
       reader.readAsText(files[0]);
-      // const fileJson = JSON.parse(this.fileUpload);
-      // console.log('fileJson', fileJson);
     },
   },
   watch: {
@@ -290,10 +283,8 @@ export default {
         let currentButtonList = this.buttonList;
         const robotId = this.robotConnected.id;
         let currentSelectedBtnList = this.selectedButtonList;
-        console.log('this.fileUpload', val);
         for (let btn of val.buttonList) {
           btn.robotId = robotId;
-          console.log('btn.robotId', btn.robotId);
           currentButtonList.push(btn);
         }
         this.$store.dispatch('updateButtonList', currentButtonList);
@@ -306,7 +297,6 @@ export default {
     },
     // loadData: {
     //   handler() {
-    //     console.log('wow');
     //   },
     //   deep: true,
     // },
@@ -364,21 +354,22 @@ export default {
 
 .wh-custom {
   height: 720px;
-  width: 800px;
+  width: 1000px;
   /* background: #f8f3ea; */
 }
 
 .bg-button-move {
-  background: #cdf0ff;
+  background: #6144a3;
+  color: #ffffff;
 }
 
 .bg-button-move:hover {
-  background: #344a53;
+  background: #3f13a6;
   color: #ffffff;
 }
 
 .bg-clicked-btn {
-  background: #344a53;
+  background: #3f13a6;
   color: #ffffff;
 }
 
@@ -386,8 +377,8 @@ export default {
   background: #eeecec;
 }
 
-.border-green {
-  border: 2px solid #344a53;
+.border-purple-custom {
+  border: 2px solid #3f13a6;
 }
 
 .cursor-move-btn {

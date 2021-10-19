@@ -40,7 +40,7 @@
               + Add robot
             </div>
           </div>
-          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg mb-20">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
@@ -87,38 +87,6 @@
                       <div class="text-xs text-gray-500">{{ robot.ip }}:{{ robot.port }}</div>
                     </div>
                   </td>
-                  <!-- <td class="px-6 py-4">
-                    <span
-                      v-if="robot.id === robotConnected.id"
-                      class="
-                        px-2
-                        inline-flex
-                        text-xs
-                        leading-5
-                        font-semibold
-                        rounded-full
-                        bg-green-100
-                        text-green-800
-                      "
-                    >
-                      Available
-                    </span>
-                    <span
-                      v-else
-                      class="
-                        px-2
-                        inline-flex
-                        text-xs
-                        leading-5
-                        font-semibold
-                        rounded-full
-                        bg-gray-100
-                        text-gray-800
-                      "
-                    >
-                      Unavailable
-                    </span>
-                  </td> -->
                   <td class="px-6 py-4 text-right text-sm font-medium">
                     <div class="flex justify-between items-center">
                       <a
@@ -288,7 +256,6 @@ export default {
         });
 
         this.ros.on('connection', () => {
-          console.log('connect');
           this.connected = true;
           this.errorState = false;
           this.$store.dispatch('updateWSAddress', ws_address);
@@ -296,10 +263,9 @@ export default {
           // this.setTopicList();
         });
 
-        this.ros.on('error', error => {
+        this.ros.on('error', () => {
           // this.responseMessage = 'Error connecting to websocket server';
           this.errorState = true;
-          console.log('Error', error);
           this.disconnect();
         });
 
@@ -312,9 +278,7 @@ export default {
       }
     },
     async clickedSimulation(robot) {
-      console.log('clickedSimulation');
       this.loadingState = true;
-      console.log('this.loadingState', this.loadingState);
       this.connectionState = true;
       this.$store.dispatch('updateRobotConnected', robot);
       const address = `ws://${robot.ip}:${robot.port}`;
@@ -370,9 +334,7 @@ export default {
           ip: robot.ip,
           port: robot.port,
         };
-        console.log('robotSelectedInfo', robotSelectedInfo);
         response = await connectToRobot(robotSelectedInfo);
-        console.log('this.response', response);
         let responseCommandList = [];
         if (response.status === 200) {
           if (robot.commands.length > 0) {
@@ -390,7 +352,6 @@ export default {
             //     robotSelectedInfo.command = command;
             //     const res = await runCommand(robotSelectedInfo);
             //     responseCommandList.push(res);
-            //     console.log('res', res);
             //   })
             // );
           }

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-20 bg-blue-custom flex items-center px-10 flex-row justify-between z-50 relative">
+  <div class="h-20 bg-purple-custom flex items-center px-10 flex-row justify-between z-50 relative">
     <router-link class="cursor-pointer" to="/">
       <div class="flex items-end relative">
         <img class="w-10 h-auto" src="@/assets/images/robot-icon.png" alt="robotIcon" />
@@ -12,21 +12,21 @@
     </router-link>
     <div class="flex items-end" v-show="objectNotEmpty(robotConnected)">
       <div
-        class="menu mr-4 font-bold text-xl text-white cursor-pointer"
+        class="menu mr-4 text-xl text-white cursor-pointer"
         :class="{ 'selected-menu': pageName === 'Graph' }"
         @click="changePage('Graph')"
       >
         Graph
       </div>
       <div
-        class="menu mr-4 font-bold text-xl text-white cursor-pointer"
+        class="menu mr-4 text-xl text-white cursor-pointer"
         :class="{ 'selected-menu': pageName === 'StreamingVideo' }"
         @click="changePage('StreamingVideo')"
       >
         Streaming Video
       </div>
       <div
-        class="menu mr-4 font-bold text-xl text-white cursor-pointer"
+        class="menu mr-4 text-xl text-white cursor-pointer"
         :class="{ 'selected-menu': pageName === 'CustomizeButton' }"
         @click="changePage('CustomizeButton')"
       >
@@ -42,7 +42,7 @@
           aria-haspopup="true"
           aria-expanded="false"
         >
-          <div class="font-bold text-xl">
+          <div class="text-xl">
             {{ robotConnected.robotName }}
           </div>
         </button>
@@ -81,7 +81,7 @@ export default {
       return this.$route.name;
     },
     robotName() {
-      return this.$route.params.robotName;
+      return this.robotConnected.robotName;
     },
   },
   methods: {
@@ -127,8 +127,8 @@ export default {
 </script>
 
 <style scoped>
-.bg-blue-custom {
-  background: #485a73;
+.bg-purple-custom {
+  background: #0e0055;
   /* background: #6c605b; */
 }
 

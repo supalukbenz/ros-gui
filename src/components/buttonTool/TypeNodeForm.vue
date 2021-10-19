@@ -91,11 +91,9 @@ export default {
       let value = event.target.value;
       this.parent.push(name);
       let currentVariableList = this.variableList;
-      console.log('type', type);
       if (this.getInputType(type) === 'number') {
         value = Number(value);
       }
-      console.log('value', value);
       const variable = this.parent.reduceRight(
         (acc, cur) => ({
           [cur]: acc,
@@ -111,11 +109,9 @@ export default {
       if (this.editedVariable !== undefined) {
         let tempParent = this.parent;
         tempParent.push(name);
-        console.log('tempParent', tempParent);
         // let value = _.get(this.editedVariable, tempParent);
         let value = 1;
         tempParent.pop();
-        console.log('value', value);
         if (value) {
           return value;
         }
