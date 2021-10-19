@@ -34,7 +34,7 @@ Before using this project, make sure that the robot has the following packages:
 Clone the repository and install dependencies:
     
 ```bash
-$ https://github.com/supalukbenz/ros-gui.git
+$ git clone https://github.com/supalukbenz/ros-gui.git
 $ cd ros-gui 
 $ npm install
 ```
