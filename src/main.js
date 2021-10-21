@@ -43,7 +43,7 @@ window.EventEmitter2 = EventEmitter2;
 Vue.component('vue-draggable-resizable', VueDraggableResizable);
 
 // Vue.use(LoadScript);
-axios.defaults.baseURL = 'http://localhost:5000/';
+axios.defaults.baseURL = 'http://127.0.0.1:5000/';
 
 new Vue({
   router,
