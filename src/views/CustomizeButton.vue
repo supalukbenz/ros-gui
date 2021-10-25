@@ -128,7 +128,7 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="addButtonModal" role="dialog">
+    <div class="modal fade z-200" id="addButtonModal" role="dialog">
       <div class="modal-dialog modal-dialog-centered modal-lg w-fit modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">

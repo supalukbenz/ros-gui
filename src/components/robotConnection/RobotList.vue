@@ -125,7 +125,7 @@
       </div>
     </div>
 
-    <div class="modal fade" id="modal" role="dialog">
+    <div class="modal fade z-200" id="modal" role="dialog">
       <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">

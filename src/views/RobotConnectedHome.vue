@@ -1,7 +1,7 @@
 <template>
   <div class="h-screen">
     <Loading v-if="!isConnected"></Loading>
-    <div class="modal" role="dialog" id="errorConnectionModal">
+    <div class="modal fade z-200" role="dialog" id="errorConnectionModal">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">

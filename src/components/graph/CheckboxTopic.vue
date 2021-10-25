@@ -13,9 +13,9 @@
           Set topic
         </button>
       </div>
-      <div class="modal fade" :id="topicModalId" role="dialog">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-          <div class="modal-content">
+      <div class="modal fade z-200" :id="topicModalId" role="dialog">
+        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable z-200">
+          <div class="modal-content z-200">
             <div class="modal-header">
               <h5 class="modal-title" id="exampleModalLongTitle">Choose Topic</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">

@@ -46,12 +46,12 @@
       <a class="dropdown-item cursor-pointer" @click="handleEditButton()">Edit</a>
       <a class="dropdown-item text-red cursor-pointer" @click="handleRemoveButton()">Remove</a>
     </div>
-    <div class="modal fade" :id="modalId" role="dialog">
+    <div class="modal fade z-200" :id="modalId" role="dialog">
       <div
         :class="{ 'modal-lg': editState, '': removeState }"
         class="modal-dialog modal-dialog-centered w-fit modal-dialog-scrollable"
       >
-        <div class="modal-content">
+        <div class="modal-content z-200">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLongTitle">
               {{ editState ? 'Edit button' : 'Remove button' }}
@@ -152,17 +152,16 @@ export default {
       let selectedId = 1;
       if (currentSelectedButton.length > 0) {
         let sortedButton = currentSelectedButton.sort((a, b) => a.selectedId - b.selectedId);
-        console.log('sortedButton', sortedButton);
         selectedId = sortedButton[currentSelectedButton.length - 1].selectedId + 1;
-        console.log('selectedId', selectedId);
       }
       // let currentButton = this.buttonInfo;
       let newButton = {
         buttonAction: this.buttonInfo.buttonAction,
         buttonId: this.buttonInfo.buttonId,
-        butttonMode: this.buttonInfo.buttonMode,
+        buttonMode: this.buttonInfo.buttonMode,
         buttonName: this.buttonInfo.buttonName,
         buttonStyle: this.buttonInfo.buttonStyle,
+        rateHz: this.buttonInfo.rateHz,
         robotId: this.buttonInfo.robotId,
       };
       newButton.selectedId = selectedId;
@@ -244,9 +243,6 @@ export default {
 
 .text-red {
   color: rgb(228, 57, 57) !important;
-}
-.dropdownRightButton {
-  /* position: static !important; */
 }
 
 .modal-backdrop {

@@ -21,7 +21,7 @@
         <div>
           {{
             selectedButton.buttonMode === 'Topic'
-              ? selectedButton.buttonAction.nodeAction / selectedButton.buttonAction.nodeType
+              ? selectedButton.buttonAction.nodeAction + '/' + selectedButton.buttonAction.nodeType
               : selectedButton.buttonAction.paramAction
           }}
           <!-- {{ selectedButton.buttonAction.nodeAction }}/{{ selectedButton.buttonAction.nodeType }} -->
@@ -128,6 +128,7 @@ export default {
       clikedButtonIdList: [],
       rosTopic: null,
       rosParam: null,
+      stopInterval: false,
     };
   },
   props: {
@@ -153,6 +154,7 @@ export default {
           this.clikedButtonIdList.push(button.selectedId);
         }
         if (button.buttonMode === 'Topic') {
+          console.log('Topic');
           this.rosTopic = new ROSLIB.Topic({
             ros: this.ros,
             name: button.buttonAction.topicName,
@@ -177,7 +179,19 @@ export default {
             });
           } else {
             const message = new ROSLIB.Message(button.buttonAction.variables);
-            this.rosTopic.publish(message);
+            this.stopInterval = false;
+            if (button.rateHz && button.rateHz !== undefined) {
+              const hzToMillisec = (1 / button.rateHz) * 1000;
+              var intervalTimer = setInterval(() => {
+                this.rosTopic.publish(message);
+                console.log(hzToMillisec);
+                if (this.stopInterval) {
+                  clearInterval(intervalTimer);
+                }
+              }, hzToMillisec);
+            } else {
+              this.rosTopic.publish(message);
+            }
           }
         } else {
           this.rosParam = new ROSLIB.Param({
@@ -191,6 +205,7 @@ export default {
       }
     },
     removeClickedButtonId(button) {
+      this.stopInterval = true;
       if (button.buttonMode === 'Topic') {
         if (button.buttonAction.nodeType === 'subscriber') {
           this.rosTopic.unsubscribe();

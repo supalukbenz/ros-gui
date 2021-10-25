@@ -50,4 +50,8 @@ html {
 .text-purple-custom {
   color: #3f13a6;
 }
+
+.z-200 {
+  z-index: 200;
+}
 </style>

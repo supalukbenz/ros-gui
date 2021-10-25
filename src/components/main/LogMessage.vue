@@ -14,7 +14,7 @@
         text-left
         font-mono
         text-sm
-        z-100
+        z-20
         overflow-y-scroll overflow-x-scroll
       "
       :class="[openLogMsg ? 'fade-in' : 'fade-out']"
@@ -77,8 +77,8 @@ export default {
   background: rgba(183, 194, 210, 0.69);
 }
 
-.z-100 {
-  z-index: 100;
+.z-20 {
+  z-index: 20;
 }
 
 .z-150 {

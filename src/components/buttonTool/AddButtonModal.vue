@@ -174,6 +174,13 @@
             :topic="topicSelected"
             :editedVariable="editedVariable"
           ></VariableNodeForm>
+          <div class="text-left">
+            <input type="checkbox" v-model="enableRateHz" id="rateCheckbox" />
+            <label class="form-check-label text-sm ml-2" for="rateCheckbox">Rate mode</label>
+            <div v-if="enableRateHz">
+              <input type="number" v-model="rateHz" class="border-b w-14 rounded text-center" /> Hz
+            </div>
+          </div>
         </div>
       </div>
       <div class="flex justify-start items-start flex-col mr-4 min-w-20" v-else>
@@ -383,7 +390,7 @@ export default {
       buttonName: '',
       widthButton: 120,
       bgButton: '#60A5FA',
-      textColorButton: '#2C3E50',
+      textColorButton: '#ffffff',
       editedVariable: null,
       heightButton: 48,
       msg: '',
@@ -398,6 +405,8 @@ export default {
       paramName: '',
       filteredInputParams: [],
       paramValue: '',
+      enableRateHz: false,
+      rateHz: null,
     };
   },
   created() {
@@ -555,49 +564,16 @@ export default {
               paramValue: this.paramValue,
               paramAction: this.paramAction,
             },
+            rateHz: null,
           };
+          if (this.enableRateHz && (this.rateHz || this.rateHz > 0)) {
+            btnForm.rateHz = this.rateHz;
+          }
           currentButtonList.push(btnForm);
         }
         this.$store.dispatch('updateCloseAddButtonModal', true);
         this.setEmptyButtonForm();
       } else {
-        // currentButtonList.map(b => {
-        //   if (b.buttonId === this.buttonInfo.buttonId) {
-        //     b.buttonAction.nodeType = this.nodeType;
-        //     b.buttonAction.nodeAction = this.nodeAction;
-        //     b.buttonAction.msgType = this.msg;
-        //     b.buttonAction.topicName = this.topicName;
-        //     b.buttonName = this.buttonName;
-        //     b.buttonStyle.width = this.widthButton;
-        //     b.buttonStyle.height = this.heightButton;
-        //     b.buttonStyle.bg = this.bgButton;
-        //     b.buttonStyle.color = this.textColorButton;
-        //     b.buttonMode = this.buttonMode;
-        //     if (this.variableList.length > 0) {
-        //       b.buttonAction.variables = variables;
-        //     }
-        //   }
-        //   return b;
-        // });
-        // let currentSelectedList = this.selectedButtonList;
-        // currentSelectedList.map(b => {
-        //   if (b.buttonId === this.buttonInfo.buttonId) {
-        //     b.buttonAction.nodeType = this.nodeType;
-        //     b.buttonAction.nodeAction = this.nodeAction;
-        //     b.buttonAction.msgType = this.msg;
-        //     b.buttonAction.topicName = this.topicName;
-        //     b.buttonName = this.buttonName;
-        //     b.buttonStyle.width = this.widthButton;
-        //     b.buttonStyle.height = this.heightButton;
-        //     b.buttonStyle.bg = this.bgButton;
-        //     b.buttonStyle.color = this.textColorButton;
-        //     b.buttonMode = this.buttonMode;
-        //     if (this.variableList.length > 0) {
-        //       b.buttonAction.variables = variables;
-        //     }
-        //   }
-        //   return b;
-        // });
         currentButtonList = this.setInputValue(currentButtonList, variables);
         let currentSelectedList = this.setInputValue(this.selectedButtonList, variables);
         this.$store.dispatch('updateCloseEditButtonModal', true);
@@ -616,12 +592,14 @@ export default {
       this.msg = '';
       this.widthButton = 120;
       this.bgButton = '#60A5FA';
-      this.textColorButton = '#2C3E50';
+      this.textColorButton = '#ffffff';
       this.heightButton = 48;
       this.filteredMsg = [];
       this.paramAction = 'Set';
       this.paramValue = '';
       this.paramName = '';
+      this.rateHz = null;
+      this.enableRateHz = false;
       this.buttonMode = 'Topic';
       this.$store.dispatch('updateVariableList', []);
     },
@@ -642,6 +620,7 @@ export default {
           b.buttonStyle.bg = this.bgButton;
           b.buttonStyle.color = this.textColorButton;
           b.buttonMode = this.buttonMode;
+          b.rateHz = this.rateHz;
           if (this.variableList.length > 0) {
             b.buttonAction.variables = variables;
           }
@@ -696,6 +675,10 @@ export default {
         this.paramAction = this.buttonInfo.buttonAction.paramAction;
         this.paramValue = this.buttonInfo.buttonAction.paramValue;
         this.paramName = this.buttonInfo.buttonAction.paramName;
+        this.rateHz = this.buttonInfo.rateHz;
+        if (this.rateHz) {
+          this.enableRateHz = true;
+        }
         this.keyVariableObject = Object.keys(this.buttonInfo.buttonAction.variables);
       } else {
         this.setEmptyButtonForm();

@@ -1,5 +1,7 @@
 <template>
-  <div class="h-20 bg-purple-custom flex items-center px-10 flex-row justify-between z-50 relative">
+  <div
+    class="h-20 bg-purple-custom flex items-center px-10 flex-row justify-between relative z-200"
+  >
     <router-link class="cursor-pointer" to="/">
       <div class="flex items-end relative">
         <img class="w-10 h-auto" src="@/assets/images/robot-icon.png" alt="robotIcon" />
@@ -135,6 +137,10 @@ export default {
 .bg-cloud {
   background: #dea01e;
   z-index: -1;
+}
+
+.z-200 {
+  z-index: 200;
 }
 
 .text-blue {

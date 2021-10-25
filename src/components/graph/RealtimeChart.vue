@@ -229,6 +229,7 @@ export default {
         }
         for (let topicName in this.topics) {
           this.topics[topicName].topic.subscribe(message => {
+            console.log('message', message);
             if (this.pause) {
               return;
             }
@@ -246,6 +247,7 @@ export default {
               for (let f in field) {
                 dataMsg = dataMsg[field[f]];
               }
+              console.log('dataMsg', dataMsg);
               const value = data.selection[i];
               if (data.arrayIndexTopic.length > 0) {
                 const topic = data.arrayIndexTopic.find(a => a.value === value);
