@@ -12,28 +12,28 @@
         <div class="ml-1 text-2xl text-white">GUI</div>
       </div>
     </router-link>
-    <div class="flex items-end" v-show="objectNotEmpty(robotConnected)">
-      <div
+    <div class="flex items-end" v-if="objectNotEmpty(robotConnected)">
+      <router-link
+        :to="{ name: 'Graph', params: { robotName: this.robotName } }"
         class="menu mr-4 text-xl text-white cursor-pointer"
         :class="{ 'selected-menu': pageName === 'Graph' }"
-        @click="changePage('Graph')"
       >
         Graph
-      </div>
-      <div
+      </router-link>
+      <router-link
+        :to="{ name: 'StreamingVideo', params: { robotName: this.robotName } }"
         class="menu mr-4 text-xl text-white cursor-pointer"
         :class="{ 'selected-menu': pageName === 'StreamingVideo' }"
-        @click="changePage('StreamingVideo')"
       >
         Streaming Video
-      </div>
-      <div
-        class="menu mr-4 text-xl text-white cursor-pointer"
+      </router-link>
+      <router-link
+        :to="{ name: 'CustomizeButton', params: { robotName: this.robotName } }"
         :class="{ 'selected-menu': pageName === 'CustomizeButton' }"
-        @click="changePage('CustomizeButton')"
+        class="menu mr-4 text-xl text-white cursor-pointer"
       >
         Customize Button
-      </div>
+      </router-link>
       <!-- <div class="menu mr-4 font-bold text-xl text-white cursor-pointer">Robot List</div> -->
       <div>
         <button
@@ -77,29 +77,28 @@ export default {
   computed: {
     ...mapGetters({
       robotConnected: 'getRobotConnected',
+      selectedButtonList: 'getSelectedButtonList',
       ros: 'getROS',
     }),
     pageName() {
       return this.$route.name;
     },
     robotName() {
-      return this.robotConnected.robotName;
+      return this.objectNotEmpty(this.robotConnected) ? this.robotConnected.robotName : '';
     },
   },
   methods: {
     objectNotEmpty(obj) {
       return Object.keys(obj).length !== 0;
     },
-    changePage(page) {
-      this.$router
-        .push({
-          name: page,
-          params: { robotName: this.robotName },
-        })
-        .catch(() => {});
-    },
     async handleRobotDisconnection() {
       const robotForm = this.robotConnected;
+      let currentSelectedButton = this.selectedButtonList;
+      currentSelectedButton.map(b => {
+        b.clickState = false;
+        return b;
+      });
+      this.$store.dispatch('updateSelectedButtonList', currentSelectedButton);
       try {
         this.ros.close();
         // await disconnectToRobot(robotForm);
@@ -151,6 +150,7 @@ export default {
   letter-spacing: 2px;
 }
 .menu {
+  text-decoration: none !important;
   border-bottom: 2px solid transparent;
 }
 .menu:hover {

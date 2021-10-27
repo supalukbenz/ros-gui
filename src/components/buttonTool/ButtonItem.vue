@@ -165,6 +165,7 @@ export default {
         robotId: this.buttonInfo.robotId,
       };
       newButton.selectedId = selectedId;
+      newButton.clickState = false;
       newButton.buttonPosition = {
         xPos: 0,
         yPos: 0,

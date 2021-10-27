@@ -27,4 +27,14 @@ async function runCommand(form) {
   return resInfo;
 }
 
-export { connectToRobot, disconnectToRobot, runCommand };
+async function closeCommand(form) {
+  console.log('form', form);
+  const response = await axios.post('close_command', form);
+  const resInfo = {
+    status: response.status,
+    data: response.data,
+  };
+  return resInfo;
+}
+
+export { connectToRobot, disconnectToRobot, runCommand, closeCommand };

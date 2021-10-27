@@ -3,11 +3,12 @@
     <div class="rounded-full border-2 flex flex-row mb-2 text-sm font-bold">
       <div
         class="
-          w-1/2
+          w-1/3
           flex
           justify-center
           border-r
           py-1
+          border
           rounded-l-full
           border-green-500
           cursor-pointer
@@ -19,11 +20,29 @@
         Topic
       </div>
       <div
-        class="w-1/2 flex justify-center py-1 rounded-r-full cursor-pointer hover:bg-green-600"
+        class="w-1/3 flex justify-center py-1 rounded-none cursor-pointer hover:bg-green-600 border"
         :class="[buttonMode === 'Param' ? 'bg-green-500 text-white' : 'bg-gray-400 text-gray-200']"
         @click="changeMode('Param')"
       >
         Param
+      </div>
+      <div
+        class="
+          w-1/3
+          flex
+          justify-center
+          py-1
+          rounded-r-full
+          cursor-pointer
+          hover:bg-green-600
+          border
+        "
+        :class="[
+          buttonMode === 'Command' ? 'bg-green-500 text-white' : 'bg-gray-400 text-gray-200',
+        ]"
+        @click="changeMode('Command')"
+      >
+        Command
       </div>
     </div>
     <div
@@ -183,7 +202,10 @@
           </div>
         </div>
       </div>
-      <div class="flex justify-start items-start flex-col mr-4 min-w-20" v-else>
+      <div
+        class="flex justify-start items-start flex-col mr-4 min-w-20"
+        v-if="buttonMode === 'Param'"
+      >
         <div class="grid grid-cols-2 w-full">
           <div class="text-left">
             <div class="form-check form-check-inline">
@@ -246,6 +268,13 @@
           class="border rounded w-full px-2 py-1"
           v-model="paramValue"
         />
+      </div>
+      <div
+        class="flex justify-start items-start flex-col mr-4 min-w-20"
+        v-if="buttonMode === 'Command'"
+      >
+        <div class="font-bold mt-2">Command</div>
+        <input type="text" class="border rounded w-full px-2 py-1" v-model="command" />
       </div>
       <div
         :class="[windowWidth < 992 ? 'mt-4' : 'w-72 pl-4']"
@@ -407,6 +436,7 @@ export default {
       paramValue: '',
       enableRateHz: false,
       rateHz: null,
+      command: '',
     };
   },
   created() {
@@ -536,8 +566,15 @@ export default {
           const sortedButton = currentButtonList.slice().sort((a, b) => a.buttonId - b.buttonId);
           id = sortedButton[currentButtonList.length - 1].buttonId + 1;
         }
-        const checkInput =
-          this.buttonMode === 'Topic' ? this.checkTopicInput() : this.checkParamInput();
+
+        let checkInput = false;
+        if (this.buttonMode === 'Topic') {
+          checkInput = this.checkTopicInput();
+        } else if (this.buttonMode === 'Param') {
+          checkInput = this.checkParamInput();
+        } else if (this.buttonMode === 'Command') {
+          checkInput = this.checkCommandInput();
+        }
 
         if (checkInput) {
           if (this.buttonName === '') {
@@ -563,6 +600,7 @@ export default {
               paramName: this.paramName,
               paramValue: this.paramValue,
               paramAction: this.paramAction,
+              command: this.command,
             },
             rateHz: null,
           };
@@ -621,6 +659,9 @@ export default {
           b.buttonStyle.color = this.textColorButton;
           b.buttonMode = this.buttonMode;
           b.rateHz = this.rateHz;
+          if (this.enableRateHz && (this.rateHz || this.rateHz > 0)) {
+            b.rateHz = this.rateHz;
+          }
           if (this.variableList.length > 0) {
             b.buttonAction.variables = variables;
           }
@@ -632,7 +673,7 @@ export default {
     handleSameName() {
       if (this.buttonMode === 'Topic') {
         this.buttonName = this.topicName;
-      } else {
+      } else if (this.buttonMode === 'Param') {
         this.buttonName = this.paramName;
         this.widthButton = 160;
       }
@@ -649,6 +690,9 @@ export default {
       return this.paramAction === 'Set'
         ? this.paramValue !== '' && this.paramName !== ''
         : this.paramName !== '';
+    },
+    checkCommandInput() {
+      return this.command !== '';
     },
     selectedMsgItem(item) {
       this.msg = item;
@@ -676,7 +720,7 @@ export default {
         this.paramValue = this.buttonInfo.buttonAction.paramValue;
         this.paramName = this.buttonInfo.buttonAction.paramName;
         this.rateHz = this.buttonInfo.rateHz;
-        if (this.rateHz) {
+        if (this.rateHz && this.rateHz !== undefined) {
           this.enableRateHz = true;
         }
         this.keyVariableObject = Object.keys(this.buttonInfo.buttonAction.variables);

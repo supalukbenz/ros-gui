@@ -30,6 +30,10 @@ html {
   height: 100%;
 }
 
+input {
+  color: #000000 !important;
+}
+
 #nav {
   padding: 30px;
 }

@@ -166,6 +166,7 @@ export default {
       closeModal: 'getCloseModal',
       msgList: 'getMsgList',
       topicList: 'getTopicList',
+      selectedButtonList: 'getSelectedButtonList',
     }),
   },
   components: {
@@ -294,6 +295,12 @@ export default {
       // }
     },
     resetROSInfo() {
+      let currentSelectedButton = this.selectedButtonList;
+      currentSelectedButton.map(b => {
+        b.clickState = false;
+        return b;
+      });
+      this.$store.dispatch('updateSelectedButtonList', currentSelectedButton);
       this.$store.dispatch('updateRobotConnected', {});
       this.$store.dispatch('updateRosbridgeURL', '');
       this.$store.dispatch('updateROS', null);
@@ -347,13 +354,6 @@ export default {
               responseCommandList.push(res);
               index++;
             }
-            // await Promise.all(
-            //   robot.commands.map(async command => {
-            //     robotSelectedInfo.command = command;
-            //     const res = await runCommand(robotSelectedInfo);
-            //     responseCommandList.push(res);
-            //   })
-            // );
           }
           this.$store.dispatch('updateRobotConnected', robot);
           const ws_address = `ws://${robot.ip}:${robot.port}`;

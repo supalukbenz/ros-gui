@@ -3,12 +3,6 @@ import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
-// function checkTypeObject(item) {
-//   if (typeof item === 'object') {
-//     return [];
-//   }
-// }
-
 export default new Vuex.Store({
   state: {
     ws_address: '',

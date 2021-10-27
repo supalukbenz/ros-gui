@@ -14,7 +14,7 @@
         text-left
         font-mono
         text-sm
-        z-20
+        z-50
         overflow-y-scroll overflow-x-scroll
       "
       :class="[openLogMsg ? 'fade-in' : 'fade-out']"
@@ -24,7 +24,7 @@
         {{ log.msg }}
       </div>
     </div>
-    <div @click="handleOpenLog()" class="z-150 fixed-button w-14 h-14 cursor-pointer">
+    <div @click="handleOpenLog()" class="z-150 fixed-button w-14 h-14 cursor-pointer opacity-50">
       <!-- <img src="@/assets/images/command-icon.png" /> -->
       <div class="absolute text-5xl text-blue-custom"><i class="fas fa-comment-alt"></i></div>
       <div class="absolute text-white pl-2 pt-2"><i class="fas fa-terminal"></i></div>
@@ -77,8 +77,8 @@ export default {
   background: rgba(183, 194, 210, 0.69);
 }
 
-.z-20 {
-  z-index: 20;
+.z-50 {
+  z-index: 50;
 }
 
 .z-150 {
