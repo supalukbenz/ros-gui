@@ -28,6 +28,12 @@ Before using this project, make sure that the robot has the following packages:
    - Install Linux Screen on Ubuntu and Debian
 
      ```sudo apt install screen```
+     
+4. **npm** is the default package manager for the JavaScript runtime environment Node.js.
+   - Install npm on PC you want to run the project on.  
+
+     ```sudo apt-get install nodejs-dev node-gyp libssl1.0-dev```
+     ```sudo apt-get install npm```
 
 ## Project installation
 
