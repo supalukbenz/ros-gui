@@ -370,7 +370,11 @@ export default {
             }
           }
           this.$store.dispatch('updateRobotConnected', robot);
-          const ws_address = `ws://${robot.ip}:${robot.port}`;
+          let ws_address = `ws://${robot.ip}:${robot.port}`;
+          if (process.env.NODE_ENV === 'production') {
+            console.log('production');
+            ws_address = `wss://${robot.ip}:${robot.port}`;
+          }
           this.$store.dispatch('updateRosbridgeURL', ws_address);
           // await this.connect(ws_address);
           this.responseMessage = 'Connected to the robot.';
