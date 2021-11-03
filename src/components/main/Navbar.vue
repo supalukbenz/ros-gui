@@ -24,14 +24,14 @@
     <div class="flex items-end" v-if="objectNotEmpty(robotConnected)">
       <router-link
         :to="{ name: 'Graph', params: { robotName: this.robotName } }"
-        class="menu mr-4 text-xl text-white cursor-pointer"
+        class="menu mr-4 text-xl text-purple-custom cursor-pointer"
         :class="{ 'selected-menu': pageName === 'Graph' }"
       >
         Graph
       </router-link>
       <router-link
         :to="{ name: 'StreamingVideo', params: { robotName: this.robotName } }"
-        class="menu mr-4 text-xl text-white cursor-pointer"
+        class="menu mr-4 text-xl text-purple-custom cursor-pointer"
         :class="{ 'selected-menu': pageName === 'StreamingVideo' }"
       >
         Streaming Video
@@ -39,7 +39,7 @@
       <router-link
         :to="{ name: 'CustomizeButton', params: { robotName: this.robotName } }"
         :class="{ 'selected-menu': pageName === 'CustomizeButton' }"
-        class="menu mr-4 text-xl text-white cursor-pointer"
+        class="menu mr-4 text-xl text-purple-custom cursor-pointer"
       >
         Customize Button
       </router-link>
@@ -169,6 +169,7 @@ export default {
 }
 .menu:hover {
   border-color: #dea01e;
+  color: #461e68;
 }
 
 .selected-menu {

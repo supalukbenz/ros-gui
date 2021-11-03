@@ -1,19 +1,19 @@
 <template>
-  <div id="app flex flex-col justify-between">
+  <div id="app">
     <Navbar></Navbar>
     <router-view />
-    <Footer></Footer>
+    <!-- <Footer></Footer> -->
   </div>
 </template>
 
 <script>
 import Navbar from '@/components/main/Navbar.vue';
-import Footer from '@/components/main/Footer.vue';
+// import Footer from '@/components/main/Footer.vue';
 
 export default {
   components: {
     Navbar,
-    Footer,
+    // Footer,
   },
 };
 </script>

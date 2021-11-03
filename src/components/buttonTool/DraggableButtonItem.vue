@@ -181,7 +181,9 @@ export default {
         tempObj = { ...tempObj };
         // tempObj = { value: obj.toString() };
       }
-      return tempObj;
+      if (!Array.isArray(obj)) {
+        return tempObj;
+      }
     },
     clickedState(selectedId) {
       return this.clikedButtonIdList.includes(selectedId);
