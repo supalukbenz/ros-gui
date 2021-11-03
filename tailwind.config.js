@@ -1,12 +1,6 @@
 module.exports = {
-  purge: {
-    enabled: process.env.NODE_ENV === 'production',
-    mode: 'all',
-    // content: ['./build/*.html', './build/**/*.html'],
-    // options: {
-    //   whitelist: [],
-    // },
-  },
+  purge: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
+  enabled: process.env.NODE_ENV === 'production',
   darkMode: false, // or 'media' or 'class'
   theme: {
     extend: {
