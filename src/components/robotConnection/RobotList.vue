@@ -1,10 +1,9 @@
 <template>
-  <div>
+  <div class="relative">
     <Loading v-if="loadingState"></Loading>
-    <div class="flex justify-end">
+    <div class="fixed w-full">
       <!-- <StatusCard :responseMessage="responseMessage" :errorState="errorState"></StatusCard> -->
       <div
-        v-show="responseMessage !== ''"
         :class="[
           errorState ? 'bg-red-300' : 'bg-green-300',
           responseMessage !== '' ? 'transformLeft' : 'fadeInOut',
@@ -13,26 +12,44 @@
         class="
           responseCard
           py-3
-          w-96
           text-left
-          rounded-tl-3xl rounded-bl-3xl
+          rounded-xl
           px-4
+          max-w-3xl
           absolute
+          right-0
+          opacity-90
           font-semibold
           z-10
           whitespace-pre-line
+          relative
+          flex flex-row
         "
         ref="resCard"
       >
+        <div class="absolute top-0 left-0">x</div>
         {{ responseMessage }}
       </div>
     </div>
-    <div class="m-10 flex justify-center">
+    <div class="px-14 py-6 flex justify-center max-w-screen-xl mx-auto">
       <div class="flex flex-col table-w">
         <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div class="flex justify-end text-md mb-1 font-semibold w-100">
+          <div class="flex justify-end text-md mb-4 font-semibold w-100">
             <div
-              class="cursor-pointer"
+              class="
+                cursor-pointer
+                text-center
+                tracking-wider
+                uppercase
+                text-sm
+                shadow
+                bg-yellow-btn
+                text-white
+                px-3
+                py-1
+                rounded-full
+                w-fit
+              "
               data-toggle="modal"
               data-target="#modal"
               @click="addRobotButton()"
@@ -74,9 +91,7 @@
                   >
                     Status
                   </th> -->
-                  <th scope="col" class="relative px-6 py-3 w-1/4">
-                    <span class="sr-only">Edit</span>
-                  </th>
+                  <th scope="col" class="relative w-1/4"></th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -104,7 +119,7 @@
                       <button
                         v-if="robot.id !== robotConnected.id"
                         @click="handleRobotConnection(robot)"
-                        class="p-2 w-24 bg-blue-500 text-white rounded font-bold hover:bg-blue-700"
+                        class="p-2 w-24 text-white rounded font-bold bg-purple-btn"
                       >
                         Connect
                       </button>
@@ -129,7 +144,7 @@
       <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle">
+            <h5 class="modal-title ml-6" id="exampleModalLongTitle">
               {{ editState ? 'Edit Robot' : 'Add Robot' }}
             </h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -265,7 +280,7 @@ export default {
         });
 
         this.ros.on('error', () => {
-          // this.responseMessage = 'Error connecting to websocket server';
+          this.responseMessage = 'Error connecting to websocket server';
           this.errorState = true;
           this.disconnect();
         });
@@ -323,11 +338,11 @@ export default {
       if (this.ros) {
         this.ros.close();
       }
-      this.responseMessage = '';
+      // this.responseMessage = '';
       this.disconnect();
     },
     async handleConnectionMessage() {
-      await this.sleep(5000);
+      await this.sleep(20000);
       this.responseMessage = '';
     },
     async handleRobotConnection(robot) {
@@ -390,9 +405,9 @@ export default {
 </script>
 
 <style scoped>
-.responseCard {
+/* .responseCard {
   transition: opacity 500ms ease 1000ms;
-}
+} */
 
 .fadeInOut {
   -webkit-animation: fadeinout 4s linear forwards;
@@ -451,7 +466,7 @@ export default {
     transform: translateX(0%);
   }
   100% {
-    transform: translateX(100%);
+    transform: translateX(20px);
   }
 }
 @-webkit-keyframes slide-out {
@@ -459,7 +474,7 @@ export default {
     -webkit-transform: translateX(0%);
   }
   100% {
-    -webkit-transform: translateX(100%);
+    -webkit-transform: translateX(20px);
   }
 }
 

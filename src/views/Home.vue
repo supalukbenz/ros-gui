@@ -1,8 +1,8 @@
 <template>
   <div
-    class="bg-cover bg-no-repeat background-size-100"
+    class="bg-cover bg-no-repeat"
     :style="{
-      backgroundImage: `url(${require('@/assets/images/vector-bg.webp')})`,
+      backgroundImage: `url(${require('@/assets/images/homepage_bg_2.webp')})`,
     }"
   >
     <RobotList></RobotList>

@@ -1,15 +1,24 @@
 <template>
   <div
-    class="h-20 bg-purple-custom flex items-center px-10 flex-row justify-between relative z-200"
+    class="
+      h-20
+      bg-white
+      flex
+      items-center
+      px-10
+      flex-row
+      justify-between
+      relative
+      z-200
+      border-t-custom
+    "
   >
     <router-link class="cursor-pointer" to="/">
       <div class="flex items-end relative">
-        <img class="w-10 h-auto" src="@/assets/images/robot-icon.png" alt="robotIcon" />
-        <!-- <div class="font-bold text-2xl text-blue">ROS</div>
-        <div class="text-2xl text-white">GUI</div> -->
-        <div class="absolute left-0 bg-cloud w-24 h-10"></div>
+        <img class="w-auto h-12" src="@/assets/images/vistec_logo.png" alt="robotIcon" />
+        <!-- <div class="absolute left-0 bg-cloud w-24 h-10"></div>
         <div class="ros-txt font-bold text-2xl text-white">ROS</div>
-        <div class="ml-1 text-2xl text-white">GUI</div>
+        <div class="ml-1 text-2xl text-white">GUI</div> -->
       </div>
     </router-link>
     <div class="flex items-end" v-if="objectNotEmpty(robotConnected)">
@@ -131,6 +140,11 @@ export default {
 .bg-purple-custom {
   background: #0e0055;
   /* background: #6c605b; */
+}
+
+.border-t-custom {
+  border-top-width: 10px;
+  border-color: #592583;
 }
 
 .bg-cloud {

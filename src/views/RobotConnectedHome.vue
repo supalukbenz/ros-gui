@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen">
+  <div class="h-screen max-w-screen-xl mx-auto">
     <Loading v-if="!isConnected"></Loading>
     <div class="modal fade z-200" role="dialog" id="errorConnectionModal">
       <div class="modal-dialog modal-dialog-centered">
