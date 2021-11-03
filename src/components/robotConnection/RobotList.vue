@@ -4,6 +4,7 @@
     <div class="fixed w-full">
       <!-- <StatusCard :responseMessage="responseMessage" :errorState="errorState"></StatusCard> -->
       <div
+        v-if="responseMessage !== ''"
         :class="[
           errorState ? 'bg-red-300' : 'bg-green-300',
           responseMessage !== '' ? 'transformLeft' : 'fadeInOut',
@@ -13,7 +14,7 @@
           responseCard
           py-3
           text-left
-          rounded-xl
+          rounded-tl-full rounded-bl-full
           px-4
           max-w-3xl
           absolute
@@ -22,12 +23,10 @@
           font-semibold
           z-10
           whitespace-pre-line
-          relative
-          flex flex-row
         "
         ref="resCard"
       >
-        <div class="absolute top-0 left-0">x</div>
+        <!-- <div class="absolute top-0 left-0">x</div> -->
         {{ responseMessage }}
       </div>
     </div>

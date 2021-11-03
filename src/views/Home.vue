@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-cover bg-no-repeat"
+    class="bg-cover bg-no-repeat min-h-100"
     :style="{
       backgroundImage: `url(${require('@/assets/images/homepage_bg_2.webp')})`,
     }"
@@ -24,5 +24,9 @@ export default {
 <style scoped>
 .background-size-100 {
   background-size: 100% 100%;
+}
+
+.min-h-100 {
+  min-height: 100vh;
 }
 </style>

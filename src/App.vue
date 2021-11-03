@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app flex flex-col justify-between">
     <Navbar></Navbar>
     <router-view />
     <Footer></Footer>
