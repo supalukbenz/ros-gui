@@ -93,4 +93,8 @@ input {
 .z-200 {
   z-index: 200;
 }
+
+.modal-backdrop {
+  z-index: 0 !important;
+}
 </style>
