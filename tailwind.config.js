@@ -2,10 +2,10 @@ module.exports = {
   purge: {
     enabled: process.env.NODE_ENV === 'production',
     mode: 'all',
-    content: ['./build/*.html', './build/**/*.html'],
-    options: {
-      whitelist: [],
-    },
+    // content: ['./build/*.html', './build/**/*.html'],
+    // options: {
+    //   whitelist: [],
+    // },
   },
   darkMode: false, // or 'media' or 'class'
   theme: {
