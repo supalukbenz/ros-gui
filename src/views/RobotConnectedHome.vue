@@ -209,7 +209,6 @@ export default {
       const req = new ROSLIB.ServiceRequest({
         type: msgName,
       });
-
       if (state === 'msgROS') {
         msgDetails.callService(req, result => {
           let currentMsgList = this.msgList;
@@ -310,7 +309,7 @@ export default {
       });
     },
     async getServicesROSInfo(data) {
-      const serviceDetail = new ROSLIB.Service({
+      let serviceDetail = new ROSLIB.Service({
         ros: this.ros,
         name: '/rosapi/service_request_details',
         serviceType: 'rosapi/ServiceRequestDetails',
@@ -319,16 +318,24 @@ export default {
         type: data,
       });
       serviceDetail.callService(req, result => {
+        console.log('serviceDetail req', req);
         let currentServiceList = this.serviceList;
         result.typedefs.forEach(data => {
           currentServiceList[data] = data;
           const parseTypedef = this.parseTypedef(result.typedefs);
           currentServiceList[data].request_info = parseTypedef;
         });
+        const parsedObj = JSON.parse(JSON.stringify(currentServiceList));
+        console.log('parsedObj', parsedObj);
       });
     },
     async loadData() {
-      await Promise.all([this.setTopicList(), this.setNodeList(), this.setParams()]);
+      await Promise.all([
+        this.setTopicList(),
+        this.setNodeList(),
+        this.setParams(),
+        this.setServices(),
+      ]);
       this.loadDataState = true;
     },
     filterROSTopic(topic) {

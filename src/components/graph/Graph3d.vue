@@ -35,7 +35,6 @@ import Highcharts from 'highcharts';
 //     };
 //   }),
 // });
-
 export default {
   components: {
     // VueHighcharts,
@@ -121,12 +120,8 @@ export default {
           accessibility: {
             exposeAsGroupOnly: true,
           },
-          data: [
-            [-5, 0, 1],
-            [-2, 9, 1],
-            [2, 3, 4],
-            [1, 3, 4],
-          ],
+          lineWidth: 2,
+          data: [[0, 0, 0]],
         },
       ],
     });
@@ -139,18 +134,32 @@ export default {
       //   },
       //   true
       // );
-      if (Array.isArray(data)) {
-        this.chart.addSeries({
-          data: data,
-        });
-      }
+
+      // data.forEach(element => {
+      //   this.chart.series[0].setData(element, false);
+      // });
+      console.log('data', data);
+      this.chart.series[0].setData(data);
+      // this.chart.redraw();
     },
   },
   watch: {
-    scatterDataSetList(val) {
-      if (this.selectedScatterTopic.length === val.length) {
-        this.renderScatterChart(val);
-      }
+    // scatterDataSetList(val) {
+    //   if (this.selectedScatterTopic.length > 0) {
+    //     this.renderScatterChart(val);
+    //   } else {
+    //     this.renderScatterChart([[0, 0, 0]]);
+    //   }
+    // },
+    selectedScatterTopic: {
+      handler(data) {
+        if (data.length > 0) {
+          this.renderScatterChart(data);
+        } else {
+          this.renderScatterChart([[0, 0, 0]]);
+        }
+      },
+      deep: true,
     },
   },
 };

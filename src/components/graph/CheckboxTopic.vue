@@ -13,27 +13,31 @@
           Set topic
         </button>
       </div>
-      <div class="modal fade z-200" :id="topicModalId" role="dialog">
-        <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable z-200">
-          <div class="modal-content z-200">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLongTitle">Choose Topic</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <TopicListModal :graphState="graphState" v-if="addTopicState"></TopicListModal>
-              <div
-                v-else
-                class="spinner-border text-blue-300"
-                style="width: 2rem; height: 2rem"
-                role="status"
-              ></div>
-              <!-- <Loading v-if="loadingState"></Loading> -->
-            </div>
-            <div class="modal-footer"></div>
+    </div>
+    <div class="modal fade" :id="topicModalId" data-keyboard="false" data-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Choose Topic</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
+          <div class="modal-body">
+            <TopicListModal
+              class="px-5"
+              :graphState="graphState"
+              v-if="addTopicState"
+            ></TopicListModal>
+            <div
+              v-else
+              class="spinner-border text-blue-300"
+              style="width: 2rem; height: 2rem"
+              role="status"
+            ></div>
+            <!-- <Loading v-if="loadingState"></Loading> -->
+          </div>
+          <div class="modal-footer"></div>
         </div>
       </div>
     </div>
@@ -208,3 +212,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.modal-body {
+  max-height: 30rem;
+}
+</style>

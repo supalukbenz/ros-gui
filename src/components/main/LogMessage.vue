@@ -2,7 +2,7 @@
   <div>
     <div
       id="logContainer"
-      v-show="openLogMsg"
+      v-show="showLog"
       class="
         bg-log-custom
         max-w
@@ -17,7 +17,7 @@
         z-50
         overflow-y-scroll overflow-x-scroll
       "
-      :class="[openLogMsg ? 'fade-in' : 'fade-out']"
+      :class="[showLog ? 'fade-in' : 'fade-out']"
     >
       <div v-for="(log, index) in logMsg" :key="index">
         <span>[{{ log.dateString }}]</span><span class="font-bold"> {{ log.name }}:</span>
@@ -39,16 +39,11 @@ export default {
   computed: {
     ...mapGetters({
       logMsg: 'getLogMessage',
+      showLog: 'getShowLogMessage',
     }),
     logMsgLength() {
       return this.logMsg.length;
     },
-  },
-  data() {
-    return {
-      // logMsg: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-      openLogMsg: true,
-    };
   },
   mounted() {
     this.scrollToDown();
@@ -59,7 +54,7 @@ export default {
       logBody.scrollTop = logBody.scrollHeight;
     },
     handleOpenLog() {
-      this.openLogMsg = !this.openLogMsg;
+      this.$store.dispatch('updateShowLogMessage', !this.showLog);
     },
   },
   watch: {

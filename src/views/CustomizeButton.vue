@@ -1,7 +1,7 @@
 <template>
   <div class="h-full w-auto relative">
     <div
-      class="z-40 bg-white border border-l w-52 rounded overflow-y-scroll mb-3 absolute"
+      class="bg-white border border-l w-52 rounded overflow-y-scroll mb-3 absolute"
       :class="[showButtonList ? 'h-80' : 'h-auto']"
     >
       <div class="px-3 py-2 flex flex-row items-center justify-between rounded-lg buttonListMenu">
@@ -22,7 +22,7 @@
         </button>
       </div>
       <div
-        class="absolute w-full z-40 buttonListMenu"
+        class="absolute w-full buttonListMenu"
         v-if="showButtonList"
         :class="[showButtonList ? 'fade-out' : 'fade-in']"
       >
@@ -81,7 +81,7 @@
           @click="handleChangePosition()"
           :class="[moveState ? 'bg-clicked-btn' : 'bg-button-move']"
           type="button"
-          class="border-purple-custom shadow rounded-full w-10 h-10 z-40"
+          class="border-purple-custom shadow rounded-full w-10 h-10"
         >
           <span v-show="!moveState"><i class="fas fa-arrows-alt"></i></span>
           <span v-show="moveState"><i class="fas fa-save"></i></span>
@@ -89,7 +89,7 @@
       </div>
     </div>
     <!-- <SideBar></SideBar> -->
-    <div class="flex flex-row w-full h-full relative mt-20">
+    <div class="flex flex-row w-full h-full relative mt-20 -z-1">
       <div
         class="shadow w-full h-custom rounded-lg bg-board overflow-auto flex relative inset-custom"
         ref="parent"
@@ -340,8 +340,8 @@ export default {
 .border .bg-board {
   background: #f0f0f0;
 }
-.z-40 {
-  z-index: 40;
+.-z-1 {
+  z-index: -1;
 }
 
 .z-20 {
@@ -391,6 +391,7 @@ export default {
 
 .bg-container {
   background-size: 75px 75px;
+  z-index: -1;
   background-image: linear-gradient(
       0deg,
       transparent 24%,

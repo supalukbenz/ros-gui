@@ -89,6 +89,7 @@ export default {
                 // },
                 callback: value => {
                   let num = this.addUnitToNum(value);
+                  // console.log('value', num);
                   return num;
                 },
               },

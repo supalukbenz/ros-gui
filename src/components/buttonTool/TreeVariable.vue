@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for="(key, index) in keyVariableObject" :key="index" class="text-left flex flex-col">
+    <div v-for="(key, index) in keyVariableObject()" :key="index" class="text-left flex flex-col">
       <div class="" v-if="typeof keyObj[key] === 'object'">
         <div :style="{ marginLeft: depth + 'px' }" class="text-muted text-sm">{{ key }}/</div>
         <tree-variable :keyObj="keyObj[key]" :depth="depth + 10"></tree-variable>
@@ -24,9 +24,14 @@ export default {
     keyObj: Object,
     depth: Number,
   },
-  computed: {
+  computed: {},
+  methods: {
     keyVariableObject() {
-      return Object.keys(this.keyObj);
+      if (typeof this.keyObj === 'object' && !Array.isArray(this.keyObj) && this.keyObj !== null) {
+        return Object.keys(this.keyObj);
+      } else {
+        console.log(this.keyObj);
+      }
     },
   },
 };

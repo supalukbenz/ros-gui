@@ -164,6 +164,7 @@ export default {
     return {
       clikedButtonIdList: [],
       rosTopic: null,
+      rosService: null,
       rosParam: null,
       stopInterval: false,
       responseCommandList: [],
@@ -181,50 +182,60 @@ export default {
         tempObj = { ...tempObj };
         // tempObj = { value: obj.toString() };
       }
-      if (!Array.isArray(obj)) {
-        return tempObj;
-      }
+
+      return tempObj;
     },
     clickedState(selectedId) {
       return this.clikedButtonIdList.includes(selectedId);
     },
     async handleButtonAction(button) {
       if (button.buttonMode === 'Topic') {
-        this.rosTopic = new ROSLIB.Topic({
-          ros: this.ros,
-          name: button.buttonAction.topicName,
-          messageType: button.buttonAction.msgType,
-        });
-        if (button.buttonAction.nodeType === 'subscriber') {
-          $(`#${this.tooltipVariableId}`).addClass('element-visible');
-          let currentButtonList = this.buttonList;
-          let currentSelectedList = this.selectedButtonList;
-          const indexButtonList = currentButtonList.findIndex(r => r.buttonId === button.buttonId);
-          const indexSelectedList = currentSelectedList.findIndex(
-            r => r.buttonId === button.buttonId
-          );
-          this.rosTopic.subscribe(message => {
-            this.subscribeInput = message;
-            currentButtonList[indexButtonList].buttonAction.variables = message;
-            currentSelectedList[indexSelectedList].buttonAction.variables = message;
-            this.$store.dispatch('updateButtonList', currentButtonList);
-            this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
+        if (button.buttonAction.nodeAction === 'topic') {
+          this.rosTopic = new ROSLIB.Topic({
+            ros: this.ros,
+            name: button.buttonAction.topicName,
+            messageType: button.buttonAction.msgType,
           });
-        } else {
-          const message = new ROSLIB.Message(button.buttonAction.variables);
-          this.stopInterval = false;
-          if (button.rateHz && button.rateHz !== undefined) {
-            const hzToMillisec = (1 / button.rateHz) * 1000;
-            var intervalTimer = setInterval(() => {
-              this.rosTopic.publish(message);
-              console.log(hzToMillisec);
-              if (this.stopInterval) {
-                clearInterval(intervalTimer);
-              }
-            }, hzToMillisec);
+          if (button.buttonAction.nodeType === 'subscriber') {
+            $(`#${this.tooltipVariableId}`).addClass('element-visible');
+            let currentButtonList = this.buttonList;
+            let currentSelectedList = this.selectedButtonList;
+            const indexButtonList = currentButtonList.findIndex(
+              r => r.buttonId === button.buttonId
+            );
+            const indexSelectedList = currentSelectedList.findIndex(
+              r => r.buttonId === button.buttonId
+            );
+            this.rosTopic.subscribe(message => {
+              this.subscribeInput = message;
+              currentButtonList[indexButtonList].buttonAction.variables = message;
+              currentSelectedList[indexSelectedList].buttonAction.variables = message;
+              this.$store.dispatch('updateButtonList', currentButtonList);
+              this.$store.dispatch('updateSelectedButtonList', currentSelectedList);
+            });
           } else {
-            this.rosTopic.publish(message);
+            const message = new ROSLIB.Message(button.buttonAction.variables);
+            this.stopInterval = false;
+            if (button.rateHz && button.rateHz !== undefined) {
+              const hzToMillisec = (1 / button.rateHz) * 1000;
+              var intervalTimer = setInterval(() => {
+                this.rosTopic.publish(message);
+                console.log(hzToMillisec);
+                if (this.stopInterval) {
+                  clearInterval(intervalTimer);
+                }
+              }, hzToMillisec);
+            } else {
+              this.rosTopic.publish(message);
+            }
           }
+        } else {
+          // console.log('service');
+          // this.rosService = new ROSLIB.Topic({
+          //   ros: this.ros,
+          //   name: button.buttonAction.topicName,
+          //   messageType: button.buttonAction.msgType,
+          // });
         }
       } else if (button.buttonMode === 'Param') {
         this.rosParam = new ROSLIB.Param({

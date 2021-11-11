@@ -376,7 +376,7 @@ export default {
             ws_address = `wss://${robot.ip}:${robot.port}`;
           }
           this.$store.dispatch('updateRosbridgeURL', ws_address);
-          // await this.connect(ws_address);
+          await this.connect(ws_address);
           this.responseMessage = 'Connected to the robot.';
           this.$router.push({
             name: 'Graph',

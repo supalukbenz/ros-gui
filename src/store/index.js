@@ -23,6 +23,10 @@ export default new Vuex.Store({
     variableList: [],
     buttonList: JSON.parse(localStorage.getItem('buttonList')) || [],
     selectedButtonList: JSON.parse(localStorage.getItem('selectedButtonList')) || [],
+    showLogMessage:
+      JSON.parse(localStorage.getItem('showLog')) !== null
+        ? JSON.parse(localStorage.getItem('showLog'))
+        : true,
     data: {
       selection: [],
       source: [],
@@ -107,6 +111,9 @@ export default new Vuex.Store({
     getLineGraphCloseModal: state => {
       return state.lineGraphCloseModal;
     },
+    getShowLogMessage: state => {
+      return state.showLogMessage;
+    },
   },
   mutations: {
     setWSAddress(state, payload) {
@@ -190,6 +197,10 @@ export default new Vuex.Store({
     setLineGraphCloseModal(state, payload) {
       state.lineGraphCloseModal = payload;
     },
+    setShowLogMessage(state, payload) {
+      state.showLogMessage = payload;
+      localStorage.setItem('showLog', JSON.stringify(payload));
+    },
   },
   actions: {
     updateWSAddress({ commit }, payload) {
@@ -260,6 +271,9 @@ export default new Vuex.Store({
     },
     updateLineGraphCloseModal({ commit }, payload) {
       commit('setLineGraphCloseModal', payload);
+    },
+    updateShowLogMessage({ commit }, payload) {
+      commit('setShowLogMessage', payload);
     },
   },
   modules: {},

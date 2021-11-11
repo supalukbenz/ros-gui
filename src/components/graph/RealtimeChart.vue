@@ -56,7 +56,7 @@
       </div>
     </div>
     <div v-if="graphType === 'ScatterPlot'">
-      <Graph3d :scatterDataSetList="scatterDataSetList"></Graph3d>
+      <Graph3d :scatterDataSetList="plots"></Graph3d>
     </div>
   </div>
 </template>
@@ -112,11 +112,19 @@ export default {
       pause: false,
       useMsgTimeStamp: false,
       renderGraph: false,
+      render3DGraph: false,
       graph3dconnected: false,
+      interval: null,
       topicScatter: {},
       scatterDataSetList: [],
       framerate: 30,
       expandFramerate: false,
+      plot: {
+        plotX: '',
+        plotY: '',
+        plotZ: '',
+      },
+      plots: [],
       slider: {
         lineHeight: 7,
         processStyle: {
@@ -220,25 +228,26 @@ export default {
         if (!node['children']) {
           let nodeValue = node.value;
           if (data.arrayIndexTopic.length > 0) {
-            const topic = data.arrayIndexTopic.find(a => a.value === nodeValue);
-            if (topic !== undefined) {
-              nodeValue = `${topic.value}/${topic.index}`;
+            // const topic = data.arrayIndexTopic.find(a => a.value === nodeValue);
+            for (let indexTopic of data.arrayIndexTopic) {
+              if (indexTopic !== undefined) {
+                nodeValue = `${indexTopic.value}/${indexTopic.index}`;
+                await this.addLine(nodeValue, rootNode.value, rootNode.type);
+              }
             }
+            // if (topic !== undefined) {
+            //   nodeValue = `${topic.value}/${topic.index}`;
+            // }
+          } else {
+            await this.addLine(nodeValue, rootNode.value, rootNode.type);
           }
-          await this.addLine(nodeValue, rootNode.value, rootNode.type);
         }
         for (let topicName in this.topics) {
           this.topics[topicName].topic.subscribe(message => {
-            console.log('message', message);
             if (this.pause) {
               return;
             }
-            let time = Date.now();
-            if (message['header'] && message['header']['stamp']) {
-              time = Math.round(
-                message.header.stamp.secs * 1000 + message.header.stamp.nsecs / 1e6
-              );
-            }
+            // let time = Date.now();
             let lines = this.topics[topicName].lines;
             for (let l in lines) {
               const fieldName = lines[l].substr(topicName.length + 1, lines[l].length);
@@ -247,10 +256,11 @@ export default {
               for (let f in field) {
                 dataMsg = dataMsg[field[f]];
               }
-              console.log('dataMsg', dataMsg);
-              const value = data.selection[i];
+              // const value = data.selection[i];
+
               if (data.arrayIndexTopic.length > 0) {
-                const topic = data.arrayIndexTopic.find(a => a.value === value);
+                const topic = data.arrayIndexTopic.find(a => `${a.value}/${a.index}` === lines[l]);
+
                 if (topic !== undefined) {
                   if (Array.isArray(dataMsg)) {
                     if (dataMsg.length < topic.index) {
@@ -261,22 +271,15 @@ export default {
               }
               if (Array.isArray(dataMsg)) {
                 lines.splice(l, 1);
+                console.log('Array.isArray');
               }
               if (!this.isNumeric(dataMsg)) {
+                console.log('this.isNumeric(dataMsg)');
                 return;
               } else {
                 // dataMsg = Number(dataMsg.toLocaleString('fullwide', { useGrouping: false }));
               }
-
-              this.data.datasets.forEach(dataset => {
-                if (dataset['label'] === lines[l]) {
-                  dataset.data.push({
-                    x: time,
-                    y: dataMsg,
-                  });
-                  return;
-                }
-              });
+              this.addLabelDataToLineChart(lines[l], dataMsg);
             }
           });
         }
@@ -285,28 +288,63 @@ export default {
         this.renderGraph = true;
       }
     },
-    async updateScatterPlot(data) {
-      let plot = [];
-      for (let i in data.selection) {
-        const node = this.getNode(data.selection[i], data.source);
-        const rootNode = this.getNode(node.root, data.source);
-        let topic = await this.addPlot(node.value, rootNode.value, rootNode.type);
-        const fieldName = data.selection[i].substr(
-          rootNode.value.length + 1,
-          data.selection[i].length
-        );
-        await topic.subscribe(async message => {
-          let fieldValue = await message[fieldName];
-          plot.push(fieldValue);
-          topic.unsubscribe();
-        });
-      }
-      return plot;
+    addLabelDataToLineChart(line, dataMsg) {
+      let time = Date.now();
+      this.data.datasets.forEach(dataset => {
+        if (dataset['label'] === line) {
+          dataset.data.push({
+            x: time,
+            y: dataMsg,
+          });
+          return;
+        }
+      });
+    },
+    async updateScatterPlot(data, coordinate) {
+      const node = this.getNode(data.selection, data.source);
+      const rootNode = this.getNode(node.root, data.source);
+      let topic = await this.addPlot(node.value, rootNode.value, rootNode.type);
+      const fieldName = data.selection.substr(rootNode.value.length + 1, data.selection.length);
+
+      await topic.subscribe(async message => {
+        console.log('message', message);
+        const field = fieldName.split('/');
+        let fieldValue = message;
+        for (let f in field) {
+          fieldValue = fieldValue[field[f]];
+        }
+        console.log('fieldValue', fieldValue);
+        // let fieldValue = await message[fieldName];
+
+        fieldValue = isNaN(Number(fieldValue)) ? 0 : Number(fieldValue);
+        fieldValue = typeof fieldValue === 'string' ? 0 : Number(fieldValue);
+
+        if (coordinate === 'x') {
+          this.plot.plotX = this.detectNumberMessage(fieldValue);
+          console.log('x: fieldValue', fieldValue);
+        }
+        if (coordinate === 'y') {
+          this.plot.plotY = this.detectNumberMessage(fieldValue);
+          console.log('y: fieldValue', fieldValue);
+        }
+        if (coordinate === 'z') {
+          this.plot.plotZ = this.detectNumberMessage(fieldValue);
+          console.log('z: fieldValue', fieldValue);
+        }
+
+        this.plots.push([this.plot.plotX, this.plot.plotY, this.plot.plotZ]);
+        // if (!this.render3DGraph) {
+        topic.unsubscribe();
+        // }
+      });
     },
     async reconnectROS() {
       this.ros = await new ROSLIB.Ros({
         url: this.rosbridgeURL,
       });
+    },
+    detectNumberMessage(val) {
+      return typeof val === 'string' && isNaN(Number(val)) ? 0 : Number(val);
     },
     async addPlot(plot, topicName, topicType) {
       await this.reconnectROS();
@@ -370,33 +408,41 @@ export default {
         this.updateLineChart(this.dataTopic);
       }
     },
-    // dataSelectionLength() {
-    //   this.renderGraph = false;
-    //   this.updateLineChart(this.dataTopic);
-    // },
     selectedScatterTopic: {
       async handler(data) {
-        const dataScatter = {
-          source: this.dataTopic.source,
-          selection: data,
-        };
-        // if (val <= 0) {
-        // this.topicScatter = {};
-        // }
-        let interval;
+        // let interval;
         if (data.length <= 0) {
-          clearInterval(interval);
+          clearInterval(this.interval);
+          this.plots = [];
+          this.render3DGraph = false;
+        } else {
+          this.interval = setInterval(async () => {
+            this.render3DGraph = true;
+            await this.updateScatterPlot(
+              {
+                source: this.dataTopic.source,
+                selection: data[0],
+              },
+              'x'
+            );
+            await this.updateScatterPlot(
+              {
+                source: this.dataTopic.source,
+                selection: data[1],
+              },
+              'y'
+            );
+            await this.updateScatterPlot(
+              {
+                source: this.dataTopic.source,
+                selection: data[2],
+              },
+              'z'
+            );
+          }, 1000);
         }
-        interval = setInterval(async () => {
-          const scatterDataSet = await this.updateScatterPlot(dataScatter);
-          this.scatterDataSetList.push(scatterDataSet);
-          // this.scatterDataSet = [];
-        }, 4000);
       },
       deep: true,
-    },
-    selectedScatterTopicLength() {
-      // console.log('this.selectedScatterTopic', this.selectedScatterTopic);
     },
   },
 };

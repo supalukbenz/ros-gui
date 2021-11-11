@@ -94,7 +94,10 @@ input {
   z-index: 200;
 }
 
-.modal-backdrop {
+/* .modal-backdrop {
   z-index: 0 !important;
+} */
+.modal-backdrop {
+  position: relative;
 }
 </style>

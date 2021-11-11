@@ -4,8 +4,8 @@
       <CheckboxTopic graphState="LineChart"></CheckboxTopic>
       <RealtimeChart graphType="Line" class="mb-10"></RealtimeChart>
       <hr />
-      <!-- <CheckboxTopic graphState="Graph3d" class="mt-10"></CheckboxTopic>
-      <RealtimeChart graphType="ScatterPlot" class="mb-10"></RealtimeChart> -->
+      <CheckboxTopic graphState="Graph3d" class="mt-10"></CheckboxTopic>
+      <RealtimeChart graphType="ScatterPlot" class="mb-10"></RealtimeChart>
     </div>
   </div>
 </template>
